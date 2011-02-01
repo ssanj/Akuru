@@ -57,12 +57,23 @@ object AkuruMain extends Tools {
   }
 
   def main(args: Array[String]) {
-    workOnBlog[Unit]{
-      Blog(title = "Lessons learned", labels = Seq("work", "movement"))
-    }{(c, d) => doSave(d)(c.col)}.fold(l => println("error ->" + l), r => println("success"))
+    val blog = Blog(title = "Lessons learned", labels = Seq("work", "movement"))
+    workOnBlog[Unit](blog){
+      (c, d) => doSave(d)(c.col)
+    }.right.flatMap{r =>
+      reduce(blog.labels.map(l => workOnLabel[Unit](Label(value = l)){ (c,d) => doSave(d)(c.col) })).toLeft({})
+    }.fold(l => println("error ->" + l), r => println("success"))
   }
 
-//  def workOnBlog[R]: (=> Blog) => ((Connection, Blog) => R) => Either[String, R] = doWork[Blog, R](onAkuru("blog"))
+  def reduce(seq:Seq[Either[String, Unit]]): Option[String] = {
+      seq.filter(e => e.isLeft) match {
+        case Seq() => None
+        case Seq(Left(error)) => Some(error)
+        case s @ Seq(Left(e1), Left(_)) => stringToOption(s.tail.foldLeft(e1)((a, b) => a + ("\n" + b.left.get)))
+        case x @ _ => Some("Unexpected match ->  " + x)
+      }
+  }
+
   def workOnBlog[R] = workOnDomain[R, Blog]("blog")
 
   def workOnLabel[R] = workOnDomain[R, Label]("label")
