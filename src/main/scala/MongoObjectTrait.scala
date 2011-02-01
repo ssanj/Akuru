@@ -43,6 +43,12 @@ trait MongoObjectTrait {
       dbo.put(key, list)
     }
 
+    def putArray2[T](key:String, values:Seq[T]) {
+      import scala.collection.JavaConversions._
+      val list:java.util.List[T] = values
+      dbo.put(key, list)
+    }
+
     def toDBObject: DBObject = dbo
   }
 

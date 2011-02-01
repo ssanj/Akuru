@@ -8,10 +8,14 @@ import com.mongodb.{DBCollection}
 import MongoTypes._
 import scala.{Either}
 
-trait MongoCollectionTrait {
+trait MongoCollectionTrait extends Tools {
 
   //TODO:Once all methods ar tested remove dbc and replace with newdbc.
   case class MongoCollection(dbc:DBCollection, newdbc:DBCollectionTrait) {
+
+    import _root_.akuru.AkuruMain.{DomainObject, Versioned}
+    import com.mongodb.WriteResult
+    import org.bson.types.ObjectId
 
     def findOne[T](mo:MongoObject)(implicit con:MongoConverter[T]): Either[MongoError, Option[T]] = {
       wrapWith{ newdbc.findOne(mo.toDBObject).map(con.convert(_)) }
@@ -33,6 +37,41 @@ trait MongoCollectionTrait {
     }
 
     def save[T](value:T)(implicit mc:MongoConverter[T]): Either[MongoError, Unit] =  save(mc.convert(value))
+
+    def save2[T <: DomainObject[T]](domain: => T)(implicit con:T => MongoObject): Either[String, Unit] = {
+        import MongoWriteResult._
+        runSafelyWithEither{
+          dbc.save(con(domain))
+        } match {
+          case Left(msg) => Left(msg)
+          case Right(wr) => wr.getMongoError.map(_.message).toLeft({})
+        }
+    }
+
+//    def save2[T <: DomainObject[T]](f: T)(implicit con:T => MongoObject, blah:WriteResult => MongoWriteResult, con2: MongoObject => T): Either[MongoError, T] = {
+//      import MongoObject._
+//      println("called")
+//      if (f.id.isDefined) {
+//          val find = mongoObject("_id" -> toObjectId(f.id), "version" -> f.version)
+//          val update = con(f.createUpdatedVersion)
+//          println("called1")
+//          findAndModify2(find , empty, update)
+//      }
+//      else {
+//        println("called2")
+//          runSafelyWithEitherCustomError[MongoError, MongoWriteResult]{ dbc.save(con(f)) }{e => MongoError(e.getMessage, e.getStackTraceString)}.
+//                  fold(l => Left(l), r => r.getMongoError match {
+//            case None => Right(f)
+//            case error @ Some(me) => error.toLeft(f)
+//          })
+//      }
+//    }
+
+    def someSave[T <: DomainObject[T], R](f:(MongoCollection, MongoObject) => R)(t:T)(col:() => MongoCollection)(implicit con:T => MongoObject): Either[String, R] = {
+      runSafelyWithEither{
+        f(col.apply, con(t))
+      }
+    }
 
     def update(query:MongoObject, upate:MongoObject, upsert:Boolean):Either[MongoError, Unit] = {
       import MongoTypes.MongoWriteResult._

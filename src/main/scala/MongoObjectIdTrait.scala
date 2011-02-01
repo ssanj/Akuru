@@ -14,6 +14,8 @@ trait MongoObjectIdTrait {
 
   object MongoObjectId {
     implicit def objectIdToMongoObjectId(id:ObjectId): MongoObjectId = MongoObjectId(id)
+
+    implicit def stringToMongoObjectId(id:String): MongoObjectId = MongoObjectId(new ObjectId(id))
   }
 
 }
