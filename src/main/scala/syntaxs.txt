@@ -12,3 +12,9 @@
 
   //save { blog :: labelSeq map (Lable(value = _)) }
   //update { {"date" -> currentDateAsTime} {push ("spend", createSpends)} true}
+
+
+    val result = (withAkuru on(save(blog) _) on("label", labelSeq map (l => save(Label(value = l)) _)) run) getOrElse("success >>")
+
+
+withAkuru -> { save(blog) } ->> { labelList.map(l => save(Label(value = l)) _) } -> { save(Admin("") }
