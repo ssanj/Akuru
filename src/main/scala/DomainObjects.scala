@@ -43,6 +43,17 @@ trait DomainObjects  {
         mo
     }
   }
+
+  trait CollectionName[T] {
+    val name:String
+  }
+
+  implicit object BlogCollection extends CollectionName[Blog] {
+    override val name = "blog"
+  }
+
+  implicit object LabelCollection extends CollectionName[Label] {
+    override val name = "label"
+  }
 }
 
-object DomainObjects extends DomainObjects

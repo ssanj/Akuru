@@ -26,7 +26,7 @@ object AkuruMain extends DomainObjects with Tools with SideEffects {
 
   def createServer = () => new MongoServer
 
-  def save[T <% MongoObject](f:  => T)(col:MongoCollection):Option[String] = { col.save3(f) }
+  def save[T <% MongoObject : CollectionName](f:  => T)(col:MongoCollection):Option[String] = { col.save3(f) }
 
   type UserFunction = MongoCollection => Option[String]
 
