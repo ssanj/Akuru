@@ -1,0 +1,14 @@
+  // fc = fc.add("blog"){ save(blog) }
+  // fc = labels foldLeft(fc) {(a,b) => fc.add("label")(save(Label(l)) }
+  // fc.add("spendii")(find ("date" -> currentDateAsTime) delete)
+  // fc.run
+
+  //"title" -> "blah", "labels" -> "aa" :: "bb" :: Nil
+
+  //onCol("blog") save (createDS)
+  //onCol("") find ("date" -> currentDateAsTime) delete showError or printSuccess
+  //onCol("") find ("date" -> currentDateAsTime) pushOnto("spends" -> createSpend(description, cost.toDouble, label)) createIfNotFound showError or printSuccess
+  //onCol("") find ("date" -> currentDateAsTime) replaceWith(createDS(description, cost.toDouble, label)) createIfNotFound showError or printSuccess
+
+  //save { blog :: labelSeq map (Lable(value = _)) }
+  //update { {"date" -> currentDateAsTime} {push ("spend", createSpends)} true}
