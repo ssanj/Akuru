@@ -7,7 +7,7 @@ package akuru
 
 import MongoTypes._
 
-object AkuruMain extends DomainObjects with Tools with SideEffects {
+object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFunctions with DomainSupport {
 
 
   def main(args: Array[String]) {
@@ -16,44 +16,9 @@ object AkuruMain extends DomainObjects with Tools with SideEffects {
     val blogs:List[Blog] = (for (n <- 1 to 100) yield Blog(title = "Lessons learned" + n , labels = labelList.toSeq)).toList
 
     val result = {withAkuru ->
-                    (save(blog)) ->>
-                    (labelList.map(l => save(Label(value = l)) _)) ->>
-                    (blogs.map(b => save(b) _))
-                  run}.getOrElse("success >>")
+            (save(blog)) ->> (labelList.map(l => save(Label(value = l)) _)) ->> (blogs.map(b => save(b) _))}.run.getOrElse("success >>")
     println(result)
   }
 
   def withAkuru: FutureConnection = withConnection(createServer)("akuru")
-
-  def withConnection(s:() => MongoServer)(dbName:String): FutureConnection =  FutureConnection(s, dbName)
-
-  def createServer = () => new MongoServer
-
-  def save[T <% MongoObject : CollectionName](f:  => T)(col:String => MongoCollection):Option[String] = {
-    col(implicitly[CollectionName[T]].name).save3(f)
-  }
-
-  type UserFunction = (String => MongoCollection) => Option[String]
-
-  case class FutureConnection(fserver:() => MongoServer, dbName:String, items:List[UserFunction] = Nil) {
-
-    def ->(uf:UserFunction): FutureConnection = ->>(List(uf))
-
-    def ->>(f:List[UserFunction]): FutureConnection = FutureConnection(fserver, dbName,  f ::: items)
-
-    def run: Option[String] = {
-      runSafelyWithDefault{
-        getServer.right.flatMap(getDatabase(_).right.map(db => items.foldRight(None:Option[String]){(t, a) =>
-          if (!a.isDefined) t(db.getCollection(_)) else a})) match {
-          case Right(e @ Some(error)) => e
-          case Right(n @ None) => n
-          case Left(e @ error) => Some(e)
-        }
-      }(e => Some(e.getMessage + " " + e.getStackTraceString))
-    }
-
-    def getServer: Either[String, MongoServer] = runSafelyWithEither(fserver.apply)
-
-    def getDatabase(server:MongoServer): Either[String, MongoDatabase] = runSafelyWithEither(server.getDatabase(dbName))
-  }
 }

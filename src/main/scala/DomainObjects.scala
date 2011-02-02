@@ -8,12 +8,7 @@ package akuru
 import MongoTypes._
 import MongoObject.empty
 
-trait DomainObjects  {
-  trait Ided {
-    val id:Option[MongoObjectId]
-  }
-
-  trait DomainObject extends Ided
+trait DomainObjects { this:DomainSupport =>
 
   case class Blog(override val id:Option[MongoObjectId] = None, title:String, labels:Seq[String]) extends DomainObject
 
@@ -44,9 +39,6 @@ trait DomainObjects  {
     }
   }
 
-  trait CollectionName[T] {
-    val name:String
-  }
 
   implicit object BlogCollection extends CollectionName[Blog] {
     override val name = "blog"
