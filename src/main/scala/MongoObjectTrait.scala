@@ -18,6 +18,15 @@ trait MongoObjectTrait {
     def this(tuples:Seq[Tuple2[String, Any]]) = this(new BasicDBObject(scala.collection.JavaConversions.asJavaMap(tuples.toMap)))
 
     def get[T](key:String)(implicit con:AnyRefConverter[T]): T = con.convert(dbo.get(key))
+    def getPlainArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] = {
+      import scala.collection.JavaConversions._
+      val buffer = new ListBuffer[T]
+      for(element <- dbo.get(key).asInstanceOf[BasicDBList].iterator) {
+        buffer += (con.convert(element))
+      }
+
+      buffer.toSeq
+    }
 
     def getId: MongoObjectId = MongoObjectId(dbo.get("_id").asInstanceOf[ObjectId])
 

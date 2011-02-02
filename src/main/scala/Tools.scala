@@ -73,4 +73,9 @@ trait Tools {
   def stringToOption(str:String): Option[String] = if (str.isEmpty) None else Some(str)
 
   def getStringOrDefault: ( => String) => String  => String = f => d => runSafelyWithDefault(f)(_ => d)
+
+  def nullToOption[A](f: => A): Option[A] = {
+    val result = f
+    if (result == null) None else Some(result)
+  }
 }

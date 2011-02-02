@@ -15,7 +15,7 @@ trait DBCollectionTrait {
   def find(dbo:DBObject): DBCursor
 }
 
-object DBCollectionTrait extends JavaToScala {
+object DBCollectionTrait extends Tools {
 
   implicit def createDBCollectionTrait(dbc:DBCollection): DBCollectionTrait = new DBCollectionTrait {
 

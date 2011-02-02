@@ -18,6 +18,11 @@ trait MongoFunctions extends DomainSupport {
     col(implicitly[CollectionName[T]].name).save3(f)
   }
 
+  def findOne[T](f:  => MongoObject)(g: T => Option[String])(col:String => MongoCollection)
+                (implicit f1: T => MongoObject, f3: MongoObject => T, f4: CollectionName[T]): Option[String] = {
+    col(implicitly[CollectionName[T]].name).findOne3(f).fold(l => Some(l), r => if (r.isEmpty) None else r.flatMap(g))
+  }
+
   type UserFunction = (String => MongoCollection) => Option[String]
 
   case class FutureConnection(fserver:() => MongoServer, dbName:String, items:List[UserFunction] = Nil) {

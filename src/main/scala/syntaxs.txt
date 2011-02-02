@@ -18,3 +18,7 @@
 
 
 withAkuru -> { save(blog) } ->> { labelList.map(l => save(Label(value = l)) _) } -> { save(Admin("") }
+
+
+{ withAkuru ~~> (save(blog) _) ~~> (labelList.map(l => save(Label(value = l)) _)) ~~> (blogs.map(b => save(b) _)) } ~~>()
+{ withAkuru ~~> (findOne(query("title" -> "apples not oranges"))(printBlogTitle) _) } ~~>()

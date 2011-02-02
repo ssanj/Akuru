@@ -7,7 +7,7 @@ package akuru
 import MongoTypes._
 import com.mongodb.{WriteResult}
 
-trait MongoWriteResultTrait extends WrapWithTrait {
+trait MongoWriteResultTrait extends WrapWithTrait with Tools with SideEffects {
 
   trait WriteResultTrait {
     def getError: Option[String]
@@ -20,9 +20,13 @@ trait MongoWriteResultTrait extends WrapWithTrait {
         wr.getError.flatMap(e => wr.getLastErrorTrace.map(t => MongoError(e, t)))
       }.fold(Some(_), identity)
     }
+
+    def getStringError: Option[String] = mongoErrorToString(getMongoError)
+
+    def mongoErrorToString(me:Option[MongoError]): Option[String] = me.map(e => addWithNewLine(e.message, e.stackTrace))
   }
 
-  object MongoWriteResult extends JavaToScala  {
+  object MongoWriteResult extends Tools  {
     implicit def writeResultToMongoWriteResult(wr:WriteResult): MongoWriteResult =
       MongoWriteResult(new WriteResultTrait {
         def getError = nullToOption(wr.getError)

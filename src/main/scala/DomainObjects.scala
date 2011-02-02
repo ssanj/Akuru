@@ -16,7 +16,7 @@ trait DomainObjects { this:DomainSupport =>
 
   object Blog {
     implicit def mongoToBlogConverter(mo:MongoObject): Blog = {
-      Blog(Some(mo.getId), mo.get[String]("title"), Seq.empty)
+      Blog(Some(mo.getId), mo.get[String]("title"), mo.getPlainArray[String]("labels"))
     }
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = {

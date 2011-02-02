@@ -13,8 +13,8 @@ trait MongoCollectionTrait extends Tools {
   //TODO:Once all methods ar tested remove dbc and replace with newdbc.
   case class MongoCollection(dbc:DBCollection, newdbc:DBCollectionTrait) {
 
-    import com.mongodb.WriteResult
     import org.bson.types.ObjectId
+    import com.mongodb.{DBObject, WriteResult}
 
     def findOne[T](mo:MongoObject)(implicit con:MongoConverter[T]): Either[MongoError, Option[T]] = {
       wrapWith{ newdbc.findOne(mo.toDBObject).map(con.convert(_)) }
@@ -37,12 +37,15 @@ trait MongoCollectionTrait extends Tools {
 
     def saveToOption(mo:MongoObject): Option[String] = {
       import MongoTypes.MongoWriteResult._
-      dbc.save(mo.toDBObject).getMongoError.map(me => me.message + " " + me.stackTrace)
+      dbc.save(mo.toDBObject).getStringError
     }
 
     def save[T](value:T)(implicit mc:MongoConverter[T]): Either[MongoError, Unit] =  save(mc.convert(value))
 
     def save3[T <% MongoObject](value:T): Option[String] = { saveToOption(value) }
+
+    def findOne3[T](mo:MongoObject)(implicit f1: T => MongoObject, f2: DBObject => MongoObject, f3: MongoObject => T, f4: MongoObject => DBObject):
+      Either[String, Option[T]] = runSafelyWithEither{ nullToOption(dbc.findOne(f4(mo))).map( f3.compose(f2)) }
 
     def update(query:MongoObject, upate:MongoObject, upsert:Boolean):Either[MongoError, Unit] = {
       import MongoTypes.MongoWriteResult._

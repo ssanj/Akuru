@@ -8,7 +8,7 @@ package akuru
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
 
-final class JavaToScalaWithNullToOptionSuite extends FunSuite with ShouldMatchers with JavaToScala {
+final class ToolsWithNullToOptionSuite extends FunSuite with ShouldMatchers with Tools {
 
   test("NullToOption should convert null to None") {
     nullToOption(null) should equal (None)

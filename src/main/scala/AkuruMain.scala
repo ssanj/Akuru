@@ -6,19 +6,26 @@
 package akuru
 
 import MongoTypes._
+import MongoTypes.MongoObject.query
 
 object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFunctions with DomainSupport {
 
 
   def main(args: Array[String]) {
-    val labelList = List("work", "movement")
-    val blog = Blog(title = "Lessons learned", labels = labelList.toSeq)
-    val blogs:List[Blog] = (for (n <- 1 to 100) yield Blog(title = "Lessons learned" + n , labels = labelList.toSeq)).toList
+    val blogs = List(Blog(title = "lessons learned", labels = Seq("jobs", "lessons", "work")),
+                     Blog(title = "Hello World Lift", labels = Seq("lift", "scala", "sbt")),
+                     Blog(title = "Linux RAID Failed on Boot", labels = Seq("boot", "degraded", "ubuntu")))
 
     val result = {withAkuru ~~>
-                    (save(blog) _) ~~> (labelList.map(l => save(Label(value = l)) _)) ~~> (blogs.map(b => save(b) _))
+                    (blogs.map(b => save(b) _)) ~~> (blogs.flatMap(b => b.labels.map(l => save(Label(value = l)) _)).toList) ~~>
+                    (findOne(query("title" -> "Hello World Lift"))(printBlog) _)
                  } ~~>() getOrElse("success >>")
     println(result)
+  }
+
+  def printBlog(blog:Blog): Option[String] = {
+    println("blog title -> " + blog.title + blog.labels.mkString("[", ",", "]") )
+    None
   }
 
   def withAkuru: FutureConnection = onDatabase("akuru")
