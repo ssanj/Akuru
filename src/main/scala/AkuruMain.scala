@@ -13,14 +13,14 @@ object AkuruMain extends DomainObjects with Tools with SideEffects {
   def main(args: Array[String]) {
     val labelSeq = List("work", "movement")
     val blog = Blog(title = "Lessons learned", labels = labelSeq.toSeq)
-    val result = onAkuru.
-                  add("blog"){ save(blog) }.
-                  addAll("label"){ labelSeq map (l => save(Label(value = l)) _) }.
-                  run.getOrElse("success >>")
+    val result = (withAkuru
+                    on("blog", save(blog) _)
+                    on("label", labelSeq map (l => save(Label(value = l)) _))
+                  run) getOrElse("success >>")
     println(result)
   }
 
-  def onAkuru: FutureConnection = withConnection(createServer)("akuru")
+  def withAkuru(): FutureConnection = withConnection(createServer)("akuru")
 
   def withConnection(s:() => MongoServer)(dbName:String): FutureConnection =  FutureConnection(s, dbName)
 
@@ -34,9 +34,9 @@ object AkuruMain extends DomainObjects with Tools with SideEffects {
 
   case class FutureConnection(fserver:() => MongoServer, dbName:String, items:List[ColToUserFunction] = Nil) {
 
-    def add(col:String)(f:UserFunction): FutureConnection = FutureConnection(fserver, dbName, (col, f) :: items)
+    def on(col:String, uf:UserFunction): FutureConnection = on(col, List(uf))
 
-    def addAll(col:String)(f:List[UserFunction]): FutureConnection = f.foldLeft(this)((a,b) => a.add(col)(b))
+    def on(col:String, f:List[UserFunction]): FutureConnection = f.foldLeft(this)((a,b) => FutureConnection(fserver, dbName, (col, b) :: items))
 
     def run: Option[String] = {
       runSafelyWithDefault{
