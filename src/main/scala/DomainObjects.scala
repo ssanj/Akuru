@@ -26,9 +26,14 @@ trait DomainObjects { this:DomainSupport =>
         mo.putArray2("labels", domain.labels)
         mo
     }
+
+    implicit object BlogCollection extends CollectionName[Blog] {
+      override val name = "blog"
+    }
   }
 
   object Label {
+
     implicit def mongoToLabelConverter(mo:MongoObject): Label = Label(Some(mo.getId), mo.get[String]("value"))
 
     implicit def labelToMongoConverter(domain:Label): MongoObject = {
@@ -37,15 +42,11 @@ trait DomainObjects { this:DomainSupport =>
         mo.put("value", domain.value)
         mo
     }
+
+    implicit object LabelCollection extends CollectionName[Label] {
+      override val name = "label"
+    }
   }
 
-
-  implicit object BlogCollection extends CollectionName[Blog] {
-    override val name = "blog"
-  }
-
-  implicit object LabelCollection extends CollectionName[Label] {
-    override val name = "label"
-  }
 }
 

@@ -10,9 +10,11 @@ trait MongoFunctions extends DomainSupport {
 
   def withConnection(s:() => MongoServer)(dbName:String): FutureConnection =  FutureConnection(s, dbName)
 
+  def onDatabase: String => FutureConnection = dbName => withConnection(createServer)(dbName)
+
   def createServer = () => new MongoServer
 
-  def save[T <% MongoObject : CollectionName](f:  => T)(col:String => MongoCollection):Option[String] = {
+  def save[T <% MongoObject : CollectionName](f:  => T)(col:String => MongoCollection): Option[String] = {
     col(implicitly[CollectionName[T]].name).save3(f)
   }
 
@@ -20,11 +22,11 @@ trait MongoFunctions extends DomainSupport {
 
   case class FutureConnection(fserver:() => MongoServer, dbName:String, items:List[UserFunction] = Nil) {
 
-    def ->(uf:UserFunction): FutureConnection = ->>(List(uf))
+    def ~~>(uf:UserFunction): FutureConnection = ~~>(List(uf))
 
-    def ->>(f:List[UserFunction]): FutureConnection = FutureConnection(fserver, dbName,  f ::: items)
+    def ~~>(f:List[UserFunction]): FutureConnection = FutureConnection(fserver, dbName,  f ::: items)
 
-    def run : Option[String] = {
+    def ~~>() : Option[String] = {
       runSafelyWithDefault{
         getServer.right.flatMap(getDatabase(_).right.map(db => items.foldRight(None:Option[String]){(t, a) =>
           if (!a.isDefined) t(db.getCollection(_)) else a})) match {

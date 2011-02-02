@@ -15,10 +15,11 @@ object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFun
     val blog = Blog(title = "Lessons learned", labels = labelList.toSeq)
     val blogs:List[Blog] = (for (n <- 1 to 100) yield Blog(title = "Lessons learned" + n , labels = labelList.toSeq)).toList
 
-    val result = {withAkuru ->
-            (save(blog)) ->> (labelList.map(l => save(Label(value = l)) _)) ->> (blogs.map(b => save(b) _))}.run.getOrElse("success >>")
+    val result = {withAkuru ~~>
+                    (save(blog) _) ~~> (labelList.map(l => save(Label(value = l)) _)) ~~> (blogs.map(b => save(b) _))
+                 } ~~>() getOrElse("success >>")
     println(result)
   }
 
-  def withAkuru: FutureConnection = withConnection(createServer)("akuru")
+  def withAkuru: FutureConnection = onDatabase("akuru")
 }
