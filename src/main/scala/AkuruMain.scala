@@ -22,7 +22,7 @@ object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFun
     val result = {withAkuru ~~>
                     /*(blogs.map(b => save(b) _)) ~~> (blogs.flatMap(b => b.labels.map(l => save(Label(value = l)) _)).toList) ~~>*/
                     (findOne(query("title" -> "Hello World Lift"))(printBlog) _) ~~>
-                    (find(regex("labels", "ubuntu|work", i))(printBlogs) _)
+                    (find(regex("labels" -> ("ubuntu|work"/i)))(printBlogs) _)
                  } ~~>() getOrElse("success >>")
     println(result)
   }

@@ -5,6 +5,8 @@
 
 package akuru
 
+import MongoTypes._
+import MongoTypes.MongoObject.empty
 
 trait MongoRegEx {
 
@@ -22,4 +24,28 @@ trait MongoRegEx {
     val d = Value(Pattern.UNIX_LINES)
   }
 
+  def regex(t:Tuple2[String, RegEx]): MongoObject =  t._2.toMongo(t._1)
+
+  case class RegEx(reg:String, flag:RegexConstants.Value) {
+
+    def toMongo(key:String): MongoObject = {
+      val mo = empty
+      val q = empty
+      mo.put("$regex", reg)
+      getRegexFlags(flag.id).foreach(mo.put("$options", _))
+      q.put(key, mo.toDBObject)
+      q
+    }
+
+    private def getRegexFlags(f:Int): Option[String] = {
+      import org.bson.BSON
+      runSafelyWithOptionReturnResult(BSON.regexFlags(f))
+    }
+  }
+
+  case class RegExWithOptions(reg:String) {
+    def / (flag:RegexConstants.Value): RegEx = RegEx(reg, flag)
+  }
+
+  implicit def stringToRegX(reg:String): RegExWithOptions = RegExWithOptions(reg)
 }
