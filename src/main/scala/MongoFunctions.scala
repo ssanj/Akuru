@@ -6,7 +6,7 @@
 package akuru
 import MongoTypes._
 
-trait MongoFunctions extends DomainSupport {
+trait MongoFunctions extends Tools with DomainSupport {
 
   def withConnection(s:() => MongoServer)(dbName:String): FutureConnection =  FutureConnection(s, dbName)
 
@@ -20,7 +20,7 @@ trait MongoFunctions extends DomainSupport {
 
   def findOne[T](f: => MongoObject)(g: T => Option[String])(col:String => MongoCollection)
                 (implicit f1: MongoObject => T, f2: CollectionName[T]): Option[String] = {
-    col(implicitly[CollectionName[T]].name).findOne3[T](f).fold(l => Some(l), (r:Option[T]) => if (r.isEmpty) None else r.flatMap(t => g(t)))
+    col(implicitly[CollectionName[T]].name).findOne3[T](f).fold(l => Some(l), r => foldOption(r)(None:Option[String])(g))
   }
 
   type UserFunction = (String => MongoCollection) => Option[String]

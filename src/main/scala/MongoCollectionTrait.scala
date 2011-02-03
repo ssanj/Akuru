@@ -56,7 +56,8 @@ trait MongoCollectionTrait extends Tools {
       }
     }
 
-    def findAndModify[T](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean)(implicit mc:MongoConverter[T]) : Either[MongoError, T] = {
+    def findAndModify[T](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean)(implicit mc:MongoConverter[T]):
+      Either[MongoError, T] = {
       import MongoObject.empty
       wrapWith {
         mc.convert(dbc.findAndModify(query, empty, sort, false, update, returnNew, false))

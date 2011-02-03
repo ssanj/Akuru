@@ -74,8 +74,12 @@ trait Tools {
 
   def getStringOrDefault: ( => String) => String  => String = f => d => runSafelyWithDefault(f)(_ => d)
 
+  //TODO: Test
   def nullToOption[A](f: => A): Option[A] = {
     val result = f
     if (result == null) None else Some(result)
   }
+
+  //TODO: Test
+  def foldOption[T, R](op:Option[T])(n: => R)(s:T => R): R = if (op.isEmpty) n else s(op.get)
 }
