@@ -35,17 +35,16 @@ trait MongoCollectionTrait extends Tools {
       }
     }
 
-    def saveToOption(mo:MongoObject): Option[String] = {
-      import MongoTypes.MongoWriteResult._
-      dbc.save(mo.toDBObject).getStringError
-    }
-
     def save[T](value:T)(implicit mc:MongoConverter[T]): Either[MongoError, Unit] =  save(mc.convert(value))
 
-    def save3[T <% MongoObject](value:T): Option[String] = { saveToOption(value) }
+    def save3[T <% MongoObject](value:T): Option[String] = {
+      import MongoTypes.MongoWriteResult._
+      dbc.save(value.toDBObject).getStringError
+    }
 
-    def findOne3[T](mo:MongoObject)(implicit f1: T => MongoObject, f2: DBObject => MongoObject, f3: MongoObject => T, f4: MongoObject => DBObject):
-      Either[String, Option[T]] = runSafelyWithEither{ nullToOption(dbc.findOne(f4(mo))).map( f3.compose(f2)) }
+    def findOne3[T](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Option[T]] = {
+      runSafelyWithEither{ nullToOption(dbc.findOne(mo.toDBObject)).map(t => f3(t)) }
+    }
 
     def update(query:MongoObject, upate:MongoObject, upsert:Boolean):Either[MongoError, Unit] = {
       import MongoTypes.MongoWriteResult._

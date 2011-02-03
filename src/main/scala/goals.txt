@@ -1,0 +1,4 @@
+1. Functional
+2. No/Low side effecting code
+3. Type safe
+4. Easy to use

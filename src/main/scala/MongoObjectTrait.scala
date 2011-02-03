@@ -59,6 +59,7 @@ trait MongoObjectTrait {
     }
 
     def toDBObject: DBObject = dbo
+
   }
 
   object MongoObject {

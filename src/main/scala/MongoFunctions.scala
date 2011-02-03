@@ -18,9 +18,9 @@ trait MongoFunctions extends DomainSupport {
     col(implicitly[CollectionName[T]].name).save3(f)
   }
 
-  def findOne[T](f:  => MongoObject)(g: T => Option[String])(col:String => MongoCollection)
-                (implicit f1: T => MongoObject, f3: MongoObject => T, f4: CollectionName[T]): Option[String] = {
-    col(implicitly[CollectionName[T]].name).findOne3(f).fold(l => Some(l), r => if (r.isEmpty) None else r.flatMap(g))
+  def findOne[T](f: => MongoObject)(g: T => Option[String])(col:String => MongoCollection)
+                (implicit f1: MongoObject => T, f2: CollectionName[T]): Option[String] = {
+    col(implicitly[CollectionName[T]].name).findOne3[T](f).fold(l => Some(l), (r:Option[T]) => if (r.isEmpty) None else r.flatMap(t => g(t)))
   }
 
   type UserFunction = (String => MongoCollection) => Option[String]
