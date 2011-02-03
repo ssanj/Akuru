@@ -23,6 +23,11 @@ trait MongoFunctions extends Tools with DomainSupport {
     col(implicitly[CollectionName[T]].name).findOne3[T](f).fold(l => Some(l), r => foldOption(r)(None:Option[String])(g))
   }
 
+  def find[T](f: => MongoObject)(g: Seq[T] => Option[String])(col:String => MongoCollection)
+                (implicit f1: MongoObject => T, f2: CollectionName[T]): Option[String] = {
+    col(implicitly[CollectionName[T]].name).find3[T](f).fold(l => Some(l), r => g(r))
+  }
+
   type UserFunction = (String => MongoCollection) => Option[String]
 
   case class FutureConnection(fserver:() => MongoServer, dbName:String, items:List[UserFunction] = Nil) {

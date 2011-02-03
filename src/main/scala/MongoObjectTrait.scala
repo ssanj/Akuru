@@ -8,8 +8,9 @@ import collection.mutable.ListBuffer
 import com.mongodb.{BasicDBList, BasicDBObject, DBObject}
 import org.bson.types.ObjectId
 import MongoTypes.MongoObjectId
+import MongoTypes.RegexConstants
 
-trait MongoObjectTrait {
+trait MongoObjectTrait extends Tools {
 
   case class MongoObject(dbo:DBObject) {
 
@@ -90,5 +91,19 @@ trait MongoObjectTrait {
     def query(tuples:Tuple2[String, Any]*) = new MongoObject(tuples.toSeq)
 
     def mongoObject(tuples:Tuple2[String, Any]*) = new MongoObject(tuples.toSeq)
+
+    def regex(key:String, reg:String, f:RegexConstants.Value): MongoObject = {
+      val mo = empty
+      val q = empty
+      mo.put("$regex", reg)
+      getRegexFlags(f.id).foreach(mo.put("$options", _))
+      q.put(key, mo.toDBObject)
+      q
+    }
+
+    def getRegexFlags(f:Int): Option[String] = {
+      import org.bson.BSON
+      runSafelyWithOptionReturnResult(BSON.regexFlags(f))
+    }
   }
 }

@@ -5,7 +5,7 @@
 package akuru
 
 /**
- * Captures all Mongo functionality. import MongoTypes._ to work with MongoDB. 
+ * Captures all Mongo functionality. import MongoTypes._ to work with MongoDB.
  */
 object MongoTypes extends MongoServerTrait with
                           MongoDatabaseTrait with
@@ -16,5 +16,6 @@ object MongoTypes extends MongoServerTrait with
                           MongoWriteResultTrait with
                           MongoErrorTrait with
                           WrapWithTrait with
-                          MongoFunc {
+                          MongoFunc with
+                          MongoRegEx {
 }

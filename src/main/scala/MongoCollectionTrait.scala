@@ -43,8 +43,21 @@ trait MongoCollectionTrait extends Tools {
     }
 
     def findOne3[T](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Option[T]] = {
-      runSafelyWithEither{ nullToOption(dbc.findOne(mo.toDBObject)).map(t => f3(t)) }
+      runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => f3(t)) }
     }
+
+    def find3[T](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Seq[T]] = {
+      runSafelyWithEither {
+        val mc:MongoCursor = dbc.find(mo)
+        mc.asSeq[T]
+      }
+    }
+
+//    def find[T](mo:MongoObject)(implicit con:MongoConverter[T]): Either[MongoError, Seq[T]] = {
+//      wrapWith{
+//        val mc:MongoCursor = newdbc.find(mo.toDBObject)
+//        mc.toSeq[T]
+//      }
 
     def update(query:MongoObject, upate:MongoObject, upsert:Boolean):Either[MongoError, Unit] = {
       import MongoTypes.MongoWriteResult._

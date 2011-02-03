@@ -22,3 +22,6 @@ withAkuru -> { save(blog) } ->> { labelList.map(l => save(Label(value = l)) _) }
 
 { withAkuru ~~> (save(blog) _) ~~> (labelList.map(l => save(Label(value = l)) _)) ~~> (blogs.map(b => save(b) _)) } ~~>()
 { withAkuru ~~> (findOne(query("title" -> "apples not oranges"))(printBlogTitle) _) } ~~>()
+
+{ withAkuru ~~> (find(regex("labels", "ubuntu|work", i))(printBlogs) _) } ~~>() getOrElse("success >>")
+{ withAkuru ~~> (find(regex("labels" -> ("ubuntu|work" / i)))(printBlogs) _) } ~~>() getOrElse("success >>")
