@@ -75,12 +75,22 @@ trait MongoObjectTrait extends Tools {
 
     def push(col:String, value:MongoObject): MongoObject =  $func("$push", col, value)
 
+    def set(col:String, value:AnyRef): MongoObject =  $funcAny("$set", col, value)
+
     def pull(col:String, value:MongoObject): MongoObject =  $func("$pull", col, value)
 
     def $func(action:String, col:String, value:MongoObject): MongoObject = {
       val parent = new MongoObject
       val element = new MongoObject
       element.putMongo(col, value)
+      parent.putMongo(action, element)
+      parent
+    }
+
+    def $funcAny(action:String, col:String, value:AnyRef): MongoObject = {
+      val parent = new MongoObject
+      val element = new MongoObject
+      element.put(col, value)
       parent.putMongo(action, element)
       parent
     }

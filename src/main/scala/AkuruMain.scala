@@ -15,14 +15,18 @@ object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFun
     import RegexConstants._
     import MongoObject._
 
-    val blogs = List(Blog(title = "lessons learned", labels = Seq("jobs", "lessons", "work")),
+    val b1 = Blog(title = "lessons learned", labels = Seq("jobs", "lessons", "work"))
+
+    val blogs = List(b1,
                      Blog(title = "Hello World Lift", labels = Seq("lift", "scala", "sbt")),
                      Blog(title = "Linux RAID Failed on Boot", labels = Seq("boot", "degraded", "ubuntu")))
 
     val result = {withAkuru ~~>
                     /*(blogs.map(b => save(b) _)) ~~> (blogs.flatMap(b => b.labels.map(l => save(Label(value = l)) _)).toList) ~~>*/
                     (findOne(query("title" -> "Hello World Lift"))(printBlog) _) ~~>
-                    (find(regex("labels" -> ("ubuntu|work"/i)))(printBlogs) _)
+                    (find(regex("labels" -> ("ubuntu|work"/i)))(printBlogs) _) ~~>
+                    (update[Blog](query("title" -> "lessons learned"))(set("title", "Lessons Learned")) _) ~~>
+                    (findOne(regex("labels" -> ("work")/i))(printBlog) _)
                  } ~~>() getOrElse("success >>")
     println(result)
   }
