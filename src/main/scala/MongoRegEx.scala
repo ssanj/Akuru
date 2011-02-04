@@ -59,10 +59,4 @@ trait MongoRegEx {
      mo.merge(tuple._2.toMongo(tuple._1))
      mo
    }
-
-//  implicit def rexToMongoObject(tuples:Tuple2[String, RegEx]*): MongoObject = {
-//    val mo = empty
-//    tuples foreach (t => mo.merge(t._2.toMongo(t._1)))
-//    mo
-//  }
 }
