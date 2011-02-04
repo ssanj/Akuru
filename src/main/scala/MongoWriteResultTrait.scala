@@ -26,7 +26,7 @@ trait MongoWriteResultTrait extends WrapWithTrait with Tools with SideEffects {
     def mongoErrorToString(me:Option[MongoError]): Option[String] = me.map(e => addWithNewLine(e.message, e.stackTrace))
   }
 
-  object MongoWriteResult extends Tools  {
+  object MongoWriteResult {
     implicit def writeResultToMongoWriteResult(wr:WriteResult): MongoWriteResult =
       MongoWriteResult(new WriteResultTrait {
         def getError = nullToOption(wr.getError)

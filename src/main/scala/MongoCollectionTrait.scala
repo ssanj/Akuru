@@ -39,7 +39,7 @@ trait MongoCollectionTrait extends Tools {
 
     def save3[T <% MongoObject](value:T): Option[String] = {
       import MongoTypes.MongoWriteResult._
-      dbc.save(value.toDBObject).getStringError
+      runSafelyWithEither(dbc.save(value.toDBObject)).fold(l => Some(l), r => r.getStringError)
     }
 
     def findOne3[T](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Option[T]] = {
@@ -53,11 +53,15 @@ trait MongoCollectionTrait extends Tools {
       }
     }
 
-//    def find[T](mo:MongoObject)(implicit con:MongoConverter[T]): Either[MongoError, Seq[T]] = {
-//      wrapWith{
-//        val mc:MongoCursor = newdbc.find(mo.toDBObject)
-//        mc.toSeq[T]
+//    def update3(query:MongoObject, upate:MongoObject, upsert:Boolean):Option[String] = {
+//      import MongoTypes.MongoWriteResult._
+//      wrapWith {
+//        dbc.update(query.toDBObject, upate.toDBObject, upsert, false)
+//      } match {
+//        case Right(result) => result.getMongoError match { case None => Right();  case Some(me) => Left(me) }
+//        case Left(me) => Left(me)
 //      }
+//    }
 
     def update(query:MongoObject, upate:MongoObject, upsert:Boolean):Either[MongoError, Unit] = {
       import MongoTypes.MongoWriteResult._
