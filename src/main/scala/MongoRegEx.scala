@@ -48,4 +48,10 @@ trait MongoRegEx {
   }
 
   implicit def stringToRegX(reg:String): RegExWithOptions = RegExWithOptions(reg)
+
+  implicit def rexToMongoObject(tuples:Tuple2[String, RegEx]*): MongoObject = {
+    val mo = empty
+    tuples map (t => t._2.toMongo(t._1)) foreach (m => mo.merge(m))
+    mo
+  }
 }

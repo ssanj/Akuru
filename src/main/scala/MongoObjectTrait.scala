@@ -18,6 +18,7 @@ trait MongoObjectTrait extends Tools {
     def this(tuples:Seq[Tuple2[String, Any]]) = this(new BasicDBObject(scala.collection.JavaConversions.asJavaMap(tuples.toMap)))
 
     def get[T](key:String)(implicit con:AnyRefConverter[T]): T = con.convert(dbo.get(key))
+
     def getPlainArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] = {
       import scala.collection.JavaConversions._
       val buffer = new ListBuffer[T]
@@ -45,6 +46,8 @@ trait MongoObjectTrait extends Tools {
     def putMongo(key:String, mongo:MongoObject) { dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]) }
 
     def putId(id:MongoObjectId) { dbo.put("_id", id.toObjectId) }
+
+    def merge(mo:MongoObject) { dbo.putAll(mo) }
 
     def putArray(key:String, values:Seq[MongoObject]) {
       import scala.collection.JavaConversions._
@@ -102,5 +105,7 @@ trait MongoObjectTrait extends Tools {
     def query(tuples:Tuple2[String, Any]*) = new MongoObject(tuples.toSeq)
 
     def mongoObject(tuples:Tuple2[String, Any]*) = new MongoObject(tuples.toSeq)
+
+    implicit def tToMongoObject(t:Tuple2[String, Any]*): MongoObject = new MongoObject(t.toSeq)
   }
 }
