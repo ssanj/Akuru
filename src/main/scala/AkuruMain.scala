@@ -28,13 +28,13 @@ object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFun
                     (drop[Label] _) ~~>
                     (blogs.map(b => save(b) _)) ~~>
                     (blogs.flatMap(b => b.labels.map(l => save(Label(value = l)) _)).toList) ~~>
-                    (findOne(query("title" -> "Hello World Lift"))(printBlog) _) ~~>
-                    (find(regex("labels" -> ("ubuntu|work"/i)))(printBlogs) _) ~~>
-                    (update[Blog](query("title" -> "lessons learned"))(set("title", "Lessons Learned")) _) ~~>
+                    (findOne("title" -> "Hello World Lift")(printBlog) _) ~~>
+                    ( find { regex("labels" -> ("ubuntu|work"/i)) } { printBlogs } _ ) ~~>
+                    (update[Blog]("title" -> "lessons learned")(set("title", "Lessons Learned")) _) ~~>
                     (findOne(regex("labels" -> ("work")/i))(printBlog) _) ~~>
-                    (update[Blog](query("title" -> "Lessons Learned"))(b2) _) ~~>
+                    (update[Blog]("title" -> "Lessons Learned")(b2) _) ~~>
                     (findOne(regex("labels" -> ("work")/i))(printBlog) _) ~~>
-                    (upsert[Blog](query("title" -> "Semigroup"))(b3) _) ~~>
+                    (upsert[Blog]("title" -> "Semigroup")(b3) _) ~~>
                     (findOne(regex("labels" -> ("functional")/i))(printBlog) _)
                  } ~~>() getOrElse("success >>")
     println(result)
