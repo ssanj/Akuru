@@ -37,10 +37,7 @@ trait MongoCollectionTrait extends Tools {
 
     def save[T](value:T)(implicit mc:MongoConverter[T]): Either[MongoError, Unit] =  save(mc.convert(value))
 
-    def save3[T <% MongoObject](value:T): Option[String] = {
-      import MongoTypes.MongoWriteResult._
-      runSafelyWithEither(dbc.save(value.toDBObject)).fold(l => Some(l), r => r.getStringError)
-    }
+    def save3[T <% MongoObject](value:T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
 
     def findOne3[T](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Option[T]] = {
       runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => f3(t)) }
@@ -53,15 +50,15 @@ trait MongoCollectionTrait extends Tools {
       }
     }
 
-//    def update3(query:MongoObject, upate:MongoObject, upsert:Boolean):Option[String] = {
-//      import MongoTypes.MongoWriteResult._
-//      wrapWith {
-//        dbc.update(query.toDBObject, upate.toDBObject, upsert, false)
-//      } match {
-//        case Right(result) => result.getMongoError match { case None => Right();  case Some(me) => Left(me) }
-//        case Left(me) => Left(me)
-//      }
-//    }
+    def update3(query:MongoObject, upate:MongoObject, upsert:Boolean = false, multi:Boolean = false):Option[String] = {
+      writeResultToOption(() => dbc.update(query.toDBObject, upate.toDBObject, upsert, multi))
+    }
+
+    def writeResultToOption(f:() => WriteResult): Option[String] =  {
+      import MongoTypes.MongoWriteResult._
+      runSafelyWithEither(f.apply).fold(l => Some(l), r => r.getStringError)
+    }
+
 
     def update(query:MongoObject, upate:MongoObject, upsert:Boolean):Either[MongoError, Unit] = {
       import MongoTypes.MongoWriteResult._
