@@ -24,7 +24,12 @@ trait MongoRegEx {
     val d = Value(Pattern.UNIX_LINES)
   }
 
-  def regex(t:Tuple2[String, RegEx]): MongoObject =  t._2.toMongo(t._1)
+  //def regex(t:Tuple2[String, RegEx]): MongoObject =  t._2.toMongo(t._1)
+  def regex(tuples:Tuple2[String, RegEx]*): MongoObject =  {
+    val mo = empty
+    tuples foreach (t => mo.merge(t._2.toMongo(t._1)))
+    mo
+  }
 
   case class RegEx(reg:String, flag:RegexConstants.Value) {
 
@@ -49,9 +54,15 @@ trait MongoRegEx {
 
   implicit def stringToRegX(reg:String): RegExWithOptions = RegExWithOptions(reg)
 
-  implicit def rexToMongoObject(tuples:Tuple2[String, RegEx]*): MongoObject = {
-    val mo = empty
-    tuples map (t => t._2.toMongo(t._1)) foreach (m => mo.merge(m))
-    mo
-  }
+   implicit def rexToMongoObject(tuple:Tuple2[String, RegEx]): MongoObject = {
+     val mo = empty
+     mo.merge(tuple._2.toMongo(tuple._1))
+     mo
+   }
+
+//  implicit def rexToMongoObject(tuples:Tuple2[String, RegEx]*): MongoObject = {
+//    val mo = empty
+//    tuples foreach (t => mo.merge(t._2.toMongo(t._1)))
+//    mo
+//  }
 }
