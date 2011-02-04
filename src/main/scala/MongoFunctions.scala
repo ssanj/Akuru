@@ -32,6 +32,14 @@ trait MongoFunctions extends Tools with DomainSupport {
     col(implicitly[CollectionName[T]].name).update3(f, r)
   }
 
+  def upsert[T : CollectionName](f: => MongoObject)(r: => MongoObject)(col:String => MongoCollection): Option[String] = {
+    col(implicitly[CollectionName[T]].name).update3(f, r, true)
+  }
+
+  def drop[T : CollectionName](col:String => MongoCollection): Option[String] = {
+    col(implicitly[CollectionName[T]].name).drop3
+  }
+
   type UserFunction = (String => MongoCollection) => Option[String]
 
   case class FutureConnection(fserver:() => MongoServer, dbName:String, items:List[UserFunction] = Nil) {

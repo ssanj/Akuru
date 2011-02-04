@@ -16,17 +16,26 @@ object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFun
     import MongoObject._
 
     val b1 = Blog(title = "lessons learned", labels = Seq("jobs", "lessons", "work"))
+    val b2 = Blog(title = "lessons learned", labels = Seq("jobs", "work"))
+    val b3 = Blog(title = "Semigroup", labels = Seq("functional", "scala", "concepts", "semigroup"))
 
     val blogs = List(b1,
                      Blog(title = "Hello World Lift", labels = Seq("lift", "scala", "sbt")),
                      Blog(title = "Linux RAID Failed on Boot", labels = Seq("boot", "degraded", "ubuntu")))
 
     val result = {withAkuru ~~>
-                    /*(blogs.map(b => save(b) _)) ~~> (blogs.flatMap(b => b.labels.map(l => save(Label(value = l)) _)).toList) ~~>*/
+                    (drop[Blog] _) ~~>
+                    (drop[Label] _) ~~>
+                    (blogs.map(b => save(b) _)) ~~>
+                    (blogs.flatMap(b => b.labels.map(l => save(Label(value = l)) _)).toList) ~~>
                     (findOne(query("title" -> "Hello World Lift"))(printBlog) _) ~~>
                     (find(regex("labels" -> ("ubuntu|work"/i)))(printBlogs) _) ~~>
                     (update[Blog](query("title" -> "lessons learned"))(set("title", "Lessons Learned")) _) ~~>
-                    (findOne(regex("labels" -> ("work")/i))(printBlog) _)
+                    (findOne(regex("labels" -> ("work")/i))(printBlog) _) ~~>
+                    (update[Blog](query("title" -> "Lessons Learned"))(b2) _) ~~>
+                    (findOne(regex("labels" -> ("work")/i))(printBlog) _) ~~>
+                    (upsert[Blog](query("title" -> "Semigroup"))(b3) _) ~~>
+                    (findOne(regex("labels" -> ("functional")/i))(printBlog) _)
                  } ~~>() getOrElse("success >>")
     println(result)
   }

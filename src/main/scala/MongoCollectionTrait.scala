@@ -79,6 +79,8 @@ trait MongoCollectionTrait extends Tools {
     }
 
     def drop: Either[MongoError, Unit] = wrapWith(dbc.drop)
+
+    def drop3: Option[String] = runSafelyWithOptionReturnError(dbc.drop)
   }
 
   object MongoCollection {

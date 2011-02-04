@@ -77,6 +77,8 @@ trait MongoObjectTrait extends Tools {
 
     def set(col:String, value:AnyRef): MongoObject =  $funcAny("$set", col, value)
 
+    def set(col:String, value:MongoObject): MongoObject =  $func("$set", col, value)
+
     def pull(col:String, value:MongoObject): MongoObject =  $func("$pull", col, value)
 
     def $func(action:String, col:String, value:MongoObject): MongoObject = {
