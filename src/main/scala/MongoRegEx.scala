@@ -24,39 +24,50 @@ trait MongoRegEx {
     val d = Value(Pattern.UNIX_LINES)
   }
 
-  //def regex(t:Tuple2[String, RegEx]): MongoObject =  t._2.toMongo(t._1)
-  def regex(tuples:Tuple2[String, RegEx]*): MongoObject =  {
-    val mo = empty
-    tuples foreach (t => mo.merge(t._2.toMongo(t._1)))
-    mo
-  }
+   type KeyedRegEx = Tuple2[String, RegEx]
 
-  case class RegEx(reg:String, flag:RegexConstants.Value) {
+  case class RegEx(reg: String, flag: Option[RegexConstants.Value] = None) {
 
-    def toMongo(key:String): MongoObject = {
+    def toMongo(key: String): MongoObject = {
       val mo = empty
       val q = empty
       mo.put("$regex", reg)
-      getRegexFlags(flag.id).foreach(mo.put("$options", _))
+      flag.foreach(f => getRegexFlags(f.id).foreach(mo.put("$options", _)))
       q.put(key, mo.toDBObject)
       q
     }
 
-    private def getRegexFlags(f:Int): Option[String] = {
+    private def getRegexFlags(f: Int): Option[String] = {
       import org.bson.BSON
       runSafelyWithOptionReturnResult(BSON.regexFlags(f))
     }
   }
 
-  case class RegExWithOptions(reg:String) {
-    def / (flag:RegexConstants.Value): RegEx = RegEx(reg, flag)
+  case class RegExWithOptions(reg: String) {
+    def /(flag: RegexConstants.Value): RegEx = RegEx(reg, Some(flag))
+
+    def / : RegEx = RegEx(reg)
   }
 
-  implicit def stringToRegX(reg:String): RegExWithOptions = RegExWithOptions(reg)
+  def regExToMongo(tuples: KeyedRegEx*): MongoObject = {
+    val mo = empty
+    tuples foreach (t => mo.merge(t._2.toMongo(t._1)))
+    mo
+  }
 
-   implicit def rexToMongoObject(tuple:Tuple2[String, RegEx]): MongoObject = {
-     val mo = empty
-     mo.merge(tuple._2.toMongo(tuple._1))
-     mo
-   }
+  def regex(tuples: KeyedRegEx*): MongoObject = regExToMongo(tuples:_*)
+
+  implicit def stringToRegX(reg: String): RegExWithOptions = RegExWithOptions(reg)
+
+  implicit def regexTuple1ToMongoObject(tuple: KeyedRegEx): MongoObject = regExToMongo(tuple)
+
+  implicit def regexTuple2ToMongoObject(tuples: Tuple2[KeyedRegEx, KeyedRegEx]): MongoObject = regExToMongo(tuples._1, tuples._2)
+
+  implicit def regexTuple3ToMongoObject(tuples: Tuple3[KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject = regExToMongo(tuples._1, tuples._2, tuples._3)
+
+  implicit def regexTuple4ToMongoObject(tuples: Tuple4[KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
+    regExToMongo(tuples._1, tuples._2, tuples._3, tuples._4)
+
+  implicit def regexTuple5ToMongoObject(tuples: Tuple5[KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
+    regExToMongo(tuples._1, tuples._2, tuples._3, tuples._4, tuples._5)
 }

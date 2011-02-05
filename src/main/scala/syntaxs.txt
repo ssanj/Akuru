@@ -27,3 +27,7 @@ withAkuru -> { save(blog) } ->> { labelList.map(l => save(Label(value = l)) _) }
 { withAkuru ~~> (find(regex("labels" -> ("ubuntu|work" / i)))(printBlogs) _) } ~~>() getOrElse("success >>")
 
 update(regex("title" -> "Lift"/i)(Blog("LiftInAction", Seq("misc"))
+
+
+findOne("labels" -> ("Functional")/i)
+findOne("labels" -> ("functional")./)
