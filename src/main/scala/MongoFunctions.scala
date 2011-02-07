@@ -14,43 +14,33 @@ trait MongoFunctions extends Tools with DomainSupport {
 
   def createServer = () => new MongoServer
 
-//  def save[T <% MongoObject : CollectionName](f: => T)(col:CollectionFunction): Option[String] = {
-//    col(implicitly[CollectionName[T]].name).save3(f)
-//  }
+  def collectionName[T : CollectionName]: String = implicitly[CollectionName[T]].name
 
-  def save[T <% MongoObject : CollectionName](f: => T): UserFunction = col => col(implicitly[CollectionName[T]].name).save3(f)
+  def save[T <% MongoObject : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save3(f)
 
-  //TODO: f should be f:() =>MongoObject
   def findOne[T](f: => MongoObject)(g: T => Option[String])(h:() => Unit)(col:String => MongoCollection)
                 (implicit f1: MongoObject => T, f2: CollectionName[T]): Option[String] = {
-    col(implicitly[CollectionName[T]].name).findOne3[T](f).fold(l => Some(l), r => foldOption(r){h.apply;None:Option[String]}(g))
+    col(collectionName[T]).findOne3[T](f).fold(l => Some(l), r => foldOption(r){h.apply;None:Option[String]}(g))
   }
 
   def ignoreError = () => {}
 
-  //TODO: f should be f:() =>MongoObject
   def find[T](f: => MongoObject)(g: Seq[T] => Option[String])(col:String => MongoCollection)
                 (implicit f1: MongoObject => T, f2: CollectionName[T]): Option[String] = {
-    col(implicitly[CollectionName[T]].name).find3[T](f).fold(l => Some(l), r => g(r))
+    col(collectionName[T]).find3[T](f).fold(l => Some(l), r => g(r))
   }
 
-  //TODO: f should be f:() =>MongoObject
-  //TODO: r should be r:() =>MongoObject
   def update[T : CollectionName](f: => MongoObject)(r: => MongoObject)(col:String => MongoCollection): Option[String] = {
-    col(implicitly[CollectionName[T]].name).update3(f, r)
+    col(collectionName[T]).update3(f, r)
   }
 
-  //TODO: f should be f:() =>MongoObject
-  //TODO: r should be r:() =>MongoObject
   def upsert[T : CollectionName](f: => MongoObject)(r: => MongoObject)(col:String => MongoCollection): Option[String] = {
-    col(implicitly[CollectionName[T]].name).update3(f, r, true)
+    col(collectionName[T]).update3(f, r, true)
   }
 
   def drop[T : CollectionName](col:String => MongoCollection): Option[String] = {
-    col(implicitly[CollectionName[T]].name).drop3
+    col(collectionName[T]).drop3
   }
-
-  //implicit def funcToUserFunction(f: => Option[String]): UserFunction = col =>  f
 
   type UserFunction = CollectionFunction => Option[String]
 

@@ -34,7 +34,6 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers with Do
 
     def exceptionBlog():Blog = throw new RuntimeException(expectedError)
 
-    //have to use (_) instead of _. Could be a possible scala bug.  http://bit.ly/eqptdA
     ({ onDatabase("akuru_test") ~~> (save(exceptionBlog))} ~~>()).verifyError(s => s should include regex (expectedError))
   }
 
