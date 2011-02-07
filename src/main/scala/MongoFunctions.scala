@@ -23,22 +23,14 @@ trait MongoFunctions extends Tools with DomainSupport {
 
   def ignoreError = () => {}
 
-  def find[T](f: => MongoObject)(g: Seq[T] => Option[String])(col:String => MongoCollection)
-                (implicit f1: MongoObject => T, f2: CollectionName[T]): Option[String] = {
-    col(collectionName[T]).find3[T](f).fold(l => Some(l), r => g(r))
-  }
+  def find[T : CollectionName, R >: MongoObject <% T](f: => MongoObject)(g: Seq[T] => Option[String]): UserFunction =
+    col => col(collectionName[T]).find3[T](f).fold(l => Some(l), r => g(r))
 
-  def update[T : CollectionName](f: => MongoObject)(r: => MongoObject)(col:String => MongoCollection): Option[String] = {
-    col(collectionName[T]).update3(f, r)
-  }
+  def update[T : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction = col => col(collectionName[T]).update3(f, r)
 
-  def upsert[T : CollectionName](f: => MongoObject)(r: => MongoObject)(col:String => MongoCollection): Option[String] = {
-    col(collectionName[T]).update3(f, r, true)
-  }
+  def upsert[T : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction = col => col(collectionName[T]).update3(f, r, true)
 
-  def drop[T : CollectionName](col:String => MongoCollection): Option[String] = {
-    col(collectionName[T]).drop3
-  }
+  def drop[T : CollectionName]: UserFunction = col => col(collectionName[T]).drop3
 
   type UserFunction = CollectionFunction => Option[String]
 

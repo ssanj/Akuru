@@ -17,7 +17,7 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers with Do
 
   "A MongoCollection" should "save a new MongoObject" in {
      ({ onDatabase("akuru_test") ~~>
-          (drop[Blog] _) ~~>
+          (drop[Blog]) ~~>
           ( findOne("title" -> "blah") { t:Blog => fail("Shouldn't have found Blog") } { ignoreError }) ~~>
           ( save(Blog(title = "blah", labels = Seq("test", "random")))) ~~>
           ( findOne("title" -> "blah") { t:Blog =>

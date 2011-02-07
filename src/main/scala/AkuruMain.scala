@@ -24,17 +24,17 @@ object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFun
                      Blog(title = "Linux RAID Failed on Boot", labels = Seq("boot", "degraded", "ubuntu")))
 
     val result = {withAkuru ~~>
-                    (drop[Blog] _) ~~>
-                    (drop[Label] _) ~~>
+                    (drop[Blog]) ~~>
+                    (drop[Label]) ~~>
                     (blogs.map(b => save(b))) ~~>
                     (blogs.flatMap(b => b.labels.map(l => save(Label(value = l)))).toList) ~~>
                     (findOne("title" -> "Hello World Lift")(printBlog)(ignoreError)) ~~>
-                    ( find { ("labels" ->  ("ubuntu|work"/i), "title" -> ("less"/i)) } { printBlogs } _) ~~>
-                    (update[Blog]("title" -> "lessons learned")(set("title", "Lessons Learned")) _) ~~>
-                    (findOne { "labels" -> ("work")/i } (printBlog) _)(ignoreError) ~~>
-                    (update[Blog]("title" -> "Lessons Learned")(b2) _) ~~>
+                    ( find { ("labels" ->  ("ubuntu|work"/i), "title" -> ("less"/i)) } { printBlogs }) ~~>
+                    (update[Blog]("title" -> "lessons learned")(set("title", "Lessons Learned"))) ~~>
+                    (findOne { "labels" -> ("work")/i } (printBlog))(ignoreError) ~~>
+                    (update[Blog]("title" -> "Lessons Learned")(b2)) ~~>
                     (findOne("labels" -> ("work")/i)(printBlog))(ignoreError) ~~>
-                    (upsert[Blog]("title" -> "Semigroup")(b3) _) ~~>
+                    (upsert[Blog]("title" -> "Semigroup")(b3)) ~~>
                     (findOne("labels" -> ("functional")./)(printBlog)(ignoreError))
                  } ~~>() getOrElse("success >>")
     println(result)
