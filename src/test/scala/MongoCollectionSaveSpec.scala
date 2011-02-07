@@ -17,18 +17,16 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
         with DomainSupport
         with MongoSpecSupport {
 
-  def success: Option[String] = None
-
   "A MongoCollection" should "save a new MongoObject" in {
-     ({ onDatabase("akuru_test") ~~>
-          (drop[Blog]) ~~>
-          ( findOne("title" -> "blah") { t:Blog => fail("Shouldn't have found Blog") } { ignoreError }) ~~>
-          ( save(Blog(title = "blah", labels = Seq("test", "random")))) ~~>
-          ( findOne("title" -> "blah") { t:Blog =>
+     ({ onTestDB ~~>
+          drop[Blog] ~~>
+          findOne("title" -> "blah") { t:Blog => fail("Shouldn't have found Blog") } { ignoreError } ~~>
+          save(Blog(title = "blah", labels = Seq("test", "random"))) ~~>
+          findOne("title" -> "blah") { t:Blog =>
               t.title should equal ("blah")
               t.labels should equal (Seq("test", "random"))
               success
-          } { fail("Didn't find Blog") })
+          } { fail("Didn't find Blog") }
       } ~~>()) verifySuccess
   }
 
@@ -38,12 +36,12 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
 
     def exceptionBlog():Blog = throw new RuntimeException(expectedError)
 
-    ({ onDatabase("akuru_test") ~~> (save(exceptionBlog))} ~~>()).verifyError(s => s should include regex (expectedError))
+    ({ onTestDB ~~> (save(exceptionBlog))} ~~>()).verifyError(s => s should include regex (expectedError))
   }
 
   it should ("handle errors that occur during function execution") in {
 
-    ({ onDatabase("akuru_test") ~~> save(Person(name = "sanj"))} ~~>()).verifyError(s => s should include regex (Person.expectedError))
+    ({ onTestDB ~~> save(Person(name = "sanj"))} ~~>()).verifyError(s => s should include regex (Person.expectedError))
   }
 
   case class Person(override val id:Option[MongoObjectId] = None, name:String) extends DomainObject

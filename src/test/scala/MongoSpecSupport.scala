@@ -6,7 +6,7 @@
 package akuru
 import org.scalatest.Assertions
 
-trait MongoSpecSupport { this:Assertions =>
+trait MongoSpecSupport { this:Assertions with MongoFunctions =>
 
   case class VerifyResult(op:Option[String]) {
 
@@ -25,6 +25,9 @@ trait MongoSpecSupport { this:Assertions =>
     }
   }
 
+  def success: Option[String] = None
+
   implicit def opToVerifyResult(op:Option[String]): VerifyResult = VerifyResult(op)
 
+  def onTestDB = onDatabase("akuru_test")
 }
