@@ -14,9 +14,11 @@ trait MongoFunctions extends Tools with DomainSupport {
 
   def createServer = () => new MongoServer
 
-  def save[T <% MongoObject : CollectionName](f: => T)(col:CollectionFunction): Option[String] = {
-    col(implicitly[CollectionName[T]].name).save3(f)
-  }
+//  def save[T <% MongoObject : CollectionName](f: => T)(col:CollectionFunction): Option[String] = {
+//    col(implicitly[CollectionName[T]].name).save3(f)
+//  }
+
+  def save[T <% MongoObject : CollectionName](f: => T): UserFunction = col => col(implicitly[CollectionName[T]].name).save3(f)
 
   //TODO: f should be f:() =>MongoObject
   def findOne[T](f: => MongoObject)(g: T => Option[String])(h:() => Unit)(col:String => MongoCollection)
@@ -47,6 +49,8 @@ trait MongoFunctions extends Tools with DomainSupport {
   def drop[T : CollectionName](col:String => MongoCollection): Option[String] = {
     col(implicitly[CollectionName[T]].name).drop3
   }
+
+  //implicit def funcToUserFunction(f: => Option[String]): UserFunction = col =>  f
 
   type UserFunction = CollectionFunction => Option[String]
 
