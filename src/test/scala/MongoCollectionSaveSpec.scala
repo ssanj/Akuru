@@ -11,7 +11,11 @@ import org.scalatest.matchers.ShouldMatchers
 import MongoTypes._
 import MongoObject.empty
 
-final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers with DomainObjects with MongoFunctions with DomainSupport {
+final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
+        with DomainObjects
+        with MongoFunctions
+        with DomainSupport
+        with MongoSpecSupport {
 
   def success: Option[String] = None
 
@@ -52,24 +56,4 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers with Do
 
     lazy val name = throw new RuntimeException("no person collection here!")
   }
-
-  case class VerifyResult(op:Option[String]) {
-
-    def verifySuccess() {
-      op match {
-        case Some(error) => fail(error)
-        case None =>
-      }
-    }
-
-    def verifyError(f:String => Unit) {
-      op match {
-        case Some(error) => f(error)
-        case None => fail("Expected an error")
-      }
-    }
-  }
-
-  implicit def opToVerifyResult(op:Option[String]): VerifyResult = VerifyResult(op)
-
 }
