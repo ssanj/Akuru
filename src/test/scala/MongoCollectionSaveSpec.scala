@@ -19,7 +19,7 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers with Do
      ({ onDatabase("akuru_test") ~~>
           (drop[Blog] _) ~~>
           ( findOne("title" -> "blah") { t:Blog => fail("Shouldn't have found Blog") } { ignoreError } _) ~~>
-          ( save(() => Blog(title = "blah", labels = Seq("test", "random"))) _) ~~>
+          ( save(Blog(title = "blah", labels = Seq("test", "random"))) _) ~~>
           ( findOne("title" -> "blah") { t:Blog =>
               t.title should equal ("blah")
               t.labels should equal (Seq("test", "random"))
@@ -34,12 +34,13 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers with Do
 
     def exceptionBlog():Blog = throw new RuntimeException(expectedError)
 
-    ({ onDatabase("akuru_test") ~~> save(exceptionBlog) _} ~~>()).verifyError(s => s should include regex (expectedError))
+    //have to use (_) instead of _. Could be a possible scala bug.  http://bit.ly/eqptdA
+    ({ onDatabase("akuru_test") ~~> (save(exceptionBlog)(_))} ~~>()).verifyError(s => s should include regex (expectedError))
   }
 
   it should ("handle errors that occur during function execution") in {
 
-    ({ onDatabase("akuru_test") ~~> save(() => Person(name = "sanj")) _} ~~>()).verifyError(s => s should include regex (Person.expectedError))
+    ({ onDatabase("akuru_test") ~~> save(Person(name = "sanj")) _} ~~>()).verifyError(s => s should include regex (Person.expectedError))
   }
 
   case class Person(override val id:Option[MongoObjectId] = None, name:String) extends DomainObject

@@ -37,7 +37,7 @@ trait MongoCollectionTrait extends Tools {
 
     def save[T](value:T)(implicit mc:MongoConverter[T]): Either[MongoError, Unit] =  save(mc.convert(value))
 
-    def save3[T <% MongoObject](value:T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
+    def save3[T <% MongoObject](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
 
     def findOne3[T](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Option[T]] = {
       runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => f3(t)) }
