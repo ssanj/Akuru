@@ -18,10 +18,8 @@ trait MongoFunctions extends Tools with DomainSupport {
 
   def save[T <% MongoObject : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save3(f)
 
-  def findOne[T](f: => MongoObject)(g: T => Option[String])(h:() => Unit)(col:String => MongoCollection)
-                (implicit f1: MongoObject => T, f2: CollectionName[T]): Option[String] = {
-    col(collectionName[T]).findOne3[T](f).fold(l => Some(l), r => foldOption(r){h.apply;None:Option[String]}(g))
-  }
+  def findOne[T : CollectionName, R >: MongoObject <% T](f: => MongoObject)(g: T => Option[String])(h: => Unit):UserFunction =
+    col => col(collectionName[T]).findOne3[T](f).fold(l => Some(l), r => foldOption(r){h;None:Option[String]}(g))
 
   def ignoreError = () => {}
 

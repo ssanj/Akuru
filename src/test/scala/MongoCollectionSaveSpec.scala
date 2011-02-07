@@ -18,14 +18,14 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers with Do
   "A MongoCollection" should "save a new MongoObject" in {
      ({ onDatabase("akuru_test") ~~>
           (drop[Blog] _) ~~>
-          ( findOne("title" -> "blah") { t:Blog => fail("Shouldn't have found Blog") } { ignoreError } _) ~~>
+          ( findOne("title" -> "blah") { t:Blog => fail("Shouldn't have found Blog") } { ignoreError }) ~~>
           ( save(Blog(title = "blah", labels = Seq("test", "random")))) ~~>
           ( findOne("title" -> "blah") { t:Blog =>
               t.title should equal ("blah")
               t.labels should equal (Seq("test", "random"))
               success
-          } { () => fail("Didn't find Blog") } _)
-      } ~~>()) verify
+          } { fail("Didn't find Blog") })
+      } ~~>()) verifySuccess
   }
 
   it should ("handle errors on object creation") in {
@@ -54,7 +54,8 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers with Do
   }
 
   case class VerifyResult(op:Option[String]) {
-    def verify() {
+
+    def verifySuccess() {
       op match {
         case Some(error) => fail(error)
         case None =>
