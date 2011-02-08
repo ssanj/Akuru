@@ -36,12 +36,10 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
     val expectedError = "ExceptionalBlog threw an Exception on Blog creation!Whoops"
 
     def exceptionBlog():Blog = throw new RuntimeException(expectedError)
-
-    ({ onTestDB ~~> (save(exceptionBlog))} ~~>()).verifyError(s => s should include regex (expectedError))
+    (onTestDB ~~> (save(exceptionBlog)) ~~>()) verifyError has (expectedError)
   }
 
   it should ("handle errors that occur during function execution") in {
-
-    ({ onTestDB ~~> save(Person(name = "sanj"))} ~~>()).verifyError(s => s should include regex (Person.expectedError))
+    (onTestDB ~~> save(Person(name = "sanj")) ~~>()) verifyError has (Person.expectedError)
   }
 }
