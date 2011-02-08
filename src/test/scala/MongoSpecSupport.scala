@@ -5,8 +5,9 @@
 
 package akuru
 import org.scalatest.Assertions
+import org.scalatest.matchers.ShouldMatchers
 
-trait MongoSpecSupport { this:Assertions with MongoFunctions =>
+trait MongoSpecSupport {   this:Assertions with ShouldMatchers with MongoFunctions =>
 
   case class VerifyResult(op:Option[String]) {
 
@@ -26,6 +27,8 @@ trait MongoSpecSupport { this:Assertions with MongoFunctions =>
   }
 
   def success: Option[String] = None
+
+  def has(str:String): String => Unit =  result => result should include regex (str)
 
   implicit def opToVerifyResult(op:Option[String]): VerifyResult = VerifyResult(op)
 

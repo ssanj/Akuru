@@ -15,7 +15,8 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
         with DomainObjects
         with MongoFunctions
         with DomainSupport
-        with MongoSpecSupport {
+        with MongoSpecSupport
+        with TestDomainObjects {
 
   "A MongoCollection" should "save a new MongoObject" in {
      ({ onTestDB ~~>
@@ -42,16 +43,5 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
   it should ("handle errors that occur during function execution") in {
 
     ({ onTestDB ~~> save(Person(name = "sanj"))} ~~>()).verifyError(s => s should include regex (Person.expectedError))
-  }
-
-  case class Person(override val id:Option[MongoObjectId] = None, name:String) extends DomainObject
-
-  implicit def personToMongo(p:Person): MongoObject = empty
-
-  implicit object Person extends CollectionName[Person] {
-
-    lazy val expectedError = "no person collection here!"
-
-    lazy val name = throw new RuntimeException("no person collection here!")
   }
 }
