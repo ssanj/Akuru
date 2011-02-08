@@ -8,6 +8,7 @@ package akuru
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FlatSpec
 import MongoTypes._
+import MongoTypes.RegexConstants._
 
 final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
         with DomainObjects
@@ -60,6 +61,18 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
     (
       onTestDB ~~> find("title" -> ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) ~~>()
     ) verifyError has ("Handler threw an Exception")
+  }
+
+  it should "find regex" in {
+    (
+      onTestDB ~~>
+              drop[Blog] ~~>
+              save(Blog(title="Querying with RegEx", labels = Seq("query", "regex"))) ~~>
+              find("title" -> ("querying with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (0); success }) ~~>
+              find("title" -> ("Querying with RegEx"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
+              find("title" -> (".* with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
+              find("labels" -> (".*query.*"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>()
+    ) verifySuccess
   }
 }
 
