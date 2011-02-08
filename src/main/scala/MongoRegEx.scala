@@ -46,7 +46,7 @@ trait MongoRegEx {
   case class RegExWithOptions(reg: String) {
     def /(flag: RegexConstants.Value): RegEx = RegEx(reg, Some(flag))
 
-    def / : RegEx = RegEx(reg)
+    def /(implicit op:Option[RegexConstants.Value]) : RegEx = RegEx(reg)
   }
 
   def regExToMongo(tuples: KeyedRegEx*): MongoObject = {
@@ -56,6 +56,8 @@ trait MongoRegEx {
   }
 
   def regex(tuples: KeyedRegEx*): MongoObject = regExToMongo(tuples:_*)
+
+  implicit def defaultRegExOption: Option[RegexConstants.Value] = None
 
   implicit def stringToRegX(reg: String): RegExWithOptions = RegExWithOptions(reg)
 
