@@ -69,7 +69,8 @@ trait MongoRegEx {
 
   implicit def regexTuple2ToMongoObject(tuples: Tuple2[KeyedRegEx, KeyedRegEx]): MongoObject = regExToMongo(tuples._1, tuples._2)
 
-  implicit def regexTuple3ToMongoObject(tuples: Tuple3[KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject = regExToMongo(tuples._1, tuples._2, tuples._3)
+  implicit def regexTuple3ToMongoObject(tuples: Tuple3[KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
+    regExToMongo(tuples._1, tuples._2, tuples._3)
 
   implicit def regexTuple4ToMongoObject(tuples: Tuple4[KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
     regExToMongo(tuples._1, tuples._2, tuples._3, tuples._4)
