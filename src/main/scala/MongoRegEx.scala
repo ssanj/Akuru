@@ -22,6 +22,7 @@ trait MongoRegEx {
     val m = Value(Pattern.MULTILINE)
     val u = Value(Pattern.UNICODE_CASE)
     val d = Value(Pattern.UNIX_LINES)
+    val none = Value(-1) //default
   }
 
    type KeyedRegEx = Tuple2[String, RegEx]
@@ -44,9 +45,12 @@ trait MongoRegEx {
   }
 
   case class RegExWithOptions(reg: String) {
-    def /(flag: RegexConstants.Value): RegEx = RegEx(reg, Some(flag))
-
-    def /(implicit op:Option[RegexConstants.Value]) : RegEx = RegEx(reg)
+    def /(implicit flag: RegexConstants.Value): RegEx = {
+      flag match {
+        case RegexConstants.none => RegEx(reg)
+        case _ => RegEx(reg, Some(flag))
+      }
+    }
   }
 
   def regExToMongo(tuples: KeyedRegEx*): MongoObject = {
@@ -57,7 +61,7 @@ trait MongoRegEx {
 
   def regex(tuples: KeyedRegEx*): MongoObject = regExToMongo(tuples:_*)
 
-  implicit def defaultRegExOption: Option[RegexConstants.Value] = None
+  implicit def defaultRegExOption: RegexConstants.Value = RegexConstants.none
 
   implicit def stringToRegX(reg: String): RegExWithOptions = RegExWithOptions(reg)
 
