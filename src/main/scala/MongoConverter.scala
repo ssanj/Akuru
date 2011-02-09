@@ -32,4 +32,11 @@ object AnyRefConverter {
   implicit object StringConverter extends AnyRefConverter[String] {
     def convert(anyRef:AnyRef): String = anyRef.toString
   }
+
+  implicit object BooleanConverter extends AnyRefConverter[Boolean] {
+    def convert(anyRef:AnyRef): Boolean = anyRef.toString.toLowerCase match {
+      case "true" => true
+      case _ => false
+    }
+  }
 }

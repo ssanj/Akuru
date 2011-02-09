@@ -32,11 +32,12 @@ trait MongoObjectTrait extends Tools {
 
     def getId: MongoObjectId = MongoObjectId(dbo.get("_id").asInstanceOf[ObjectId])
 
-    def getMongoArray[T](key:String)(implicit con:MongoConverter[T]): Seq[T] = {
+    def getMongoArray[T, R >: MongoObject <% T](key:String): Seq[T] = {
       import scala.collection.JavaConversions._
+      import MongoObject._
       val buffer = new ListBuffer[T]
       for(element <- dbo.get(key).asInstanceOf[BasicDBList].iterator) {
-        buffer += (con.convert(element.asInstanceOf[DBObject]))
+        buffer += (element.asInstanceOf[DBObject].toMongo)
       }
 
       buffer.toSeq
@@ -64,6 +65,7 @@ trait MongoObjectTrait extends Tools {
       MongoObject(dbo)
     }
 
+    //TODO:Make this return a copy
     def toDBObject: DBObject = dbo
   }
 
@@ -99,5 +101,11 @@ trait MongoObjectTrait extends Tools {
     def mongoObject(tuples:Tuple2[String, Any]*) = new MongoObject(tuples.toSeq)
 
     implicit def tToMongoObject(t:Tuple2[String, Any]*): MongoObject = new MongoObject(t.toSeq)
+
+    implicit def dboToDBOToMongo(dbo:DBObject): DBOToMongo = DBOToMongo(dbo)
+
+    case class DBOToMongo(dbo:DBObject) {
+      def toMongo(): MongoObject = MongoObject(dbo)
+    }
   }
 }
