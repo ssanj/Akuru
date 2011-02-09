@@ -18,9 +18,9 @@ trait MongoObjectTrait extends Tools {
 
     def this(tuples:Seq[Tuple2[String, Any]]) = this(new BasicDBObject(scala.collection.JavaConversions.asJavaMap(tuples.toMap)))
 
-    def get[T](key:String)(implicit con:AnyRefConverter[T]): T = con.convert(dbo.get(key))
+    def getPrimitive[T](key:String)(implicit con:AnyRefConverter[T]): T = con.convert(dbo.get(key))
 
-    def getPlainArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] = {
+    def getPrimitiveArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] = {
       import scala.collection.JavaConversions._
       val buffer = new ListBuffer[T]
       for(element <- dbo.get(key).asInstanceOf[BasicDBList].iterator) {
@@ -72,11 +72,7 @@ trait MongoObjectTrait extends Tools {
 
     implicit def MongoObjectToDBObject(mo:MongoObject): DBObject = mo.toDBObject
 
-    implicit def tuple2ToMongoObject(tuple2:Tuple2[String, Any]): MongoObject = {
-      val mo = new MongoObject
-      mo.put(tuple2._1, tuple2._2)
-      mo
-    }
+    implicit def tuple2ToMongoObject(tuple2:Tuple2[String, Any]): MongoObject =  mongo.put(tuple2._1, tuple2._2)
 
     def push(col:String, value:MongoObject): MongoObject =  $func("$push", col, value)
 
@@ -86,23 +82,13 @@ trait MongoObjectTrait extends Tools {
 
     def pull(col:String, value:MongoObject): MongoObject =  $func("$pull", col, value)
 
-    def $func(action:String, col:String, value:MongoObject): MongoObject = {
-      val parent = new MongoObject
-      val element = new MongoObject
-      element.putMongo(col, value)
-      parent.putMongo(action, element)
-      parent
-    }
+    def $func(action:String, col:String, value:MongoObject): MongoObject =  mongo.putMongo(action, mongo.putMongo(col, value))
 
-    def $funcAny(action:String, col:String, value:AnyRef): MongoObject = {
-      val parent = new MongoObject
-      val element = new MongoObject
-      element.put(col, value)
-      parent.putMongo(action, element)
-      parent
-    }
+    def $funcAny(action:String, col:String, value:AnyRef): MongoObject =  mongo.putMongo(action, mongo.put(col, value))
 
     def empty = new MongoObject
+
+    def mongo = new MongoObject
 
     def query(tuples:Tuple2[String, Any]*) = new MongoObject(tuples.toSeq)
 

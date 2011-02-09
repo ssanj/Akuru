@@ -20,7 +20,7 @@ trait DomainObjects { this:DomainSupport =>
     val labels = "labels"
 
     implicit def mongoToBlogConverter(mo:MongoObject): Blog = {
-      Blog(Some(mo.getId), mo.get[String](title), mo.getPlainArray[String](labels))
+      Blog(Some(mo.getId), mo.getPrimitive[String](title), mo.getPrimitiveArray[String](labels))
     }
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject =
@@ -35,7 +35,7 @@ trait DomainObjects { this:DomainSupport =>
 
     val value = "value"
 
-    implicit def mongoToLabelConverter(mo:MongoObject): Label = Label(Some(mo.getId), mo.get[String](value))
+    implicit def mongoToLabelConverter(mo:MongoObject): Label = Label(Some(mo.getId), mo.getPrimitive[String](value))
 
     implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).put[String](value, domain.value)
 
