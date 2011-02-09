@@ -15,15 +15,19 @@ trait DomainObjects { this:DomainSupport =>
   case class Label(override val id:Option[MongoObjectId] = None, value:String) extends DomainObject
 
   object Blog {
+
+    val title = "title"
+    val labels = "labels"
+
     implicit def mongoToBlogConverter(mo:MongoObject): Blog = {
-      Blog(Some(mo.getId), mo.get[String]("title"), mo.getPlainArray[String]("labels"))
+      Blog(Some(mo.getId), mo.get[String](title), mo.getPlainArray[String](labels))
     }
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = {
         val mo = empty
         domain.id.foreach(mo.putId)
-        mo.put("title", domain.title)
-        mo.putArray2("labels", domain.labels)
+        mo.put(title, domain.title)
+        mo.putArray2(labels, domain.labels)
         mo
     }
 
@@ -34,12 +38,14 @@ trait DomainObjects { this:DomainSupport =>
 
   object Label {
 
-    implicit def mongoToLabelConverter(mo:MongoObject): Label = Label(Some(mo.getId), mo.get[String]("value"))
+    val value = "value"
+
+    implicit def mongoToLabelConverter(mo:MongoObject): Label = Label(Some(mo.getId), mo.get[String](value))
 
     implicit def labelToMongoConverter(domain:Label): MongoObject = {
         val mo = empty
         domain.id.foreach(mo.putId)
-        mo.put("value", domain.value)
+        mo.put(value, domain.value)
         mo
     }
 
