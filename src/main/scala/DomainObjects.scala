@@ -10,7 +10,7 @@ import MongoObject.empty
 
 trait DomainObjects { this:DomainSupport =>
 
-  case class Blog(override val id:Option[MongoObjectId] = None, title:String, labels:Seq[String]) extends DomainObject
+  case class Blog(override val id:Option[MongoObjectId] = None, title:String, labels:Seq[String] = Seq[String]()) extends DomainObject
 
   case class Label(override val id:Option[MongoObjectId] = None, value:String) extends DomainObject
 
