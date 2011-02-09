@@ -11,6 +11,7 @@ import MongoTypes.MongoObjectId
 
 trait MongoObjectTrait extends Tools {
 
+  //TODO: Make this class immutable
   case class MongoObject(dbo:DBObject) {
 
     def this() = this(new BasicDBObject)

@@ -18,4 +18,8 @@ trait DomainSupport {
   trait CollectionName[T] {
     val name:String
   }
+
+  def putDomainId(domain:DomainObject, mo:MongoObject) {
+    domain.id.foreach(mo.putId)
+  }
 }
