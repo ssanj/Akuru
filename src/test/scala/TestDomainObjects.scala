@@ -16,14 +16,19 @@ trait TestDomainObjects { this:MongoFunctions =>
 
   case class Person(override val id:Option[MongoObjectId] = None, name:String) extends DomainObject
 
-  implicit def personToMongo(p:Person): MongoObject = empty
+  object Person {
 
-  implicit def mongoToPerson(mo:MongoObject): Person = Person(None, name = "testing")
+    val name = "name"
 
-  implicit object Person extends CollectionName[Person] {
+    implicit def personToMongo(p:Person): MongoObject = empty
+
+    implicit def mongoToPerson(mo:MongoObject): Person = Person(None, name = "testing")
 
     lazy val expectedError = "no person collection here!"
 
-    lazy val name = throw new RuntimeException(expectedError)
+    implicit object PersonCollectionName extends CollectionName[Person] {
+
+      lazy val name = throw new RuntimeException(expectedError)
+    }
   }
 }

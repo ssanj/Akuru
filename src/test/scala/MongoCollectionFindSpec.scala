@@ -24,7 +24,7 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
               save(Blog(title="sample1", labels = Seq("sample"))) ~~>
               save(Blog(title="sample2", labels = Seq("sample"))) ~~>
               save(Blog(title="sample3", labels = Seq("sample"))) ~~>
-              find("title" -> ("sample*"/))((blogs:Seq[Blog]) => {
+              find(Blog.title -> ("sample*"/))((blogs:Seq[Blog]) => {
                 blogs.size should equal (3)
                 blogs.exists(_.title == "sample1") should be (true)
                 blogs.exists(_.title == "sample2") should be (true)
@@ -38,7 +38,7 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
     ({
       onTestDB ~~>
               drop[Blog] ~~>
-              find("title" -> ("*"/)){(blogs:Seq[Blog]) =>
+              find(Blog.title -> ("*"/)){(blogs:Seq[Blog]) =>
                 blogs.size should equal (0)
                 success
               }
@@ -47,7 +47,7 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
 
   it should "handle exceptions thrown on finder execution" in {
     (
-      onTestDB ~~> find[Person, MongoObject]("name" -> ("*"/))(p => fail("Should not have return results")) ~~>()
+      onTestDB ~~> find[Person, MongoObject](Person.name -> ("*"/))(p => fail("Should not have return results")) ~~>()
     ) verifyError has (Person.expectedError)
   }
 
@@ -59,7 +59,7 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
 
   it should "handle exception thrown by handler function" in {
     (
-      onTestDB ~~> find("title" -> ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) ~~>()
+      onTestDB ~~> find(Blog.title -> ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) ~~>()
     ) verifyError has ("Handler threw an Exception")
   }
 
@@ -67,11 +67,11 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              save(Blog(title="Querying with RegEx", labels = Seq("query", "regex"))) ~~>
-              find("title" -> ("querying with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (0); success }) ~~>
-              find("title" -> ("Querying with RegEx"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
-              find("title" -> (".* with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
-              find("labels" -> (".*query.*"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>()
+              save(Blog(title = "Querying with RegEx", labels = Seq("query", "regex"))) ~~>
+              find(Blog.title -> ("querying with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (0); success }) ~~>
+              find(Blog.title -> ("Querying with RegEx"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
+              find(Blog.title -> (".* with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
+              find(Blog.labels -> (".*query.*"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>()
     ) verifySuccess
   }
 }

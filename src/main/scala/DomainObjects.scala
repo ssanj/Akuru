@@ -26,8 +26,8 @@ trait DomainObjects { this:DomainSupport =>
     implicit def blogToMongoConverter(domain:Blog): MongoObject = {
         val mo = empty
         domain.id.foreach(mo.putId)
-        mo.put(title, domain.title)
-        mo.putArray2(labels, domain.labels)
+        mo.put[String](title, domain.title)
+        mo.putArray2[String](labels, domain.labels)
         mo
     }
 
@@ -45,7 +45,7 @@ trait DomainObjects { this:DomainSupport =>
     implicit def labelToMongoConverter(domain:Label): MongoObject = {
         val mo = empty
         domain.id.foreach(mo.putId)
-        mo.put(value, domain.value)
+        mo.put[String](value, domain.value)
         mo
     }
 

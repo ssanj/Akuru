@@ -41,7 +41,7 @@ trait MongoObjectTrait extends Tools {
       buffer.toSeq
     }
 
-    def put(key:String, value:Any) { dbo.put(key, value.asInstanceOf[AnyRef]) }
+    def put[T](key:String, value:T) { dbo.put(key, value.asInstanceOf[AnyRef]) }
 
     def putMongo(key:String, mongo:MongoObject) { dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]) }
 
