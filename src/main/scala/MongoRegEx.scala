@@ -7,6 +7,7 @@ package akuru
 
 import MongoTypes._
 import MongoTypes.MongoObject.empty
+import MongoTypes.MongoObject.mongo
 
 trait MongoRegEx {
 
@@ -30,12 +31,8 @@ trait MongoRegEx {
   case class RegEx(reg: String, flag: Option[RegexConstants.Value] = None) {
 
     def toMongo(key: String): MongoObject = {
-      val mo = empty
-      val q = empty
-      mo.put("$regex", reg)
-      flag.foreach(f => getRegexFlags(f.id).foreach(mo.put("$options", _)))
-      q.put(key, mo.toDBObject)
-      q
+      val mo = mongo.putPrimitive("$regex", reg)
+      mongo.putMongo(key, foldOption(flag)(mo)(f => foldOption(getRegexFlags(f.id))(mo)(mo.putPrimitive("$options", _))))
     }
 
     private def getRegexFlags(f: Int): Option[String] = {
@@ -53,11 +50,7 @@ trait MongoRegEx {
     }
   }
 
-  def regExToMongo(tuples: KeyedRegEx*): MongoObject = {
-    val mo = empty
-    tuples foreach (t => mo.merge(t._2.toMongo(t._1)))
-    mo
-  }
+  def regExToMongo(tuples: KeyedRegEx*): MongoObject =  tuples.foldLeft(empty)((a,b) => a.merge(b._2.toMongo(b._1)))
 
   def regex(tuples: KeyedRegEx*): MongoObject = regExToMongo(tuples:_*)
 

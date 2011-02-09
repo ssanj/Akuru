@@ -64,8 +64,7 @@ trait MongoObjectTrait extends Tools {
       MongoObject(dbo)
     }
 
-    //TODO:Make this return a copy. Using dbo.toMap leads to errors. Investigate.
-    private[akuru] def toDBObject: DBObject = dbo
+    private[akuru] def toDBObject: DBObject = new BasicDBObject(dbo.toMap)
   }
 
   object MongoObject {
@@ -76,6 +75,8 @@ trait MongoObjectTrait extends Tools {
     implicit def tuple2PrimitiveToMongoObject(tuple2:Tuple2[String, AnyRef]): MongoObject =  mongo.putPrimitive(tuple2._1, tuple2._2)
 
     implicit def tuple2MongoToMongoObject(tuple2:Tuple2[String, MongoObject]): MongoObject =  mongo.putMongo(tuple2._1, tuple2._2)
+
+    implicit def dboToDBOToMongo(dbo:DBObject): DBOToMongo = DBOToMongo(dbo)
 
     def push(col:String, value:MongoObject): MongoObject =  $funcMongo("$push", col, value)
 
@@ -98,8 +99,6 @@ trait MongoObjectTrait extends Tools {
     def query(tuples:Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
 
     def mongoObject(tuples:Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
-
-    implicit def dboToDBOToMongo(dbo:DBObject): DBOToMongo = DBOToMongo(dbo)
 
     case class DBOToMongo(dbo:DBObject) {
       def toMongo(): MongoObject = MongoObject(dbo)
