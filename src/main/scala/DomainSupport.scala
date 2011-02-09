@@ -9,11 +9,16 @@ import MongoTypes._
 
 trait DomainSupport {
 
-  trait Ided {
-    val id:Option[MongoObjectId]
+  case class NamedField[T](name:String)
+
+  trait CommonTypes {
+      type idType = Option[MongoObjectId]
+      object id_nf extends NamedField[idType]("_id")
   }
 
-  trait DomainObject extends Ided
+  trait DomainObject extends CommonTypes {
+    val id:idType
+  }
 
   trait CollectionName[T] {
     val name:String

@@ -8,13 +8,24 @@ package akuru
 import MongoTypes._
 import MongoObject.empty
 
+
 trait DomainObjects { this:DomainSupport =>
 
-  case class Blog(override val id:Option[MongoObjectId] = None, title:String, labels:Seq[String]) extends DomainObject
+  import Blog.types._
+
+  case class Blog(override val id:idType = None, title:titleType, labels:labelsType) extends DomainObject
 
   case class Label(override val id:Option[MongoObjectId] = None, value:String) extends DomainObject
 
   object Blog {
+
+    object types extends CommonTypes {
+      type titleType = String
+      type labelsType = Seq[String]
+      object title_nf extends NamedField[titleType]("title")
+      object labels_nf extends NamedField[labelsType]("labels")
+    }
+
     implicit def mongoToBlogConverter(mo:MongoObject): Blog = {
       Blog(Some(mo.getId), mo.get[String]("title"), mo.getPlainArray[String]("labels"))
     }
@@ -27,7 +38,7 @@ trait DomainObjects { this:DomainSupport =>
         mo
     }
 
-    implicit object BlogCollection extends CollectionName[Blog] {
+    implicit object BlogCollectionName extends CollectionName[Blog] {
       override val name = "blog"
     }
   }
