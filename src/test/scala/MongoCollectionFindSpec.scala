@@ -17,7 +17,7 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
         with MongoSpecSupport
         with TestDomainObjects {
 
-  "A MongoCollection" should "find all saved objects matching a query" in {
+  "A MongoCollection with find" should "find all saved objects matching a query" in {
     ({
       onTestDB ~~>
               drop[Blog] ~~>
@@ -57,7 +57,7 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
     ) verifyError has (mongoCreationException)
   }
 
-  it should "handle exception thrown by handler function" in {
+  it should "handle exception thrown by match handler function" in {
     (
       onTestDB ~~> find(Blog.title -> ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) ~~>()
     ) verifyError has ("Handler threw an Exception")
