@@ -11,7 +11,6 @@ import MongoTypes.MongoObjectId
 
 trait MongoObjectTrait extends Tools {
 
-  //TODO: Make this class immutable
   case class MongoObject(dbo:DBObject) {
 
     def this() = this(new BasicDBObject)
@@ -65,8 +64,8 @@ trait MongoObjectTrait extends Tools {
       MongoObject(dbo)
     }
 
-    //TODO:Make this return a copy
-    def toDBObject: DBObject = dbo
+    //TODO:Make this return a copy. Using dbo.toMap leads to errors. Investigate.
+    private[akuru] def toDBObject: DBObject = dbo
   }
 
   object MongoObject {
@@ -74,7 +73,7 @@ trait MongoObjectTrait extends Tools {
 
     implicit def MongoObjectToDBObject(mo:MongoObject): DBObject = mo.toDBObject
 
-    implicit def tuple2PrimitiveToMongoObject(tuple2:Tuple2[String, Any]): MongoObject =  mongo.putPrimitive(tuple2._1, tuple2._2)
+    implicit def tuple2PrimitiveToMongoObject(tuple2:Tuple2[String, AnyRef]): MongoObject =  mongo.putPrimitive(tuple2._1, tuple2._2)
 
     implicit def tuple2MongoToMongoObject(tuple2:Tuple2[String, MongoObject]): MongoObject =  mongo.putMongo(tuple2._1, tuple2._2)
 
@@ -96,11 +95,9 @@ trait MongoObjectTrait extends Tools {
 
     def mongo = new MongoObject
 
-    def query(tuples:Tuple2[String, Any]*) = new MongoObject(tuples.toSeq)
+    def query(tuples:Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
 
-    def mongoObject(tuples:Tuple2[String, Any]*) = new MongoObject(tuples.toSeq)
-
-    implicit def tToMongoObject(t:Tuple2[String, Any]*): MongoObject = new MongoObject(t.toSeq)
+    def mongoObject(tuples:Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
 
     implicit def dboToDBOToMongo(dbo:DBObject): DBOToMongo = DBOToMongo(dbo)
 

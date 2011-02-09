@@ -3,17 +3,17 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-package akuru
+package testing
 
+import _root_.akuru._
 import MongoTypes._
-import MongoTypes.MongoObject.query
 
 object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFunctions with DomainSupport {
 
 
   def main(args: Array[String]) {
-    import RegexConstants._
-    import MongoObject._
+    import MongoTypes.RegexConstants._
+    import MongoTypes.MongoObject._
 
     val b1 = Blog(title = "lessons learned", labels = Seq("jobs", "lessons", "work"))
     val b2 = Blog(title = "lessons learned", labels = Seq("jobs", "work"))
