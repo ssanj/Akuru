@@ -32,7 +32,7 @@ trait MongoObjectTrait extends Tools {
 
     def getId: MongoObjectId = MongoObjectId(dbo.get("_id").asInstanceOf[ObjectId])
 
-    def getArray[T](key:String)(implicit con:MongoConverter[T]): Seq[T] = {
+    def getMongoArray[T](key:String)(implicit con:MongoConverter[T]): Seq[T] = {
       import scala.collection.JavaConversions._
       val buffer = new ListBuffer[T]
       for(element <- dbo.get(key).asInstanceOf[BasicDBList].iterator) {
@@ -42,7 +42,7 @@ trait MongoObjectTrait extends Tools {
       buffer.toSeq
     }
 
-    def put[T](key:String, value:T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); MongoObject(dbo) }
+    def putPrimitive[T](key:String, value:T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); MongoObject(dbo) }
 
     def putMongo(key:String, mongo:MongoObject): MongoObject = { dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]); MongoObject(dbo) }
 
@@ -50,14 +50,14 @@ trait MongoObjectTrait extends Tools {
 
     def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo); MongoObject(dbo) }
 
-    def putArray(key:String, values:Seq[MongoObject]): MongoObject = {
+    def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = {
       import scala.collection.JavaConversions._
       val list:java.util.List[DBObject] = values.map(_.toDBObject)
       dbo.put(key, list)
       MongoObject(dbo)
     }
 
-    def putArray2[T](key:String, values:Seq[T]): MongoObject = {
+    def putPrimitiveArray[T](key:String, values:Seq[T]): MongoObject = {
       import scala.collection.JavaConversions._
       val list:java.util.List[T] = values
       dbo.put(key, list)
@@ -72,19 +72,23 @@ trait MongoObjectTrait extends Tools {
 
     implicit def MongoObjectToDBObject(mo:MongoObject): DBObject = mo.toDBObject
 
-    implicit def tuple2ToMongoObject(tuple2:Tuple2[String, Any]): MongoObject =  mongo.put(tuple2._1, tuple2._2)
+    implicit def tuple2PrimitiveToMongoObject(tuple2:Tuple2[String, Any]): MongoObject =  mongo.putPrimitive(tuple2._1, tuple2._2)
 
-    def push(col:String, value:MongoObject): MongoObject =  $func("$push", col, value)
+    implicit def tuple2MongoToMongoObject(tuple2:Tuple2[String, MongoObject]): MongoObject =  mongo.putMongo(tuple2._1, tuple2._2)
 
-    def set(col:String, value:AnyRef): MongoObject =  $funcAny("$set", col, value)
+    def push(col:String, value:MongoObject): MongoObject =  $funcMongo("$push", col, value)
 
-    def set(col:String, value:MongoObject): MongoObject =  $func("$set", col, value)
+    def set(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$set", col, value)
 
-    def pull(col:String, value:MongoObject): MongoObject =  $func("$pull", col, value)
+    def set(col:String, value:MongoObject): MongoObject =  $funcMongo("$set", col, value)
 
-    def $func(action:String, col:String, value:MongoObject): MongoObject =  mongo.putMongo(action, mongo.putMongo(col, value))
+    def pull(col:String, value:MongoObject): MongoObject =  $funcMongo("$pull", col, value)
 
-    def $funcAny(action:String, col:String, value:AnyRef): MongoObject =  mongo.putMongo(action, mongo.put(col, value))
+    def pull(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$pull", col, value)
+
+    def $funcMongo(action:String, col:String, value:MongoObject): MongoObject =  mongo.putMongo(action, mongo.putMongo(col, value))
+
+    def $funcPrimitive(action:String, col:String, value:AnyRef): MongoObject =  mongo.putMongo(action, mongo.putPrimitive(col, value))
 
     def empty = new MongoObject
 
