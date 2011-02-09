@@ -6,6 +6,7 @@
 package akuru
 
 import MongoTypes._
+import MongoTypes.MongoObject.empty
 
 trait DomainSupport {
 
@@ -19,7 +20,5 @@ trait DomainSupport {
     val name:String
   }
 
-  def putDomainId(domain:DomainObject, mo:MongoObject) {
-    domain.id.foreach(mo.putId)
-  }
+  def putDomainId(domain:DomainObject): MongoObject =  foldOption(domain.id)(empty)(id => empty.putId(id))
 }

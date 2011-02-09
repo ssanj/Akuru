@@ -4,17 +4,16 @@
  */
 package akuru
 
-import com.mongodb.{DBCollection}
+import com.mongodb.DBCollection
 import MongoTypes._
-import scala.{Either}
+import scala.Either
 
 trait MongoCollectionTrait extends Tools {
 
   //TODO:Once all methods ar tested remove dbc and replace with newdbc.
   case class MongoCollection(dbc:DBCollection, newdbc:DBCollectionTrait) {
 
-    import org.bson.types.ObjectId
-    import com.mongodb.{DBObject, WriteResult}
+    import com.mongodb.WriteResult
 
    def save3[T <% MongoObject](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
 
@@ -37,7 +36,6 @@ trait MongoCollectionTrait extends Tools {
       import MongoTypes.MongoWriteResult._
       runSafelyWithEither(f.apply).fold(l => Some(l), r => r.getStringError)
     }
-
 
     def findAndModify[T](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean)(implicit mc:MongoConverter[T]):
       Either[MongoError, T] = {

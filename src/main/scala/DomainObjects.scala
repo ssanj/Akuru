@@ -23,14 +23,8 @@ trait DomainObjects { this:DomainSupport =>
       Blog(Some(mo.getId), mo.get[String](title), mo.getPlainArray[String](labels))
     }
 
-    implicit def blogToMongoConverter(domain:Blog): MongoObject = {
-        //putDomainId(domain).put[String](title, domain.title).putArray2[String](labels, domain.labels)
-        val mo = empty
-        putDomainId(domain, mo)
-        mo.put[String](title, domain.title)
-        mo.putArray2[String](labels, domain.labels)
-        mo
-    }
+    implicit def blogToMongoConverter(domain:Blog): MongoObject =
+      putDomainId(domain).put[String](title, domain.title).putArray2[String](labels, domain.labels)
 
     implicit object BlogCollection extends CollectionName[Blog] {
       override val name = "blog"
@@ -43,17 +37,11 @@ trait DomainObjects { this:DomainSupport =>
 
     implicit def mongoToLabelConverter(mo:MongoObject): Label = Label(Some(mo.getId), mo.get[String](value))
 
-    implicit def labelToMongoConverter(domain:Label): MongoObject = {
-        val mo = empty
-        putDomainId(domain, mo)
-        mo.put[String](value, domain.value)
-        mo
-    }
+    implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).put[String](value, domain.value)
 
     implicit object LabelCollection extends CollectionName[Label] {
       override val name = "label"
     }
   }
-
 }
 

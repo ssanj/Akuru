@@ -42,28 +42,29 @@ trait MongoObjectTrait extends Tools {
       buffer.toSeq
     }
 
-    def put[T](key:String, value:T) { dbo.put(key, value.asInstanceOf[AnyRef]) }
+    def put[T](key:String, value:T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); MongoObject(dbo) }
 
-    def putMongo(key:String, mongo:MongoObject) { dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]) }
+    def putMongo(key:String, mongo:MongoObject): MongoObject = { dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]); MongoObject(dbo) }
 
-    def putId(id:MongoObjectId) { dbo.put("_id", id.toObjectId) }
+    def putId(id:MongoObjectId): MongoObject = { dbo.put("_id", id.toObjectId); MongoObject(dbo) }
 
-    def merge(mo:MongoObject) { dbo.putAll(mo) }
+    def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo); MongoObject(dbo) }
 
-    def putArray(key:String, values:Seq[MongoObject]) {
+    def putArray(key:String, values:Seq[MongoObject]): MongoObject = {
       import scala.collection.JavaConversions._
       val list:java.util.List[DBObject] = values.map(_.toDBObject)
       dbo.put(key, list)
+      MongoObject(dbo)
     }
 
-    def putArray2[T](key:String, values:Seq[T]) {
+    def putArray2[T](key:String, values:Seq[T]): MongoObject = {
       import scala.collection.JavaConversions._
       val list:java.util.List[T] = values
       dbo.put(key, list)
+      MongoObject(dbo)
     }
 
     def toDBObject: DBObject = dbo
-
   }
 
   object MongoObject {
