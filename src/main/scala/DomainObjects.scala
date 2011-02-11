@@ -14,6 +14,8 @@ trait DomainObjects { this:DomainSupport =>
 
   case class Label(override val id:Option[MongoObjectId] = None, value:String) extends DomainObject
 
+  case class Blah()
+
   object Blog {
 
     val title = "title"

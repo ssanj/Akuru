@@ -14,23 +14,23 @@ trait MongoFunctions extends Tools with DomainSupport {
 
   def createServer = () => new MongoServer
 
-  def collectionName[T : CollectionName]: String = implicitly[CollectionName[T]].name
+  def collectionName[T <: DomainObject : CollectionName]: String = implicitly[CollectionName[T]].name
 
-  def save[T <% MongoObject : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save3(f)
+  def save[T <: DomainObject <% MongoObject : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save3(f)
 
-  def findOne[T : CollectionName, R >: MongoObject <% T](f: => MongoObject)(g: T => Option[String])(h: => Unit):UserFunction =
+  def findOne[T <: DomainObject : CollectionName, R >: MongoObject <% T](f: => MongoObject)(g: T => Option[String])(h: => Unit):UserFunction =
     col => col(collectionName[T]).findOne3[T](f).fold(l => Some(l), r => foldOption(r){h;None:Option[String]}(g))
 
   def ignoreError = () => {}
 
-  def find[T : CollectionName, R >: MongoObject <% T](f: => MongoObject)(g: Seq[T] => Option[String]): UserFunction =
+  def find[T <: DomainObject : CollectionName, R >: MongoObject <% T](f: => MongoObject)(g: Seq[T] => Option[String]): UserFunction =
     col => col(collectionName[T]).find3[T](f).fold(l => Some(l), r => g(r))
 
-  def update[T : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction = col => col(collectionName[T]).update3(f, r)
+  def update[T <: DomainObject : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction = col => col(collectionName[T]).update3(f, r)
 
-  def upsert[T : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction = col => col(collectionName[T]).update3(f, r, true)
+  def upsert[T <: DomainObject : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction = col => col(collectionName[T]).update3(f, r, true)
 
-  def drop[T : CollectionName]: UserFunction = col => col(collectionName[T]).drop3
+  def drop[T <: DomainObject : CollectionName]: UserFunction = col => col(collectionName[T]).drop3
 
   type UserFunction = CollectionFunction => Option[String]
 

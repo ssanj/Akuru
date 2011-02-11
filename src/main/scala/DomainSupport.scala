@@ -16,7 +16,7 @@ trait DomainSupport {
 
   trait DomainObject extends Ided
 
-  trait CollectionName[T] {
+  trait CollectionName[T <: DomainObject] {
     val name:String
   }
 
