@@ -5,8 +5,9 @@
 package akuru
 
 import MongoTypes.MongoObject
+import MongoTypes.DomainObject
 
-trait MongoConverter[T] {
+trait MongoConverter[T <: DomainObject] {
   def convert(mo:MongoObject): T
   def convert(domain:T): MongoObject
 }

@@ -8,7 +8,7 @@ import com.mongodb.DBCollection
 import MongoTypes._
 import scala.Either
 
-trait MongoCollectionTrait extends MongoFunctions { this:Tools with DomainSupport =>
+trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
 
   //TODO:Once all methods ar tested remove dbc and replace with newdbc.
   case class MongoCollection(dbc:DBCollection, newdbc:DBCollectionTrait) {
@@ -17,11 +17,11 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools with DomainSuppor
 
    def save3[T <: DomainObject <% MongoObject](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
 
-    def findOne3[T](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Option[T]] = {
+    def findOne3[T <: DomainObject](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Option[T]] = {
       runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => f3(t)) }
     }
 
-    def find3[T](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Seq[T]] = {
+    def find3[T <: DomainObject](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Seq[T]] = {
       runSafelyWithEither {
         val mc:MongoCursor = dbc.find(mo)
         mc.asSeq[T]
@@ -37,7 +37,7 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools with DomainSuppor
       runSafelyWithEither(f.apply).fold(l => Some(l), r => r.getStringError)
     }
 
-    def findAndModify[T](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean)(implicit mc:MongoConverter[T]):
+    def findAndModify[T <: DomainObject](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean)(implicit mc:MongoConverter[T]):
       Either[MongoError, T] = {
       import MongoObject.empty
       wrapWith {
