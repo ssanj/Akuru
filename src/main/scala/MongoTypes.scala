@@ -17,5 +17,6 @@ object MongoTypes extends MongoServerTrait with
                           MongoErrorTrait with
                           WrapWithTrait with
                           MongoFunc with
-                          MongoRegEx {
+                          MongoRegEx with
+                          DomainSupport {
 }

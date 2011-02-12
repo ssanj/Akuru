@@ -16,7 +16,8 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
         with MongoFunctions
         with DomainSupport
         with MongoSpecSupport
-        with TestDomainObjects {
+        with TestDomainObjects
+        with Tools {
 
   "A MongoCollection" should "save a new MongoObject" in {
      ({ onTestDB ~~>

@@ -6,7 +6,7 @@
 package akuru
 import MongoTypes._
 
-trait MongoFunctions extends Tools with DomainSupport {
+trait MongoFunctions { this:Tools  =>
 
   def withConnection(s:() => MongoServer)(dbName:String): FutureConnection =  FutureConnection(s, dbName)
 
@@ -16,7 +16,7 @@ trait MongoFunctions extends Tools with DomainSupport {
 
   def collectionName[T <: DomainObject : CollectionName]: String = implicitly[CollectionName[T]].name
 
-  def save[T <: DomainObject <% MongoObject : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save3(f)
+  def save[T <: DomainObject <% MongoObject : CollectionName : ClassManifest](f: => T): UserFunction = col => col(collectionName[T]).save3[T](f)
 
   def findOne[T <: DomainObject : CollectionName, R >: MongoObject <% T](f: => MongoObject)(g: T => Option[String])(h: => Unit):UserFunction =
     col => col(collectionName[T]).findOne3[T](f).fold(l => Some(l), r => foldOption(r){h;None:Option[String]}(g))

@@ -8,14 +8,14 @@ import com.mongodb.DBCollection
 import MongoTypes._
 import scala.Either
 
-trait MongoCollectionTrait extends Tools {
+trait MongoCollectionTrait extends MongoFunctions { this:Tools with DomainSupport =>
 
   //TODO:Once all methods ar tested remove dbc and replace with newdbc.
   case class MongoCollection(dbc:DBCollection, newdbc:DBCollectionTrait) {
 
     import com.mongodb.WriteResult
 
-   def save3[T <% MongoObject](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
+   def save3[T <: DomainObject <% MongoObject](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
 
     def findOne3[T](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Option[T]] = {
       runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => f3(t)) }

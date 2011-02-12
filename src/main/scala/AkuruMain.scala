@@ -26,8 +26,8 @@ object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFun
     val result = {withAkuru ~~>
                     (drop[Blog]) ~~>
                     (drop[Label]) ~~>
-                    (blogs.map(b => save(b))) ~~>
-                    (blogs.flatMap(b => b.labels.map(l => save(Label(value = l)))).toList) ~~>
+                    (blogs.map(b => save[Blog](b))) ~~>
+                    (blogs.flatMap(b => b.labels.map(l => save[Label](Label(value = l)))).toList) ~~>
                     (findOne(Blog.title -> "Hello World Lift")(printBlog)(ignoreError)) ~~>
                     ( find { (Blog.labels ->  ("ubuntu|work"/i), "title" -> ("less"/i)) } { printBlogs }) ~~>
                     (update[Blog](Blog.title -> "lessons learned")(set("title", "Lessons Learned"))) ~~>

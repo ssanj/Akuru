@@ -8,7 +8,7 @@ package akuru
 import MongoTypes._
 import MongoObject.empty
 
-trait DomainObjects { this:DomainSupport =>
+trait DomainObjects {
 
   case class Blog(override val id:Option[MongoObjectId] = None, title:String, labels:Seq[String] = Seq[String]()) extends DomainObject
 

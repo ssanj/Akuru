@@ -15,7 +15,8 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
         with MongoFunctions
         with DomainSupport
         with MongoSpecSupport
-        with TestDomainObjects {
+        with TestDomainObjects
+        with Tools {
 
   "A MongoCollection with find" should "find all saved objects matching a query" in {
     ({

@@ -5,10 +5,11 @@
 
 package akuru
 
-import MongoTypes._
+import MongoTypes.MongoObjectId
+import MongoTypes.MongoObject
 import MongoTypes.MongoObject.empty
 
-trait DomainSupport {
+trait DomainSupport { this:Tools =>
 
   trait Ided {
     val id:Option[MongoObjectId]
