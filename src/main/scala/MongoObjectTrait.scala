@@ -14,6 +14,8 @@ trait MongoObjectTrait extends Tools {
 
   case class MongoObject(dbo:DBObject) {
 
+    import scala.collection.generic.CanBuildFrom
+
     def this() = this(new BasicDBObject)
 
     def this(tuples:Seq[Tuple2[String, Any]]) = this(new BasicDBObject(scala.collection.JavaConversions.asJavaMap(tuples.toMap)))
@@ -64,6 +66,14 @@ trait MongoObjectTrait extends Tools {
       import scala.collection.JavaConversions._
       val list:java.util.List[T] = values
       dbo.put(key, list)
+      copyMongoObject
+    }
+
+    //TODO: Test
+    def putPrimitiveArray[T](fv:FieldValue[Traversable[T]]): MongoObject = {
+      import scala.collection.JavaConversions._
+      val list:java.util.List[T] = fv.value.toSeq
+      dbo.put(fv.name, list)
       copyMongoObject
     }
 
