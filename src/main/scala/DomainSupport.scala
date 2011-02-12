@@ -11,6 +11,16 @@ import MongoTypes.MongoObject.empty
 
 trait DomainSupport { this:Tools =>
 
+  case class FieldValue[T](field:Field[T], value:T) {
+    val name = field.name
+  }
+
+  case class Field[T](name:String) {
+    def apply(value:T): FieldValue[T] = FieldValue[T](this, value)
+  }
+
+  val idF = Field[MongoObjectId]("_id")
+
   trait Ided {
     val id:Option[MongoObjectId]
   }
