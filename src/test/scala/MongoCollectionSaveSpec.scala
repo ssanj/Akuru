@@ -8,15 +8,11 @@ package akuru
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import MongoTypes._
-import MongoObject.empty
 
 final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
-        with DomainObjects
-        with MongoFunctions
-        with DomainSupport
-        with MongoSpecSupport
         with TestDomainObjects
+        with MongoFunctions
+        with MongoSpecSupport
         with Tools {
 
   "A MongoCollection" should "save a new MongoObject" in {

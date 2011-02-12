@@ -11,9 +11,8 @@ import MongoTypes._
 import MongoTypes.RegexConstants._
 
 final class MongoCollectionFindOneSpec extends FlatSpec with ShouldMatchers
-        with DomainObjects
-        with MongoFunctions
         with TestDomainObjects
+        with MongoFunctions
         with MongoSpecSupport
         with Tools {
 

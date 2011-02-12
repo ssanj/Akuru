@@ -11,11 +11,9 @@ import MongoTypes._
 import MongoTypes.RegexConstants._
 
 final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
-        with DomainObjects
-        with MongoFunctions
-        with DomainSupport
-        with MongoSpecSupport
         with TestDomainObjects
+        with MongoFunctions
+        with MongoSpecSupport
         with Tools {
 
   "A MongoCollection with find" should "find all saved objects matching a query" in {

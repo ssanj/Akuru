@@ -3,12 +3,12 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-package testing
+package runners
 
 import _root_.akuru._
 import MongoTypes._
 
-object AkuruMain extends DomainObjects with Tools with SideEffects with MongoFunctions with DomainSupport {
+object AkuruRunner extends TestDomainObjects with MongoFunctions with Tools with SideEffects {
 
 
   def main(args: Array[String]) {
