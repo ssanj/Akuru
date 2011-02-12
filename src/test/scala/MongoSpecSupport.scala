@@ -7,7 +7,7 @@ package akuru
 import org.scalatest.Assertions
 import org.scalatest.matchers.ShouldMatchers
 
-trait MongoSpecSupport {   this:Assertions with ShouldMatchers with MongoFunctions =>
+trait MongoSpecSupport { this:Assertions with ShouldMatchers with MongoFunctions =>
 
   case class VerifyResult(op:Option[String]) {
 

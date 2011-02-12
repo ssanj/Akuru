@@ -17,8 +17,6 @@ final class MongoCollectionFindOneSpec extends FlatSpec with ShouldMatchers
         with MongoSpecSupport
         with Tools {
 
-  import Person._
-
   "A MongoCollection with findOne" should "find a single match even if multiple matches exist" in {
     (onTestDB ~~>
             drop[Blog] ~~>

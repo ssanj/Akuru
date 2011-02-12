@@ -8,7 +8,7 @@ package akuru
 import MongoTypes._
 import MongoTypes.MongoObject.empty
 
-trait TestDomainObjects { this:MongoFunctions =>
+trait TestDomainObjects {
 
   lazy val mongoCreationException = "Exceptional MongoObject"
 
