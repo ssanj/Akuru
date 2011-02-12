@@ -8,6 +8,7 @@ import collection.mutable.ListBuffer
 import com.mongodb.{BasicDBList, BasicDBObject, DBObject}
 import org.bson.types.ObjectId
 import MongoTypes.MongoObjectId
+import MongoTypes.FieldValue
 
 trait MongoObjectTrait extends Tools {
 
@@ -42,29 +43,33 @@ trait MongoObjectTrait extends Tools {
       buffer.toSeq
     }
 
-    def putPrimitive[T](key:String, value:T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); MongoObject(dbo) }
+    def putPrimitive[T](key:String, value:T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); copyMongoObject }
 
-    def putMongo(key:String, mongo:MongoObject): MongoObject = { dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]); MongoObject(dbo) }
+    def putPrimitive[T](fv:FieldValue[T]): MongoObject = { dbo.put(fv.name, fv.value.asInstanceOf[AnyRef]); copyMongoObject }
 
-    def putId(id:MongoObjectId): MongoObject = { dbo.put("_id", id.toObjectId); MongoObject(dbo) }
+    def putMongo(key:String, mongo:MongoObject): MongoObject = { dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]); copyMongoObject }
 
-    def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo); MongoObject(dbo) }
+    def putId(id:MongoObjectId): MongoObject = { dbo.put("_id", id.toObjectId); copyMongoObject }
+
+    def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo); copyMongoObject }
 
     def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = {
       import scala.collection.JavaConversions._
       val list:java.util.List[DBObject] = values.map(_.toDBObject)
       dbo.put(key, list)
-      MongoObject(dbo)
+      copyMongoObject
     }
 
     def putPrimitiveArray[T](key:String, values:Seq[T]): MongoObject = {
       import scala.collection.JavaConversions._
       val list:java.util.List[T] = values
       dbo.put(key, list)
-      MongoObject(dbo)
+      copyMongoObject
     }
 
     private[akuru] def toDBObject: DBObject = new BasicDBObject(dbo.toMap)
+
+    private[akuru] def copyMongoObject: MongoObject = MongoObject(toDBObject)
   }
 
   object MongoObject {
@@ -76,6 +81,7 @@ trait MongoObjectTrait extends Tools {
 
     implicit def tuple2MongoToMongoObject(tuple2:Tuple2[String, MongoObject]): MongoObject =  mongo.putMongo(tuple2._1, tuple2._2)
 
+    //TODO: remove this
     implicit def dboToDBOToMongo(dbo:DBObject): DBOToMongo = DBOToMongo(dbo)
 
     def push(col:String, value:MongoObject): MongoObject =  $funcMongo("$push", col, value)
@@ -100,6 +106,7 @@ trait MongoObjectTrait extends Tools {
 
     def mongoObject(tuples:Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
 
+    //TODO: remove this
     case class DBOToMongo(dbo:DBObject) {
       def toMongo(): MongoObject = MongoObject(dbo)
     }
