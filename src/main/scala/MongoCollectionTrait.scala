@@ -15,13 +15,13 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
 
     import com.mongodb.WriteResult
 
-   def save3[T <: DomainObject : DomaintToMongo](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
+   def save[T <: DomainObject : DomaintToMongo](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
 
-    def findOne3[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Option[T]] = {
+    def findOne[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Option[T]] = {
       runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => implicitly[MongoToDomain[T]].apply(t)) }
     }
 
-    def find3[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Seq[T]] = {
+    def find[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Seq[T]] = {
       runSafelyWithEither {
         val mc:MongoCursor = dbc.find(mo)
         mc.asSeq[T]

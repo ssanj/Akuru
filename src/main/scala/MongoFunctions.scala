@@ -16,15 +16,15 @@ trait MongoFunctions { this:Tools  =>
 
   def collectionName[T <: DomainObject : CollectionName]: String = implicitly[CollectionName[T]].name
 
-  def save[T <: DomainObject : DomaintToMongo : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save3[T](f)
+  def save[T <: DomainObject : DomaintToMongo : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save[T](f)
 
   def findOne[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(g: T => Option[String])(h: => Unit):UserFunction =
-    col => col(collectionName[T]).findOne3[T](f).fold(l => Some(l), r => foldOption(r){h;None:Option[String]}(g))
+    col => col(collectionName[T]).findOne[T](f).fold(l => Some(l), r => foldOption(r){h;None:Option[String]}(g))
 
   def ignoreError = () => {}
 
   def find[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(g: Seq[T] => Option[String]): UserFunction =
-    col => col(collectionName[T]).find3[T](f).fold(l => Some(l), r => g(r))
+    col => col(collectionName[T]).find[T](f).fold(l => Some(l), r => g(r))
 
   def update[T <: DomainObject : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction = col => col(collectionName[T]).update3(f, r)
 
