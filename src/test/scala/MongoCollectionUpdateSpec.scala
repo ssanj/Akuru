@@ -22,7 +22,7 @@ final class MongoCollectionUpdateSpec extends FlatSpec with ShouldMatchers
             drop[Blog] ~~>
             save(Blog(title = titleField("Blog updates"), labels = labelsField(Seq("blog, update")))) ~~>
             findOne(Blog.titleField.name -> "Blog updates") { b:Blog => ignoreSuccess } {  throw new RuntimeException("Could not find Blog") } ~~>
-            update(Blog.titleField.name -> "Blog updates" ) { set(Blog.titleField("Blog Updatees")) } ~~>
+            update[Blog](Blog.titleField.name -> "Blog updates" ) { set(Blog.titleField("Blog Updatees")) } ~~>
             findOne(Blog.titleField.name -> "Blog updates") { b:Blog => throw new RuntimeException("found old Blog") } {  ignoreError }  ~~>
             findOne(Blog.titleField.name -> "Blog Updatees") { b:Blog =>
               b.title.value should equal ("Blog Updatees")

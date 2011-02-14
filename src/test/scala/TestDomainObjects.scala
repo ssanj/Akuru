@@ -67,4 +67,34 @@ trait TestDomainObjects {
       lazy val name = throw new RuntimeException(expectedError)
     }
   }
+
+  case class Book(override val id:FieldValue[MID] = defaultId,
+                  name:FieldValue[String],
+                  authors:FieldValue[Seq[String]] = Book.authorsField(Seq("misc")),
+                  publisher:FieldValue[String],
+                  printVersion:FieldValue[Int] = Book.printVersionField(1),
+                  price:FieldValue[Double]) extends DomainObject
+
+  object Book {
+    val nameField = Field[String]("name")
+    val authorsField = Field[Seq[String]]("authors")
+    val publisherField = Field[String]("pub")
+    val printVersionField = Field[Int]("version")
+    val priceField = Field[Double]("price")
+
+    implicit def bookToMongo(b:Book): MongoObject = putDomainId(b).
+            putPrimitive(b.name).putPrimitiveArray(b.authors).putPrimitive(b.publisher).putPrimitive(b.printVersion).putPrimitive(b.price)
+
+    implicit def mongoToBook(mo:MongoObject): Book =
+      Book(id = idField(Some(mo.getId)),
+        name = nameField(mo.getPrimitive(nameField)),
+        authors = authorsField(mo.getPrimitiveArray(authorsField)),
+        publisher = publisherField(mo.getPrimitive(publisherField)),
+        printVersion = printVersionField(mo.getPrimitive(printVersionField)),
+        price = priceField(mo.getPrimitive(priceField)))
+  }
+
+  implicit object BookCollectionName extends CollectionName[Book] {
+    override val name = "book"
+  }
 }
