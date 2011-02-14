@@ -13,8 +13,6 @@ trait TestDomainObjects {
   case class Blog(override val id:Option[MongoObjectId] = None, title:FieldValue[String],
                   labels:FieldValue[Seq[String]] = Blog.labelsField(Seq[String]())) extends DomainObject
 
-  case class Label(override val id:Option[MongoObjectId] = None, value:String) extends DomainObject
-
   object Blog {
 
     val titleField = Field[String]("title")
@@ -31,13 +29,15 @@ trait TestDomainObjects {
     }
   }
 
+  case class Label(override val id:Option[MongoObjectId] = None, value:FieldValue[String]) extends DomainObject
+
   object Label {
 
-    val value = "value"
+    val valueField = Field[String]("value")
 
-    implicit def mongoToLabelConverter(mo:MongoObject): Label = Label(Some(mo.getId), mo.getPrimitive[String](value))
+    implicit def mongoToLabelConverter(mo:MongoObject): Label = Label(Some(mo.getId), value = valueField(mo.getPrimitive(valueField)))
 
-    implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).putPrimitive[String](value, domain.value)
+    implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).putPrimitive(domain.value)
 
     implicit object LabelCollection extends CollectionName[Label] {
       override val name = "label"
@@ -48,15 +48,15 @@ trait TestDomainObjects {
 
   def createExceptionalMongoObject: MongoObject = throw new RuntimeException(mongoCreationException)
 
-  case class Person(override val id:Option[MongoObjectId] = None, name:String) extends DomainObject
+  case class Person(override val id:Option[MongoObjectId] = None, name:FieldValue[String]) extends DomainObject
 
   object Person {
 
-    val name = "name"
+    val nameField = Field[String]("name")
 
     implicit def personToMongo(p:Person): MongoObject = empty
 
-    implicit def mongoToPerson(mo:MongoObject): Person = Person(None, name = "testing")
+    implicit def mongoToPerson(mo:MongoObject): Person = Person(None, name = nameField("testing"))
 
     lazy val expectedError = "no person collection here!"
 

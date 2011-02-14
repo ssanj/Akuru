@@ -39,6 +39,7 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
   }
 
   it should ("handle errors that occur during function execution") in {
-    (onTestDB ~~> save(Person(name = "sanj")) ~~>()) verifyError has (Person.expectedError)
+    import Person._
+    (onTestDB ~~> save(Person(name = nameField("sanj"))) ~~>()) verifyError has (Person.expectedError)
   }
 }

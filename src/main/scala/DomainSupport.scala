@@ -19,13 +19,17 @@ trait DomainSupport { this:Tools =>
     def apply(value:T): FieldValue[T] = FieldValue[T](this, value)
   }
 
-  val idF = Field[MongoObjectId]("_id")
+
 
   trait Ided {
     val id:Option[MongoObjectId]
   }
 
   trait DomainObject extends Ided
+
+  object DomainObject {
+    val idField = Field[Option[MongoObjectId]]("_id")
+  }
 
   trait CollectionName[T <: DomainObject] {
     val name:String

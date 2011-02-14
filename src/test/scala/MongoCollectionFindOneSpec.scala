@@ -41,7 +41,7 @@ final class MongoCollectionFindOneSpec extends FlatSpec with ShouldMatchers
 
   it should "handle exceptions thrown on finder execution" in {
     (
-      onTestDB ~~> findOne(Person.name -> ("*"/)){ p:Person => Some("Should not have return results") } { ignoreError } ~~>()
+      onTestDB ~~> findOne(Person.nameField.name -> ("*"/)){ p:Person => Some("Should not have return results") } { ignoreError } ~~>()
     ) verifyError has (Person.expectedError)
   }
 
