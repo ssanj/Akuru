@@ -22,7 +22,7 @@ trait DomainSupport { this:Tools =>
     val name = field.name
   }
 
-  case class Field[T : ClassManifest](name:String) {
+  case class Field[T](name:String) {
     def apply(value:T): FieldValue[T] = FieldValue[T](this, value)
   }
 
