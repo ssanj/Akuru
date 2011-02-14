@@ -11,6 +11,7 @@ import MongoTypes.MongoObjectId
 import MongoTypes.DomainObject
 import MongoTypes.FieldValue
 import MongoTypes.Field
+import MongoTypes.MongoToDomain
 
 trait MongoObjectTrait extends Tools {
 
@@ -26,9 +27,42 @@ trait MongoObjectTrait extends Tools {
 
     def getPrimitive[T](f:Field[T])(implicit con:AnyRefConverter[T]): T = getPrimitiveOfAnyType(f.name)
 
+    //TODO: Test
+    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): T = implicitly[MongoToDomain[T]].m2d(dbo.get(f.name).asInstanceOf[DBObject])
+
     def getPrimitiveArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] =  getPrimitiveArrayOfAnyType[T](key)
 
     def getPrimitiveArray[T](f:Field[T])(implicit con:AnyRefConverter[T]): Seq[T] =  getPrimitiveArrayOfAnyType[T](f.name)
+
+    def getId: MongoObjectId = MongoObjectId(dbo.get("_id").asInstanceOf[ObjectId])
+
+    def getMongoArray[T <: DomainObject, R >: MongoObject <% T](key:String): Seq[T] = getAnyMongoArray[T, R](key)
+
+    def getMongoArray[T <: DomainObject, R >: MongoObject <% T](f:Field[T]): Seq[T] = getAnyMongoArray[T, R](f.name)
+
+    def putPrimitive[T](key:String, value:T): MongoObject = { putPrimitiveOfAnyType[T](key, value) }
+
+    def putPrimitive[T](fv:FieldValue[T]): MongoObject = { putPrimitiveOfAnyType[T](fv.name, fv.value) }
+
+    def putMongo(key:String, mongo:MongoObject): MongoObject = putAnyMongo(key, mongo)
+
+    def putMongo[T <: DomainObject <% MongoObject](fv:FieldValue[T]): MongoObject = { putAnyMongo(fv.name, fv.value) }
+
+    //todo: a DomainObject should already have a FieldValue[MongoObjectId]
+    def putId(id:MongoObjectId): MongoObject = { dbo.put("_id", id.toObjectId); copyMongoObject }
+
+    def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo); copyMongoObject }
+
+    def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyMongoArray(key, values)
+
+    def putMongoArray[T <: DomainObject <% MongoObject](fv:FieldValue[Traversable[T]]): MongoObject = putAnyMongoArray(fv.name,
+      fv.value.map(implicitly[MongoObject](_)))
+
+    //TODO: Test
+    def putPrimitiveArray[T](key:String, values:Traversable[T]): MongoObject = putPrimitiveArrayOfAnyType[T](key, values)
+
+    //TODO: Test
+    def putPrimitiveArray[T](fv:FieldValue[Traversable[T]]): MongoObject = putPrimitiveArrayOfAnyType[T](fv.name, fv.value)
 
     private[akuru] def getPrimitiveOfAnyType[T](f: => String)(implicit con:AnyRefConverter[T]): T = con.convert(dbo.get(f))
 
@@ -42,9 +76,7 @@ trait MongoObjectTrait extends Tools {
       buffer.toSeq
     }
 
-    def getId: MongoObjectId = MongoObjectId(dbo.get("_id").asInstanceOf[ObjectId])
-
-    def getMongoArray[T, R >: MongoObject <% T](key:String): Seq[T] = {
+    private[akuru] def getAnyMongoArray[T <: DomainObject, R >: MongoObject <% T](key: => String): Seq[T] = {
       import scala.collection.JavaConversions._
       import MongoObject._
       val buffer = new ListBuffer[T]
@@ -55,45 +87,22 @@ trait MongoObjectTrait extends Tools {
       buffer.toSeq
     }
 
-    def putPrimitive[T](key:String, value:T): MongoObject = { putPrimitiveOfAnyType[T](key, value) }
-
-    def putPrimitive[T](fv:FieldValue[T]): MongoObject = { putPrimitiveOfAnyType[T](fv.name, fv.value) }
-
     private[akuru] def putPrimitiveOfAnyType[T](key: => String, value: => T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); copyMongoObject }
-
-    def putMongo(key:String, mongo:MongoObject): MongoObject = putAnyMongo(key, mongo)
-
-    def putMongo[T <: DomainObject <% MongoObject](fv:FieldValue[T]): MongoObject = { putAnyMongo(fv.name, fv.value) }
 
     private[akuru] def putAnyMongo(key: => String, mongo: => MongoObject): MongoObject = {
       dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]); copyMongoObject
     }
 
-    def putId(id:MongoObjectId): MongoObject = { dbo.put("_id", id.toObjectId); copyMongoObject }
-
-    def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo); copyMongoObject }
-
-    def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyMongoArray(key, values)
-
-    def putMongoArray[T <: DomainObject <% MongoObject](fv:FieldValue[Traversable[T]]): MongoObject = putAnyMongoArray(fv.name,
-      fv.value.map(implicitly[MongoObject](_)))
-
-    def putAnyMongoArray(key: => String, values: => Traversable[MongoObject]): MongoObject = {
+    private[akuru] def putPrimitiveArrayOfAnyType[T](key: => String, values: => Traversable[T]): MongoObject = {
       import scala.collection.JavaConversions._
-      val list:java.util.List[DBObject] = values.map(_.toDBObject).toList
+      val list:java.util.List[T] = values.toList
       dbo.put(key, list)
       copyMongoObject
     }
 
-    //TODO: Test
-    def putPrimitiveArray[T](key:String, values:Traversable[T]): MongoObject = putPrimitiveArrayOfAnyType[T](key, values)
-
-    //TODO: Test
-    def putPrimitiveArray[T](fv:FieldValue[Traversable[T]]): MongoObject = putPrimitiveArrayOfAnyType[T](fv.name, fv.value)
-
-    private[akuru] def putPrimitiveArrayOfAnyType[T](key: => String, values: => Traversable[T]): MongoObject = {
+    private[akuru] def putAnyMongoArray(key: => String, values: => Traversable[MongoObject]): MongoObject = {
       import scala.collection.JavaConversions._
-      val list:java.util.List[T] = values.toList
+      val list:java.util.List[DBObject] = values.map(_.toDBObject).toList
       dbo.put(key, list)
       copyMongoObject
     }
