@@ -9,6 +9,7 @@ import com.mongodb.{BasicDBList, BasicDBObject, DBObject}
 import org.bson.types.ObjectId
 import MongoTypes.MongoObjectId
 import MongoTypes.FieldValue
+import MongoTypes.Field
 
 trait MongoObjectTrait extends Tools {
 
@@ -20,12 +21,20 @@ trait MongoObjectTrait extends Tools {
 
     def this(tuples:Seq[Tuple2[String, Any]]) = this(new BasicDBObject(scala.collection.JavaConversions.asJavaMap(tuples.toMap)))
 
-    def getPrimitive[T](key:String)(implicit con:AnyRefConverter[T]): T = con.convert(dbo.get(key))
+    def getPrimitive[T](key:String)(implicit con:AnyRefConverter[T]): T = getPrimitiveOfAnyType(key)
 
-    def getPrimitiveArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] = {
+    def getPrimitive[T](f:Field[T])(implicit con:AnyRefConverter[T]): T = getPrimitiveOfAnyType(f.name)
+
+    def getPrimitiveArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] =  getPrimitiveArrayOfAnyType[T](key)
+
+    def getPrimitiveArray[T](f:Field[T])(implicit con:AnyRefConverter[T]): Seq[T] =  getPrimitiveArrayOfAnyType[T](f.name)
+
+    private[akuru] def getPrimitiveOfAnyType[T](f: => String)(implicit con:AnyRefConverter[T]): T = con.convert(dbo.get(f))
+
+    private[akuru] def getPrimitiveArrayOfAnyType[T](f: => String)(implicit con:AnyRefConverter[T]): Seq[T] = {
       import scala.collection.JavaConversions._
       val buffer = new ListBuffer[T]
-      for(element <- dbo.get(key).asInstanceOf[BasicDBList].iterator) {
+      for(element <- dbo.get(f).asInstanceOf[BasicDBList].iterator) {
         buffer += (con.convert(element))
       }
 
@@ -45,9 +54,11 @@ trait MongoObjectTrait extends Tools {
       buffer.toSeq
     }
 
-    def putPrimitive[T](key:String, value:T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); copyMongoObject }
+    def putPrimitive[T](key:String, value:T): MongoObject = { putPrimitiveOfAnyType[T](key, value) }
 
-    def putPrimitive[T](fv:FieldValue[T]): MongoObject = { dbo.put(fv.name, fv.value.asInstanceOf[AnyRef]); copyMongoObject }
+    def putPrimitive[T](fv:FieldValue[T]): MongoObject = { putPrimitiveOfAnyType[T](fv.name, fv.value) }
+
+    private[akuru] def putPrimitiveOfAnyType[T](key: => String, value: => T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); copyMongoObject }
 
     def putMongo(key:String, mongo:MongoObject): MongoObject = { dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]); copyMongoObject }
 
@@ -62,18 +73,16 @@ trait MongoObjectTrait extends Tools {
       copyMongoObject
     }
 
-    def putPrimitiveArray[T](key:String, values:Seq[T]): MongoObject = {
-      import scala.collection.JavaConversions._
-      val list:java.util.List[T] = values
-      dbo.put(key, list)
-      copyMongoObject
-    }
+    //TODO: Test
+    def putPrimitiveArray[T](key:String, values:Traversable[T]): MongoObject = putPrimitiveArrayOfAnyType[T](key, values)
 
     //TODO: Test
-    def putPrimitiveArray[T](fv:FieldValue[Traversable[T]]): MongoObject = {
+    def putPrimitiveArray[T](fv:FieldValue[Traversable[T]]): MongoObject = putPrimitiveArrayOfAnyType[T](fv.name, fv.value)
+
+    private[akuru] def putPrimitiveArrayOfAnyType[T](key: => String, values: => Traversable[T]): MongoObject = {
       import scala.collection.JavaConversions._
-      val list:java.util.List[T] = fv.value.toSeq
-      dbo.put(fv.name, list)
+      val list:java.util.List[T] = values.toList
+      dbo.put(key, list)
       copyMongoObject
     }
 
