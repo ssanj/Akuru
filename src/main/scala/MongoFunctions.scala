@@ -23,7 +23,7 @@ trait MongoFunctions { this:Tools  =>
 
   def ignoreError = () => {}
 
-  def find[T <: DomainObject : CollectionName, R >: MongoObject <% T](f: => MongoObject)(g: Seq[T] => Option[String]): UserFunction =
+  def find[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(g: Seq[T] => Option[String]): UserFunction =
     col => col(collectionName[T]).find3[T](f).fold(l => Some(l), r => g(r))
 
   def update[T <: DomainObject : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction = col => col(collectionName[T]).update3(f, r)

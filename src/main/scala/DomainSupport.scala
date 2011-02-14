@@ -31,7 +31,7 @@ trait DomainSupport { this:Tools =>
     val name:String
   }
 
-  trait MongoToDomain[T <: DomainObject] { def m2d(mongoObject: MongoObject): T }
+  type MongoToDomain[T <: DomainObject] = MongoObject => T
 
   def putDomainId(domain:DomainObject): MongoObject =  foldOption(domain.id)(empty)(id => empty.putId(id))
 }

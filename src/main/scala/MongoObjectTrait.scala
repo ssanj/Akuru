@@ -28,7 +28,7 @@ trait MongoObjectTrait extends Tools {
     def getPrimitive[T](f:Field[T])(implicit con:AnyRefConverter[T]): T = getPrimitiveOfAnyType(f.name)
 
     //TODO: Test
-    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): T = implicitly[MongoToDomain[T]].m2d(dbo.get(f.name).asInstanceOf[DBObject])
+    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): T = implicitly[MongoToDomain[T]].apply(dbo.get(f.name).asInstanceOf[DBObject])
 
     def getPrimitiveArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] =  getPrimitiveArrayOfAnyType[T](key)
 
@@ -81,7 +81,7 @@ trait MongoObjectTrait extends Tools {
       import MongoObject._
       val buffer = new ListBuffer[T]
       for(element <- dbo.get(key).asInstanceOf[BasicDBList].iterator) {
-        buffer += (implicitly[MongoToDomain[T]].m2d(element.asInstanceOf[DBObject]))
+        buffer += (implicitly[MongoToDomain[T]].apply(element.asInstanceOf[DBObject]))
       }
 
       buffer.toSeq
