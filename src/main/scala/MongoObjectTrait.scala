@@ -36,9 +36,9 @@ trait MongoObjectTrait extends Tools {
 
     def getId: MongoObjectId = MongoObjectId(dbo.get("_id").asInstanceOf[ObjectId])
 
-    def getMongoArray[T <: DomainObject, R >: MongoObject <% T](key:String): Seq[T] = getAnyMongoArray[T, R](key)
+    def getMongoArray[T <: DomainObject : MongoToDomain](key:String): Seq[T] = getAnyMongoArray[T](key)
 
-    def getMongoArray[T <: DomainObject, R >: MongoObject <% T](f:Field[T]): Seq[T] = getAnyMongoArray[T, R](f.name)
+    def getMongoArray[T <: DomainObject : MongoToDomain](f:Field[T]): Seq[T] = getAnyMongoArray[T](f.name)
 
     def putPrimitive[T](key:String, value:T): MongoObject = { putPrimitiveOfAnyType[T](key, value) }
 
@@ -76,12 +76,12 @@ trait MongoObjectTrait extends Tools {
       buffer.toSeq
     }
 
-    private[akuru] def getAnyMongoArray[T <: DomainObject, R >: MongoObject <% T](key: => String): Seq[T] = {
+    private[akuru] def getAnyMongoArray[T <: DomainObject : MongoToDomain](key: => String): Seq[T] = {
       import scala.collection.JavaConversions._
       import MongoObject._
       val buffer = new ListBuffer[T]
       for(element <- dbo.get(key).asInstanceOf[BasicDBList].iterator) {
-        buffer += (element.asInstanceOf[DBObject].toMongo)
+        buffer += (implicitly[MongoToDomain[T]].m2d(element.asInstanceOf[DBObject]))
       }
 
       buffer.toSeq
