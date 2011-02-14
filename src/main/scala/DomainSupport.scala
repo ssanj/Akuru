@@ -33,5 +33,7 @@ trait DomainSupport { this:Tools =>
 
   type MongoToDomain[T <: DomainObject] = MongoObject => T
 
+  type DomaintToMongo[T <: DomainObject] = T => MongoObject
+
   def putDomainId(domain:DomainObject): MongoObject =  foldOption(domain.id)(empty)(id => empty.putId(id))
 }

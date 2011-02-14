@@ -15,10 +15,10 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
 
     import com.mongodb.WriteResult
 
-   def save3[T <: DomainObject <% MongoObject](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
+   def save3[T <: DomainObject : DomaintToMongo](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
 
-    def findOne3[T <: DomainObject](mo:MongoObject)(implicit f3: MongoObject => T): Either[String, Option[T]] = {
-      runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => f3(t)) }
+    def findOne3[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Option[T]] = {
+      runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => implicitly[MongoToDomain[T]].apply(t)) }
     }
 
     def find3[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Seq[T]] = {
@@ -37,11 +37,11 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
       runSafelyWithEither(f.apply).fold(l => Some(l), r => r.getStringError)
     }
 
-    def findAndModify[T <: DomainObject](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean)(implicit mc:MongoConverter[T]):
-      Either[MongoError, T] = {
+    def findAndModify[T <: DomainObject : MongoToDomain](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean):
+    Either[MongoError, T] = {
       import MongoObject.empty
       wrapWith {
-        mc.convert(dbc.findAndModify(query, empty, sort, false, update, returnNew, false))
+        implicitly[MongoToDomain[T]].apply(dbc.findAndModify(query, empty, sort, false, update, returnNew, false))
       }
     }
 
