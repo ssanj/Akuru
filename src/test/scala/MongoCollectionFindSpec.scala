@@ -16,18 +16,20 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
         with MongoSpecSupport
         with Tools {
 
+  import Blog._
+
   "A MongoCollection with find" should "find all saved objects matching a query" in {
     ({
       onTestDB ~~>
               drop[Blog] ~~>
-              save(Blog(title="sample1", labels = Seq("sample"))) ~~>
-              save(Blog(title="sample2", labels = Seq("sample"))) ~~>
-              save(Blog(title="sample3", labels = Seq("sample"))) ~~>
-              find(Blog.title -> ("sample*"/))((blogs:Seq[Blog]) => {
+              save(Blog(title = titleField("sample1"), labels = labelsField(Seq("sample")))) ~~>
+              save(Blog(title= titleField("sample2"), labels = labelsField(Seq("sample")))) ~~>
+              save(Blog(title = titleField("sample3"), labels = labelsField(Seq("sample")))) ~~>
+              find(Blog.titleField.name -> ("sample*"/))((blogs:Seq[Blog]) => {
                 blogs.size should equal (3)
-                blogs.exists(_.title == "sample1") should be (true)
-                blogs.exists(_.title == "sample2") should be (true)
-                blogs.exists(_.title == "sample3") should be (true)
+                blogs.exists(_.title.value == "sample1") should be (true)
+                blogs.exists(_.title.value == "sample2") should be (true)
+                blogs.exists(_.title.value == "sample3") should be (true)
                 success
               })
     } ~~>()) verifySuccess
@@ -37,7 +39,7 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
     ({
       onTestDB ~~>
               drop[Blog] ~~>
-              find(Blog.title -> ("*"/)){(blogs:Seq[Blog]) =>
+              find(Blog.titleField.name -> ("*"/)){(blogs:Seq[Blog]) =>
                 blogs.size should equal (0)
                 success
               }
@@ -58,7 +60,7 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
 
   it should "handle exception thrown by match handler function" in {
     (
-      onTestDB ~~> find(Blog.title -> ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) ~~>()
+      onTestDB ~~> find(Blog.titleField.name -> ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) ~~>()
     ) verifyError has ("Handler threw an Exception")
   }
 
@@ -66,11 +68,11 @@ final class MongoCollectionFindSpec extends FlatSpec with ShouldMatchers
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              save(Blog(title = "Querying with RegEx", labels = Seq("query", "regex"))) ~~>
-              find(Blog.title -> ("querying with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (0); success }) ~~>
-              find(Blog.title -> ("Querying with RegEx"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
-              find(Blog.title -> (".* with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
-              find(Blog.labels -> (".*query.*"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>()
+              save(Blog(title = titleField("Querying with RegEx"), labels = labelsField(Seq("query", "regex")))) ~~>
+              find(Blog.titleField.name -> ("querying with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (0); success }) ~~>
+              find(Blog.titleField.name -> ("Querying with RegEx"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
+              find(Blog.titleField.name -> (".* with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
+              find(Blog.titleField.name -> (".*query.*"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>()
     ) verifySuccess
   }
 }

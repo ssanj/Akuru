@@ -10,23 +10,21 @@ import MongoTypes.MongoObject.empty
 
 trait TestDomainObjects {
 
-  case class Blog(override val id:Option[MongoObjectId] = None, title:String, labels:Seq[String] = Seq[String]()) extends DomainObject
+  case class Blog(override val id:Option[MongoObjectId] = None, title:FieldValue[String],
+                  labels:FieldValue[Seq[String]] = Blog.labelsField(Seq[String]())) extends DomainObject
 
   case class Label(override val id:Option[MongoObjectId] = None, value:String) extends DomainObject
 
-  case class Blah()
-
   object Blog {
 
-    val title = "title"
-    val labels = "labels"
+    val titleField = Field[String]("title")
+    val labelsField = Field[Seq[String]]("labels")
 
-    implicit def mongoToBlogConverter(mo:MongoObject): Blog = {
-      Blog(Some(mo.getId), mo.getPrimitive[String](title), mo.getPrimitiveArray[String](labels))
+    implicit def mongoToBlogConverter(mo:MongoObject): Blog =  {
+      Blog(Some(mo.getId), titleField(mo.getPrimitive(titleField)), labelsField(mo.getPrimitiveArray(labelsField)))
     }
 
-    implicit def blogToMongoConverter(domain:Blog): MongoObject =
-      putDomainId(domain).putPrimitive[String](title, domain.title).putPrimitiveArray[String](labels, domain.labels)
+    implicit def blogToMongoConverter(domain:Blog): MongoObject = putDomainId(domain).putPrimitive(domain.title).putPrimitiveArray(domain.labels)
 
     implicit object BlogCollection extends CollectionName[Blog] {
       override val name = "blog"

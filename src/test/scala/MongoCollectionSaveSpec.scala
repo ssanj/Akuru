@@ -15,14 +15,16 @@ final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
         with MongoSpecSupport
         with Tools {
 
+  import Blog._
+
   "A MongoCollection" should "save a new MongoObject" in {
      ({ onTestDB ~~>
           drop[Blog] ~~>
-          findOne(Blog.title -> "blah") { t:Blog => fail("Shouldn't have found Blog") } { ignoreError } ~~>
-          save(Blog(title = "blah", labels = Seq("test", "random"))) ~~>
-          findOne(Blog.title -> "blah") { t:Blog =>
-              t.title should equal ("blah")
-              t.labels should equal (Seq("test", "random"))
+          findOne(Blog.titleField.name -> "blah") { t:Blog => fail("Shouldn't have found Blog") } { ignoreError } ~~>
+          save(Blog(title = titleField("blah"), labels = labelsField(Seq("test", "random")))) ~~>
+          findOne(Blog.titleField.name -> "blah") { t:Blog =>
+              t.title.value should equal ("blah")
+              t.labels.value should equal (Seq("test", "random"))
               success
           } { fail("Didn't find Blog") }
       } ~~>()) verifySuccess
