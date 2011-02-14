@@ -4,14 +4,6 @@
  */
 package akuru
 
-import MongoTypes.MongoObject
-import MongoTypes.DomainObject
-
-trait MongoConverter[T <: DomainObject] {
-  def convert(mo:MongoObject): T
-  def convert(domain:T): MongoObject
-}
-
 trait AnyRefConverter[T] {
   def convert(anyRef:AnyRef): T
 }
