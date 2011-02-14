@@ -11,17 +11,20 @@ import MongoTypes.MongoObject.empty
 
 trait DomainSupport { this:Tools =>
 
+  type MID = Option[MongoObjectId]
+
+  type MongoToDomain[T <: DomainObject] = MongoObject => T
+
+  type DomaintToMongo[T <: DomainObject] = T => MongoObject
+
+
   case class FieldValue[T](field:Field[T], value:T) {
     val name = field.name
   }
 
-  case class Field[T](name:String) {
+  case class Field[T : ClassManifest](name:String) {
     def apply(value:T): FieldValue[T] = FieldValue[T](this, value)
   }
-
-
-
-  type MID = Option[MongoObjectId]
 
   trait DomainObject {
     val id:FieldValue[MID]
@@ -36,10 +39,6 @@ trait DomainSupport { this:Tools =>
   trait CollectionName[T <: DomainObject] {
     val name:String
   }
-
-  type MongoToDomain[T <: DomainObject] = MongoObject => T
-
-  type DomaintToMongo[T <: DomainObject] = T => MongoObject
 
   def putDomainId(domain:DomainObject): MongoObject =  foldOption(domain.id.value)(empty)(id => empty.putId(id))
 }
