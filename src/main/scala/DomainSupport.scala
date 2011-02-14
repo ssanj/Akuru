@@ -21,14 +21,16 @@ trait DomainSupport { this:Tools =>
 
 
 
-  trait Ided {
-    val id:Option[MongoObjectId]
+  type MID = Option[MongoObjectId]
+
+  trait DomainObject {
+    val id:FieldValue[MID]
   }
 
-  trait DomainObject extends Ided
-
   object DomainObject {
-    val idField = Field[Option[MongoObjectId]]("_id")
+    val idField = Field[MID]("_id")
+
+    val defaultId:FieldValue[MID] = idField.apply(None)
   }
 
   trait CollectionName[T <: DomainObject] {
@@ -39,5 +41,5 @@ trait DomainSupport { this:Tools =>
 
   type DomaintToMongo[T <: DomainObject] = T => MongoObject
 
-  def putDomainId(domain:DomainObject): MongoObject =  foldOption(domain.id)(empty)(id => empty.putId(id))
+  def putDomainId(domain:DomainObject): MongoObject =  foldOption(domain.id.value)(empty)(id => empty.putId(id))
 }
