@@ -124,18 +124,19 @@ trait MongoObjectTrait extends Tools {
     //TODO: remove this
     implicit def dboToDBOToMongo(dbo:DBObject): DBOToMongo = DBOToMongo(dbo)
 
+    implicit def fieldValueToMongo[T](fv:FieldValue[T]): MongoObject = mongo.putPrimitive[T](fv)
+
     def push(col:String, value:MongoObject): MongoObject =  $funcMongo("$push", col, value)
 
     def set(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$set", col, value)
 
     def set(col:String, value:MongoObject): MongoObject =  $funcMongo("$set", col, value)
 
-    def set[T](fv:FieldValue[T]): MongoObject = $funcPrimitive("$set", fv.name, fv.value.asInstanceOf[AnyRef])
+    def set[T](fv:FieldValue[T]): MongoObject = $funcMongo("$set", fieldToMongo1[T](fv))
 
-    def set[R, T](fv1:FieldValue[R], fv2:FieldValue[T]): MongoObject = $funcMongo("$set", mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2)))
+    def set[R, T](fv1:FieldValue[R], fv2:FieldValue[T]): MongoObject = $funcMongo("$set", fieldToMongo2[R,T](fv1, fv2))
 
-    def set[R, S, T](fv1:FieldValue[R], fv2:FieldValue[S], fv3:FieldValue[T]): MongoObject =
-      $funcMongo("$set", mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2)).merge(mongo.putPrimitive(fv3)))
+    def set[R, S, T](fv1:FieldValue[R], fv2:FieldValue[S], fv3:FieldValue[T]): MongoObject = $funcMongo("$set", fieldToMongo3[R,S,T](fv1, fv2, fv3))
 
     def pull(col:String, value:MongoObject): MongoObject =  $funcMongo("$pull", col, value)
 
@@ -146,6 +147,13 @@ trait MongoObjectTrait extends Tools {
     def $funcMongo(action:String, value:MongoObject): MongoObject =  mongo.putMongo(action, value)
 
     def $funcPrimitive(action:String, col:String, value:AnyRef): MongoObject =  mongo.putMongo(action, mongo.putPrimitive(col, value))
+
+    def fieldToMongo1[T](fv:FieldValue[T]): MongoObject = mongo.putPrimitive[T](fv)
+
+    def fieldToMongo2[R, T](fv1:FieldValue[R], fv2:FieldValue[T]): MongoObject = mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2))
+
+    def fieldToMongo3[R, S, T](fv1:FieldValue[R], fv2:FieldValue[S], fv3:FieldValue[T]): MongoObject =
+      mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2)).merge(mongo.putPrimitive(fv3))
 
     def empty = new MongoObject
 
