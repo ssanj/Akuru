@@ -51,4 +51,11 @@ trait Funcs {
     def toMongo(): MongoObject = MongoObject(dbo)
   }
 
+  def anyFunction1[T]: String => FieldValue[T] => MongoObject = fname => fv => $funcMongo(fname, fieldToMongo1[T](fv))
+
+  def anyFunction2[R, T]: String => (FieldValue[R], FieldValue[T]) => MongoObject = fname => (fv1, fv2) =>
+    $funcMongo(fname, fieldToMongo2[R,T](fv1, fv2))
+
+  def anyFunction3[R, S, T]: String => (FieldValue[R], FieldValue[S], FieldValue[T]) => MongoObject =
+    fname => (fv1, fv2, fv3) => $funcMongo(fname, fieldToMongo3[R,S,T](fv1, fv2, fv3))
 }

@@ -6,18 +6,26 @@
 package akuru
 
 import MongoTypes.MongoObject
-import MongoTypes.FieldValue
 
+/**
+ * { $set : { field : value } }
+ * sets field to value. All datatypes are supported with $set.
+ */
 trait SetFuncs { this:Funcs =>
+
+  private object SetFuncs {
+    val functionName = "$set"
+  }
+
+  import SetFuncs._
 
   def set(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$set", col, value)
 
   def set(col:String, value:MongoObject): MongoObject =  $funcMongo("$set", col, value)
 
-  def set[T](fv:FieldValue[T]): MongoObject = $funcMongo("$set", fieldToMongo1[T](fv))
+  def set[T] = anyFunction1[T](functionName)
 
-  def set[R, T](fv1:FieldValue[R], fv2:FieldValue[T]): MongoObject = $funcMongo("$set", fieldToMongo2[R,T](fv1, fv2))
+  def set[R, T] = anyFunction2[R, T](functionName)
 
-  def set[R, S, T](fv1:FieldValue[R], fv2:FieldValue[S], fv3:FieldValue[T]): MongoObject = $funcMongo("$set", fieldToMongo3[R,S,T](fv1, fv2, fv3))
-
+  def set[R, S, T] = anyFunction3[R, S, T](functionName)
 }
