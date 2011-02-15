@@ -134,6 +134,9 @@ trait MongoObjectTrait extends Tools {
 
     def set[R, T](fv1:FieldValue[R], fv2:FieldValue[T]): MongoObject = $funcMongo("$set", mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2)))
 
+    def set[R, S, T](fv1:FieldValue[R], fv2:FieldValue[S], fv3:FieldValue[T]): MongoObject =
+      $funcMongo("$set", mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2)).merge(mongo.putPrimitive(fv3)))
+
     def pull(col:String, value:MongoObject): MongoObject =  $funcMongo("$pull", col, value)
 
     def pull(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$pull", col, value)
