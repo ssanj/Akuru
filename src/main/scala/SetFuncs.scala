@@ -19,9 +19,10 @@ trait SetFuncs { this:Funcs =>
 
   import SetFuncs._
 
-  def set(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$set", col, value)
-
-  def set(col:String, value:MongoObject): MongoObject =  $funcMongo("$set", col, value)
+  //TODO: DO we need this?
+//  def set(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$set", col, value)
+//
+//  def set(col:String, value:MongoObject): MongoObject =  $funcMongo("$set", col, value)
 
   def set[T] = anyFunction1[T](functionName)
 

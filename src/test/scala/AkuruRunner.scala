@@ -15,6 +15,7 @@ object AkuruRunner extends TestDomainObjects with MongoFunctions with Tools with
     import MongoTypes.RegexConstants._
     import MongoTypes.MongoObject._
     import Blog._
+    import Label._
 
     val b1 = Blog(title = titleField("lessons learned"), labels = labelsField(Seq("jobs", "lessons", "work")))
     val b2 = Blog(title = titleField("lessons learned"), labels = labelsField(Seq("jobs", "work")))
@@ -28,14 +29,14 @@ object AkuruRunner extends TestDomainObjects with MongoFunctions with Tools with
                     (drop[Blog]) ~~>
                     (drop[Label]) ~~>
                     (blogs.map(b => save[Blog](b))) ~~>
-//                    (blogs.flatMap(b => b.labels.map(l => save[Label](Label(value = l)))).toList) ~~>
-                    (findOne(Blog.titleField.name -> "Hello World Lift")(printBlog)(ignoreError)) ~~>
+                    (blogs.flatMap(b => b.labels.value.map(l => save[Label](Label(value = valueField(l))))).toList) ~~>
+                    (findOne(Blog.titleField("Hello World Lift"))(printBlog)(ignoreError)) ~~>
                     ( find { (Blog.labelsField.name ->  ("ubuntu|work"/i), "title" -> ("less"/i)) } { printBlogs }) ~~>
-                    (update[Blog](Blog.titleField.name -> "lessons learned")(set("title", "Lessons Learned"))) ~~>
+                    (update[Blog](Blog.titleField("lessons learned"))(set(Blog.titleField("Lessons Learned")))) ~~>
                     (findOne { Blog.labelsField.name -> ("work")/i } (printBlog))(ignoreError) ~~>
-                    (update[Blog](Blog.titleField.name -> "Lessons Learned")(b2)) ~~>
+                    (update[Blog](Blog.titleField("Lessons Learned"))(b2)) ~~>
                     (findOne(Blog.labelsField.name -> ("work")/i)(printBlog))(ignoreError) ~~>
-                    (upsert[Blog](Blog.titleField.name -> "Semigroup")(b3)) ~~>
+                    (upsert[Blog](Blog.titleField("Semigroup"))(b3)) ~~>
                     (findOne(Blog.labelsField.name -> ("functional"/))(printBlog)(ignoreError))
                  } ~~>() getOrElse("success >>")
     println(result)

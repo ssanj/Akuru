@@ -44,7 +44,7 @@ final class MongoCollectionUpdateSpec extends FlatSpec with ShouldMatchers
               b.price.value  should equal (54.95D)
               success
             } { throw new RuntimeException("Could not find Book") } ~~>
-            update[Book](publisherField("artima")) { set(nameField("PISC"), printVersionField(3), priceField(99.99D))} ~~>
+            update[Book](publisherField("artima")) { set(nameField("PISC"), printVersionField(3),priceField(99.99D))} ~~>
             findOne(nameField("Programming in Scala")) {b:Book => throw new RuntimeException("Found old Book") } { ignoreError } ~~>
             findOne(nameField("PISC")) {b:Book =>
               b.name.value should equal ("PISC")
