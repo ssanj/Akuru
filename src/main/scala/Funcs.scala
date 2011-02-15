@@ -25,7 +25,13 @@ trait Funcs {
   //TODO: remove this
   implicit def dboToDBOToMongo(dbo: DBObject): DBOToMongo = DBOToMongo(dbo)
 
-  implicit def fvToMongoToMongo[T](fv:FieldValue[Seq[T]]): FVTOMongo[T] = FVTOMongo[T](fv)
+  implicit def sequencedFVTOMongo[T](fv:FieldValue[Seq[T]]): SequencedFVTOMongo[T] = SequencedFVTOMongo[T](fv)
+
+  implicit def mongoToMongoJoiner(mo:MongoObject): MongoJoiner = MongoJoiner(mo)
+
+  implicit def fvToMongoJoiner[T](fv:FieldValue[T]): MongoJoiner = MongoJoiner(mongo.putPrimitive[T](fv))
+
+  implicit def mongoJoinerToMongo(mj:MongoJoiner): MongoObject = mj.done
 
   def $funcMongo(action: String, col: String, value: MongoObject): MongoObject = mongo.putMongo(action, mongo.putMongo(col, value))
 
@@ -57,8 +63,15 @@ trait Funcs {
     def toMongo(): MongoObject = MongoObject(dbo)
   }
 
-  case class FVTOMongo[T](fv:FieldValue[Seq[T]]) {
+  case class SequencedFVTOMongo[T](fv:FieldValue[Seq[T]]) {
     def splat(): MongoObject = mongo.putPrimitiveArray[T](fv)
+  }
+
+  case class MongoJoiner(mo:MongoObject) {
+
+    def and(another:MongoObject): MongoJoiner = MongoJoiner(mo.merge(another))
+
+    def done: MongoObject = mo
   }
 
   def anyFunction1[T]: String => FieldValue[T] => MongoObject = fname => fv => $funcMongo(fname, fieldToMongo1[T](fv))

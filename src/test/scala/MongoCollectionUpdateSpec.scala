@@ -48,7 +48,7 @@ final class MongoCollectionUpdateSpec extends FlatSpec with ShouldMatchers
             update[Book](combine(publisherField("artima"), printVersionField(2), priceField(54.95D)))
                       { set(nameField("PISC"), printVersionField(3),priceField(99.99D))} ~~>
             findOne(nameField("Programming in Scala")) {b:Book => throw new RuntimeException("Found old Book") } { ignoreError } ~~>
-            findOne(combine(nameField("PISC"), printVersionField(3))) {b:Book =>
+            findOne(nameField("PISC") and printVersionField(3)) {b:Book =>
               b.name.value should equal ("PISC")
               b.authors.value should equal (Seq("Martin Odersky", "Lex Spoon", "Bill Venners"))
               b.publisher.value should  equal ("artima")
