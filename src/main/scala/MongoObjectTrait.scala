@@ -17,7 +17,6 @@ trait MongoObjectTrait extends Tools {
 
   case class MongoObject(dbo:DBObject) {
 
-    import scala.collection.generic.CanBuildFrom
 
     def this() = this(new BasicDBObject)
 
@@ -51,7 +50,7 @@ trait MongoObjectTrait extends Tools {
     //todo: a DomainObject should already have a FieldValue[MongoObjectId]
     def putId(id:MongoObjectId): MongoObject = { dbo.put("_id", id.toObjectId); copyMongoObject }
 
-    def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo); copyMongoObject }
+    def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo.toDBObject); copyMongoObject }
 
     def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyMongoArray(key, values)
 
@@ -112,60 +111,8 @@ trait MongoObjectTrait extends Tools {
     private[akuru] def copyMongoObject: MongoObject = MongoObject(toDBObject)
   }
 
-  object MongoObject {
-    implicit def dbObjectToMongoObject(dbo:DBObject): MongoObject = MongoObject(dbo)
-
-    implicit def MongoObjectToDBObject(mo:MongoObject): DBObject = mo.toDBObject
-
-    implicit def tuple2PrimitiveToMongoObject(tuple2:Tuple2[String, AnyRef]): MongoObject =  mongo.putPrimitive(tuple2._1, tuple2._2)
-
-    implicit def tuple2MongoToMongoObject(tuple2:Tuple2[String, MongoObject]): MongoObject =  mongo.putMongo(tuple2._1, tuple2._2)
-
-    //TODO: remove this
-    implicit def dboToDBOToMongo(dbo:DBObject): DBOToMongo = DBOToMongo(dbo)
-
-    implicit def fieldValueToMongo[T](fv:FieldValue[T]): MongoObject = mongo.putPrimitive[T](fv)
-
-    def push(col:String, value:MongoObject): MongoObject =  $funcMongo("$push", col, value)
-
-    def set(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$set", col, value)
-
-    def set(col:String, value:MongoObject): MongoObject =  $funcMongo("$set", col, value)
-
-    def set[T](fv:FieldValue[T]): MongoObject = $funcMongo("$set", fieldToMongo1[T](fv))
-
-    def set[R, T](fv1:FieldValue[R], fv2:FieldValue[T]): MongoObject = $funcMongo("$set", fieldToMongo2[R,T](fv1, fv2))
-
-    def set[R, S, T](fv1:FieldValue[R], fv2:FieldValue[S], fv3:FieldValue[T]): MongoObject = $funcMongo("$set", fieldToMongo3[R,S,T](fv1, fv2, fv3))
-
-    def pull(col:String, value:MongoObject): MongoObject =  $funcMongo("$pull", col, value)
-
-    def pull(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$pull", col, value)
-
-    def $funcMongo(action:String, col:String, value:MongoObject): MongoObject =  mongo.putMongo(action, mongo.putMongo(col, value))
-
-    def $funcMongo(action:String, value:MongoObject): MongoObject =  mongo.putMongo(action, value)
-
-    def $funcPrimitive(action:String, col:String, value:AnyRef): MongoObject =  mongo.putMongo(action, mongo.putPrimitive(col, value))
-
-    def fieldToMongo1[T](fv:FieldValue[T]): MongoObject = mongo.putPrimitive[T](fv)
-
-    def fieldToMongo2[R, T](fv1:FieldValue[R], fv2:FieldValue[T]): MongoObject = mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2))
-
-    def fieldToMongo3[R, S, T](fv1:FieldValue[R], fv2:FieldValue[S], fv3:FieldValue[T]): MongoObject =
-      mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2)).merge(mongo.putPrimitive(fv3))
-
-    def empty = new MongoObject
-
-    def mongo = new MongoObject
-
-    def query(tuples:Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
-
-    def mongoObject(tuples:Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
-
-    //TODO: remove this
-    case class DBOToMongo(dbo:DBObject) {
-      def toMongo(): MongoObject = MongoObject(dbo)
-    }
-  }
+  object MongoObject extends
+      SetFuncs with
+      PullFuncs with
+      Funcs
 }
