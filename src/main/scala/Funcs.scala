@@ -54,8 +54,6 @@ trait Funcs {
 
   def mongoObject(tuples: Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
 
-  def splat[T]: FieldValue[Seq[T]] => MongoObject = fv => mongo.putPrimitiveArray[T](fv)
-
   def combine(value:MongoObject*): MongoObject = if (value.isEmpty) mongo else value.foldLeft(value.head)((a, b) => a.merge(b))
 
   //TODO: remove this
