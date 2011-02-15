@@ -12,7 +12,7 @@ trait Funcs {
 
   import com.mongodb.DBObject
 
-  implicit def fieldValueToMongo[T](fv: FieldValue[T]): MongoObject = mongo.putPrimitive[T](fv)
+  implicit def fieldValueToMongo[T](fv: FieldValue[T]): MongoObject = fieldToMongo1[T](fv)
 
   implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = MongoObject(dbo)
 
@@ -24,6 +24,8 @@ trait Funcs {
 
   //TODO: remove this
   implicit def dboToDBOToMongo(dbo: DBObject): DBOToMongo = DBOToMongo(dbo)
+
+  implicit def fvToMongoToMongo[T](fv:FieldValue[Seq[T]]): FVTOMongo[T] = FVTOMongo[T](fv)
 
   def $funcMongo(action: String, col: String, value: MongoObject): MongoObject = mongo.putMongo(action, mongo.putMongo(col, value))
 
@@ -46,9 +48,17 @@ trait Funcs {
 
   def mongoObject(tuples: Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
 
+  def splat[T]: FieldValue[Seq[T]] => MongoObject = fv => mongo.putPrimitiveArray[T](fv)
+
+  def combine(value:MongoObject*): MongoObject = if (value.isEmpty) mongo else value.foldLeft(value.head)((a, b) => a.merge(b))
+
   //TODO: remove this
   case class DBOToMongo(dbo: DBObject) {
     def toMongo(): MongoObject = MongoObject(dbo)
+  }
+
+  case class FVTOMongo[T](fv:FieldValue[Seq[T]]) {
+    def splat(): MongoObject = mongo.putPrimitiveArray[T](fv)
   }
 
   def anyFunction1[T]: String => FieldValue[T] => MongoObject = fname => fv => $funcMongo(fname, fieldToMongo1[T](fv))

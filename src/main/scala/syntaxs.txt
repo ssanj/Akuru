@@ -31,3 +31,8 @@ update(regex("title" -> "Lift"/i)(Blog("LiftInAction", Seq("misc"))
 
 findOne("labels" -> ("Functional")/i)
 findOne("labels" -> ("functional")./)
+
+
+findOne(nameField("PISC") and printVersionField(3)))
+
+findOne(combine(nameField("PISC"), printVersionField(3)))
