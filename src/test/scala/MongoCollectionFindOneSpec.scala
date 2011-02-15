@@ -22,7 +22,7 @@ final class MongoCollectionFindOneSpec extends FlatSpec with ShouldMatchers
     (onTestDB ~~>
             drop[Blog] ~~>
             save(Blog(title = titleField("blah1"))) ~~> save(Blog(title = titleField("blah2"))) ~~> save(Blog(title = titleField("blah3"))) ~~>
-            findOne(Blog.titleField.name -> ("blah.*"/i)) { blog:Blog =>
+            findOne(Blog.titleField -> ("blah.*"/i)) { blog:Blog =>
                 blog.title.value should include regex ("blah")
                 success
             } { fail("Should have found hits") }
@@ -32,7 +32,7 @@ final class MongoCollectionFindOneSpec extends FlatSpec with ShouldMatchers
   it  should "call a nomatches handler function if it does not have any matches" in {
     var handlerCalled = false
     (
-      onTestDB ~~> drop[Blog] ~~> findOne(Blog.titleField.name -> ("blah"/)) { b:Blog => Some("Unexpected blog returned -> " + b) }
+      onTestDB ~~> drop[Blog] ~~> findOne(Blog.titleField -> ("blah"/)) { b:Blog => Some("Unexpected blog returned -> " + b) }
                 { handlerCalled = true } ~~>()
     ) verifySuccess()
 
@@ -41,7 +41,7 @@ final class MongoCollectionFindOneSpec extends FlatSpec with ShouldMatchers
 
   it should "handle exceptions thrown on finder execution" in {
     (
-      onTestDB ~~> findOne(Person.nameField.name -> ("*"/)){ p:Person => Some("Should not have return results") } { ignoreError } ~~>()
+      onTestDB ~~> findOne(Person.nameField -> ("*"/)){ p:Person => Some("Should not have return results") } { ignoreError } ~~>()
     ) verifyError has (Person.expectedError)
   }
 
@@ -57,7 +57,7 @@ final class MongoCollectionFindOneSpec extends FlatSpec with ShouldMatchers
       onTestDB ~~>
               drop[Blog] ~~>
               save(Blog(title = titleField("blah1"))) ~~>
-              findOne(Blog.titleField.name -> (".*"/)) { b:Blog => throw new RuntimeException("Exception thrown handling match") }
+              findOne(Blog.titleField -> (".*"/)) { b:Blog => throw new RuntimeException("Exception thrown handling match") }
                         { throw new RuntimeException("Handler should not be called on error") } ~~>()
     ) verifyError has ("Exception thrown handling match")
   }
@@ -66,7 +66,7 @@ final class MongoCollectionFindOneSpec extends FlatSpec with ShouldMatchers
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              findOne(Blog.titleField.name -> (".*"/)) { b:Blog => Some("Should not have return results -> " + b) }
+              findOne(Blog.titleField -> (".*"/)) { b:Blog => Some("Should not have return results -> " + b) }
                         { throw new RuntimeException("Handler function threw an Exception") } ~~>()
     ) verifyError has ("Handler function threw an Exception")
   }

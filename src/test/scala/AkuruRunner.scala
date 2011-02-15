@@ -31,13 +31,13 @@ object AkuruRunner extends TestDomainObjects with MongoFunctions with Tools with
                     (blogs.map(b => save[Blog](b))) ~~>
                     (blogs.flatMap(b => b.labels.value.map(l => save[Label](Label(value = valueField(l))))).toList) ~~>
                     (findOne(Blog.titleField("Hello World Lift"))(printBlog)(ignoreError)) ~~>
-                    ( find { (Blog.labelsField.name ->  ("ubuntu|work"/i), "title" -> ("less"/i)) } { printBlogs }) ~~>
+                    ( find { (Blog.labelsField.name ->  ("ubuntu|work"/i), Blog.titleField.name -> ("less"/i)) } { printBlogs }) ~~>
                     (update[Blog](Blog.titleField("lessons learned"))(set(Blog.titleField("Lessons Learned")))) ~~>
                     (findOne { Blog.labelsField.name -> ("work")/i } (printBlog))(ignoreError) ~~>
                     (update[Blog](Blog.titleField("Lessons Learned"))(b2)) ~~>
-                    (findOne(Blog.labelsField.name -> ("work")/i)(printBlog))(ignoreError) ~~>
+                    (findOne(Blog.labelsField -> ("work")/i)(printBlog))(ignoreError) ~~>
                     (upsert[Blog](Blog.titleField("Semigroup"))(b3)) ~~>
-                    (findOne(Blog.labelsField.name -> ("functional"/))(printBlog)(ignoreError))
+                    (findOne(Blog.labelsField -> ("functional"/))(printBlog)(ignoreError))
                  } ~~>() getOrElse("success >>")
     println(result)
   }

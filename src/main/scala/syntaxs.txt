@@ -34,5 +34,6 @@ findOne("labels" -> ("functional")./)
 
 
 findOne(nameField("PISC") and printVersionField(3)))
-
 findOne(combine(nameField("PISC"), printVersionField(3)))
+
+findOne(Blog.titleField -> ("blah.*"/i))
