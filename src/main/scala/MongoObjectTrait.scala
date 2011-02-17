@@ -22,22 +22,25 @@ trait MongoObjectTrait extends Tools {
 
     def this(tuples:Seq[Tuple2[String, Any]]) = this(new BasicDBObject(scala.collection.JavaConversions.asJavaMap(tuples.toMap)))
 
-    def getPrimitive[T](key:String)(implicit con:AnyRefConverter[T]): T = getPrimitiveOfAnyType(key)
+    def getPrimitive[T](key:String)(implicit con:AnyRefConverter[T]): T =
+      getAnyArrayType[T](asSingleElementContainer(key))(element => con.convert(element)).head
 
-    def getPrimitive[T](f:Field[T])(implicit con:AnyRefConverter[T]): T = getPrimitiveOfAnyType(f.name)
+    def getPrimitive[T](f:Field[T])(implicit con:AnyRefConverter[T]): T = getPrimitive[T](f.name)
 
     //TODO: Test
     def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): T = implicitly[MongoToDomain[T]].apply(dbo.get(f.name).asInstanceOf[DBObject])
 
-    def getPrimitiveArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] =  getPrimitiveArrayOfAnyType[T](key)
+    def getPrimitiveArray[T](key:String)(implicit con:AnyRefConverter[T]): Seq[T] =
+      getAnyArrayType[T](asSeqContainer(key))(element => con.convert(element))
 
-    def getPrimitiveArray[T](f:Field[Seq[T]])(implicit con:AnyRefConverter[T]): Seq[T] = getPrimitiveArrayOfAnyType[T](f.name)
+    def getPrimitiveArray[T](f:Field[Seq[T]])(implicit con:AnyRefConverter[T]): Seq[T] = getPrimitiveArray[T](f.name)
 
     def getId: MongoObjectId = MongoObjectId(dbo.get("_id").asInstanceOf[ObjectId])
 
-    def getMongoArray[T <: DomainObject : MongoToDomain](key:String): Seq[T] = getAnyMongoArray[T](key)
+    def getMongoArray[T <: DomainObject : MongoToDomain](key:String): Seq[T] = getAnyArrayType[T](asSeqContainer(key))(
+      element => implicitly[MongoToDomain[T]].apply(element.asInstanceOf[DBObject]))
 
-    def getMongoArray[T <: DomainObject : MongoToDomain](f:Field[T]): Seq[T] = getAnyMongoArray[T](f.name)
+    def getMongoArray[T <: DomainObject : MongoToDomain](f:Field[T]): Seq[T] = getMongoArray[T](f.name)
 
     def putPrimitive[T](key:String, value:T): MongoObject = { putPrimitiveOfAnyType[T](key, value) }
 
@@ -63,28 +66,25 @@ trait MongoObjectTrait extends Tools {
     //TODO: Test
     def putPrimitiveArray[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveArrayOfAnyType[T](fv.name, fv.value)
 
-    private[akuru] def getPrimitiveOfAnyType[T](f: => String)(implicit con:AnyRefConverter[T]): T = con.convert(dbo.get(f))
+//    private[akuru] def getPrimitiveOfAnyType[T](key: => String)(implicit con:AnyRefConverter[T]): T = {
+//      getAnyArrayType[T](asSingleElementContainer(key))(element => con.convert(element)).head
+//    }
 
-    private[akuru] def getPrimitiveArrayOfAnyType[T](f: => String)(implicit con:AnyRefConverter[T]): Seq[T] = {
-      import scala.collection.JavaConversions._
+    private[akuru] def getAnyArrayType[T](container: => Seq[AnyRef])(f: AnyRef => T): Seq[T] = {
       val buffer = new ListBuffer[T]
-      for(element <- dbo.get(f).asInstanceOf[BasicDBList].iterator) {
-        buffer += (con.convert(element))
+      for(element <- container) {
+        buffer += f(element)
       }
 
       buffer.toSeq
     }
 
-    private[akuru] def getAnyMongoArray[T <: DomainObject : MongoToDomain](key: => String): Seq[T] = {
+    private[akuru] def asSeqContainer(key: String): Seq[AnyRef] = {
       import scala.collection.JavaConversions._
-      import MongoObject._
-      val buffer = new ListBuffer[T]
-      for(element <- dbo.get(key).asInstanceOf[BasicDBList].iterator) {
-        buffer += (implicitly[MongoToDomain[T]].apply(element.asInstanceOf[DBObject]))
-      }
-
-      buffer.toSeq
+      dbo.get(key).asInstanceOf[BasicDBList].toSeq
     }
+
+    private[akuru] def asSingleElementContainer(key: String): Seq[AnyRef] =  Seq(dbo.get(key))
 
     private[akuru] def putPrimitiveOfAnyType[T](key: => String, value: => T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); copyMongoObject }
 
