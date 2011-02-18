@@ -9,11 +9,7 @@ package akuru
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-final class MongoCollectionSaveSpec extends FlatSpec with ShouldMatchers
-        with TestDomainObjects
-        with MongoFunctions
-        with MongoSpecSupport
-        with Tools {
+final class MongoCollectionSaveSpec extends CommonSpec {
 
   import Blog._
 

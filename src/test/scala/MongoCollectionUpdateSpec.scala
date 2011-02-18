@@ -5,16 +5,10 @@
 
 package akuru
 
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.FlatSpec
 import _root_.akuru.MongoTypes._
 import _root_.akuru.MongoTypes.MongoObject._
 
-final class MongoCollectionUpdateSpec extends FlatSpec with ShouldMatchers
-        with TestDomainObjects
-        with MongoFunctions
-        with MongoSpecSupport
-        with Tools {
+final class MongoCollectionUpdateSpec extends CommonSpec {
 
   import Blog._
   import Book._

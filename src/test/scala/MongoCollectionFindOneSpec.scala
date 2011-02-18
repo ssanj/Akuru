@@ -10,11 +10,7 @@ import org.scalatest.FlatSpec
 import MongoTypes._
 import MongoTypes.RegexConstants._
 
-final class MongoCollectionFindOneSpec extends FlatSpec with ShouldMatchers
-        with TestDomainObjects
-        with MongoFunctions
-        with MongoSpecSupport
-        with Tools {
+final class MongoCollectionFindOneSpec extends CommonSpec {
 
   import Blog._
 
