@@ -38,13 +38,13 @@ trait MongoObjectTrait extends Tools {
 
     def getId: MongoObjectId = MongoObjectId(dbo.get("_id").asInstanceOf[ObjectId])
 
-    def putPrimitive[T](key:String, value:T): MongoObject = { putPrimitiveOfAnyType[T](key, value) }
+    def putPrimitive[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
 
-    def putPrimitive[T](fv:FieldValue[T]): MongoObject = { putPrimitiveOfAnyType[T](fv.name, fv.value) }
+    def putPrimitive[T](fv:FieldValue[T]): MongoObject = { putPrimitive(fv.name, fv.value) }
 
-    def putMongo(key:String, mongo:MongoObject): MongoObject = putAnyMongo(key, mongo)
+    def putMongo(key:String, mongo:MongoObject): MongoObject = putAnyArray(asJavaObject)(key, Seq(mongo.toDBObject))
 
-    def putMongo[T <: DomainObject <% MongoObject](fv:FieldValue[T]): MongoObject = { putAnyMongo(fv.name, fv.value) }
+    def putMongo[T <: DomainObject <% MongoObject](fv:FieldValue[T]): MongoObject = { putMongo(fv.name, fv.value) }
 
     //todo: a DomainObject should already have a FieldValue[MongoObjectId]
     def putId(id:MongoObjectId): MongoObject = { dbo.put("_id", id.toObjectId); copyMongoObject }
@@ -83,21 +83,6 @@ trait MongoObjectTrait extends Tools {
     }
 
     private[akuru] def asSingleElementContainer(key: String): Seq[AnyRef] =  Seq(dbo.get(key))
-
-    private[akuru] def putPrimitiveOfAnyType[T](key: => String, value: => T): MongoObject =
-      putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef]))
-
-    private[akuru] def putAnyMongo(key: => String, mongo: => MongoObject): MongoObject = {
-      putAnyArray(asJavaObject)(key, Seq(mongo.toDBObject))
-    }
-
-//    private[akuru] def putPrimitiveArrayOfAnyType[T](key: => String, values: => Seq[T]): MongoObject = {
-//      putAnyArray(asJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
-//    }
-
-//    private[akuru] def putAnyMongoArray(key: => String, values: => Seq[MongoObject]): MongoObject = {
-//     putAnyArray(asJavaList)(key, values.map(_.toDBObject))
-//    }
 
     private[akuru] def putAnyArray(f: Seq[AnyRef] => AnyRef)(key: => String, values: => Seq[AnyRef]): MongoObject = {
       dbo.put(key, f(values))
