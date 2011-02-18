@@ -51,16 +51,17 @@ trait MongoObjectTrait extends Tools {
 
     def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo.toDBObject); copyMongoObject }
 
-    def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyMongoArray(key, values)
+    def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyArray(asJavaList)(key,
+      values.map(_.toDBObject))
 
-    def putMongoArray[T <: DomainObject <% MongoObject](fv:FieldValue[Seq[T]]): MongoObject = putAnyMongoArray(fv.name,
+    def putMongoArray[T <: DomainObject <% MongoObject](fv:FieldValue[Seq[T]]): MongoObject = putMongoArray(fv.name,
       fv.value.map(implicitly[MongoObject](_)))
 
     //TODO: Test
-    def putPrimitiveArray[T](key:String, values:Seq[T]): MongoObject = putPrimitiveArrayOfAnyType[T](key, values)
+    def putPrimitiveArray[T](key:String, values: => Seq[T]): MongoObject = putAnyArray(asJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
 
     //TODO: Test
-    def putPrimitiveArray[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveArrayOfAnyType[T](fv.name, fv.value)
+    def putPrimitiveArray[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveArray[T](fv.name, fv.value)
 
     private[akuru] def mongoConverter[T <: DomainObject : MongoToDomain](element: AnyRef): T =
       implicitly[MongoToDomain[T]].apply(element.asInstanceOf[DBObject])
@@ -90,13 +91,13 @@ trait MongoObjectTrait extends Tools {
       putAnyArray(asJavaObject)(key, Seq(mongo.toDBObject))
     }
 
-    private[akuru] def putPrimitiveArrayOfAnyType[T](key: => String, values: => Seq[T]): MongoObject = {
-      putAnyArray(asJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
-    }
+//    private[akuru] def putPrimitiveArrayOfAnyType[T](key: => String, values: => Seq[T]): MongoObject = {
+//      putAnyArray(asJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
+//    }
 
-    private[akuru] def putAnyMongoArray(key: => String, values: => Seq[MongoObject]): MongoObject = {
-     putAnyArray(asJavaList)(key, values.map(_.toDBObject))
-    }
+//    private[akuru] def putAnyMongoArray(key: => String, values: => Seq[MongoObject]): MongoObject = {
+//     putAnyArray(asJavaList)(key, values.map(_.toDBObject))
+//    }
 
     private[akuru] def putAnyArray(f: Seq[AnyRef] => AnyRef)(key: => String, values: => Seq[AnyRef]): MongoObject = {
       dbo.put(key, f(values))
