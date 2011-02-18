@@ -4,14 +4,34 @@
  */
 package akuru
 
-import MongoTypes._
-import com.mongodb.{WriteResult}
 
 trait MongoWriteResultTrait extends WrapWithTrait with Tools with SideEffects {
+
+  import MongoTypes.MongoError
+  import com.mongodb.WriteResult
 
   trait WriteResultTrait {
     def getError: Option[String]
     def getLastErrorTrace: Option[String]
+    def getN: Option[Int]
+    def getFields: Map[String, AnyRef]
+
+  }
+
+  object WriteResultTrait {
+    def create(wr:WriteResult): WriteResultTrait = new WriteResultTrait {
+        def getError: Option[String] = nullToOption(wr.getError)
+
+        def getLastErrorTrace: Option[String] = {
+          nullToOption(wr.getLastError).flatMap(x => nullToOption(x.getException)).flatMap(y => nullToOption(y.getStackTraceString))
+        }
+
+        def getN: Option[Int] = nullToOption(wr.getN)
+
+        import scala.collection.JavaConversions._
+
+        def getFields: Map[String, AnyRef] = asScalaMap[String, AnyRef](wr.getLastError()).toMap
+      }
   }
 
   case class MongoWriteResult(wr:WriteResultTrait) {
@@ -24,15 +44,24 @@ trait MongoWriteResultTrait extends WrapWithTrait with Tools with SideEffects {
     def getStringError: Option[String] = mongoErrorToString(getMongoError)
 
     def mongoErrorToString(me:Option[MongoError]): Option[String] = me.map(e => addWithNewLine(e.message, e.stackTrace))
+
+    def getField(name: String): Option[AnyRef] = runSafelyWithOptionReturnResult[AnyRef](wr.getFields(name))
+
+    def getFieldorElse(name: String, default: => AnyRef): AnyRef =  foldOption(getField(name))(default)(identity)
+
+    def getN: Option[Int] = wr.getN
+
+    def ok: Boolean = booleanFold(getField("ok"))
+
+    def updatedExisting: Boolean = booleanFold(getField("updatedExisting"))
+
+    private def booleanFold(op:Option[AnyRef]): Boolean = foldOption(op)(false)(toBoolean)
+
+    def getFields: Map[String, AnyRef] = wr.getFields
   }
 
   object MongoWriteResult {
-    implicit def writeResultToMongoWriteResult(wr:WriteResult): MongoWriteResult =
-      MongoWriteResult(new WriteResultTrait {
-        def getError = nullToOption(wr.getError)
-        def getLastErrorTrace = {
-          nullToOption(wr.getLastError).flatMap(x => nullToOption(x.getException)).flatMap(y => nullToOption(y.getStackTraceString))
-        }
-      })
+    import WriteResultTrait._
+    implicit def writeResultToMongoWriteResult(wr:WriteResult): MongoWriteResult = MongoWriteResult(create(wr))
   }
 }

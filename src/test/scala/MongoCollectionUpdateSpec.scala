@@ -21,6 +21,12 @@ final class MongoCollectionUpdateSpec extends FlatSpec with ShouldMatchers
   "A MongoCollection with Updates" should "update an existing value" in {
     ( onTestDB ~~>
             drop[Blog] ~~>
+            safeUpdate[Blog](titleField("Blog updates"))(empty) {wr: MongoWriteResult =>
+              runSafelyWithOptionReturnError {
+                wr.updatedExisting should equal (false)
+                wr.getN should equal (Some(0))
+                wr.ok should equal (true)
+            }} ~~>
             save(Blog(title = titleField("Blog updates"), labels = labelsField(Seq("blog, update")))) ~~>
             findOne(titleField("Blog updates")) { b:Blog => ignoreSuccess } {  throw new RuntimeException("Could not find Blog") } ~~>
             update[Blog](titleField("Blog updates")) { set(titleField("Blog Updatees"), labelsField(Seq("bl%%g")).splat) } ~~>

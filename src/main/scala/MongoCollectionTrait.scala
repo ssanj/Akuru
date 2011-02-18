@@ -15,7 +15,7 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
 
     import com.mongodb.WriteResult
 
-   def save[T <: DomainObject : DomaintToMongo](value: => T): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject))
+   def save[T <: DomainObject : DomaintToMongo](value: => T, handler: MongoWriteResult => Option[String]): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject), handler)
 
     def findOne[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Option[T]] = {
       runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => implicitly[MongoToDomain[T]].apply(t)) }
@@ -28,13 +28,13 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
       }
     }
 
-    def update3(query:MongoObject, upate:MongoObject, upsert:Boolean = false, multi:Boolean = false):Option[String] = {
-      writeResultToOption(() => dbc.update(query.toDBObject, upate.toDBObject, upsert, multi))
+    def update3(query:MongoObject, update:MongoObject, upsert:Boolean = false, multi:Boolean = false, handler: MongoWriteResult => Option[String]):
+      Option[String] = {
+      writeResultToOption(() => dbc.update(query.toDBObject, update.toDBObject, upsert, multi), handler)
     }
 
-    def writeResultToOption(f:() => WriteResult): Option[String] =  {
-      import MongoTypes.MongoWriteResult._
-      runSafelyWithEither(f.apply).fold(l => Some(l), r => r.getStringError)
+    def writeResultToOption(f:() => WriteResult, g: MongoWriteResult => Option[String]): Option[String] =  {
+      runSafelyWithEither(f.apply).fold(l => Some(l), r => g(r))
     }
 
     def findAndModify[T <: DomainObject : MongoToDomain](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean):
