@@ -7,5 +7,8 @@ package akuru
 
 trait SideEffects { this:Tools =>
 
-  implicit def addWithNewLine: (String, String) => String = stringAdd(getStringOrDefault(System.getProperty("line.separator"))("\n"))
+  val newLine = getStringOrDefault(System.getProperty("line.separator"))("\n")
+
+  implicit def addWithNewLine: (String, String) => String = stringAdd(newLine)
+
 }

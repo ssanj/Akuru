@@ -38,10 +38,12 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
     }
 
     def findAndModify[T <: DomainObject : MongoToDomain](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean):
-    Either[MongoError, T] = {
+    Either[String, Option[T]] = {
       import MongoObject.empty
-      wrapWith {
-        implicitly[MongoToDomain[T]].apply(dbc.findAndModify(query, empty, sort, false, update, returnNew, false))
+      runSafelyWithEither {
+        foldOption(
+          nullToOption(dbc.findAndModify(query, empty, sort, false, update, returnNew, false))){
+          None:Option[T]}{t => Some(implicitly[MongoToDomain[T]].apply(t)) }
       }
     }
 

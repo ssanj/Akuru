@@ -4,10 +4,10 @@
  */
 package akuru
 
-
 trait MongoWriteResultTrait extends WrapWithTrait with Tools with SideEffects {
 
   import MongoTypes.MongoError
+  import MongoTypes.mongoErrorToOptionString
   import com.mongodb.WriteResult
 
   trait WriteResultTrait {
@@ -41,9 +41,7 @@ trait MongoWriteResultTrait extends WrapWithTrait with Tools with SideEffects {
       }.fold(Some(_), identity)
     }
 
-    def getStringError: Option[String] = mongoErrorToString(getMongoError)
-
-    def mongoErrorToString(me:Option[MongoError]): Option[String] = me.map(e => addWithNewLine(e.message, e.stackTrace))
+    def getStringError: Option[String] = mongoErrorToOptionString(getMongoError)
 
     def getField(name: String): Option[AnyRef] = runSafelyWithOptionReturnResult[AnyRef](wr.getFields(name))
 

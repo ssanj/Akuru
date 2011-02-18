@@ -7,6 +7,8 @@ package akuru
 
 trait Tools {
 
+  val  defaultExceptionMessage = "Exception message returned was null. Possible NullPointerException."
+
   def leftToOption[T](f: Either[String, T]): Option[String] = f.left.toOption
 
   implicit def eitherToLeft[T](e:Either[String, T]): Lefty[T] = Lefty(e)
@@ -15,11 +17,12 @@ trait Tools {
     def toLeftOption: Option[String] = e.left.toOption
   }
 
-  def runSafelyWithEither[T](f: => T): Either[String, T] = runSafelyWithDefault[Either[String, T]](Right(f))(e => Left(e.getMessage))
+  def runSafelyWithEither[T](f: => T): Either[String, T] = runSafelyWithDefault[Either[String, T]](Right(f)){e => Left(nullSafeExceptionMessage(e))}
 
   def runSafelyWithEitherCustomError[E, T](f: => T)(x:Exception => E): Either[E, T] = runSafelyWithDefault[Either[E, T]](Right(f))(e => Left(x(e)))
 
-  def runSafelyWithOptionReturnError[T](f: => T): Option[String] = runSafelyWithDefault[Option[String]]{f; None}(e => Some(e.getMessage))
+  def runSafelyWithOptionReturnError[T](f: => T): Option[String] = runSafelyWithDefault[Option[String]]{f; None}(
+    e => Some(nullSafeExceptionMessage(e)))
 
   def runSafelyWithOptionReturnResult[T](f: => T): Option[T] = runSafelyWithDefault[Option[T]]{Some(f)}(_ => None)
 
@@ -29,6 +32,10 @@ trait Tools {
     }  catch {
       case e:Exception => default(e)
     }
+  }
+
+  def nullSafeExceptionMessage(ex:Exception): String = {
+    foldOption(nullToOption(ex.getMessage))(stringAdd("\n")(defaultExceptionMessage, ex.getStackTraceString))(e => ex.getMessage)
   }
 
   /**

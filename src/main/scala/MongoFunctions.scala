@@ -25,6 +25,10 @@ trait MongoFunctions { this:Tools  =>
     col => col(collectionName[T]).findOne[T](f).fold(l => Some(
       l), r => foldOption(r){h;None:Option[String]}(g))
 
+  def findAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => MongoObject
+          )(update: => MongoObject)(f: T => Option[String])(h: => Option[String]): UserFunction =
+  { col => col(collectionName[T]).findAndModify[T](query, sort, update, true).fold(l => Some(l), r=> foldOption(r){h}(f)) }
+
   def ignoreError = () => {}
 
   def ignoreSuccess: Option[String] = None:Option[String]
