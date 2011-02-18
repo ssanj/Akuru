@@ -83,25 +83,33 @@ trait MongoObjectTrait extends Tools {
 
     private[akuru] def asSingleElementContainer(key: String): Seq[AnyRef] =  Seq(dbo.get(key))
 
-    private[akuru] def putPrimitiveOfAnyType[T](key: => String, value: => T): MongoObject = { dbo.put(key, value.asInstanceOf[AnyRef]); copyMongoObject }
+    private[akuru] def putPrimitiveOfAnyType[T](key: => String, value: => T): MongoObject =
+      putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef]))
 
     private[akuru] def putAnyMongo(key: => String, mongo: => MongoObject): MongoObject = {
-      dbo.put(key, mongo.toDBObject.asInstanceOf[AnyRef]); copyMongoObject
+      putAnyArray(asJavaObject)(key, Seq(mongo.toDBObject))
     }
 
     private[akuru] def putPrimitiveArrayOfAnyType[T](key: => String, values: => Seq[T]): MongoObject = {
-      import scala.collection.JavaConversions._
-      val list:java.util.List[T] = values.toList
-      dbo.put(key, list)
+      putAnyArray(asJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
+    }
+
+    private[akuru] def putAnyMongoArray(key: => String, values: => Seq[MongoObject]): MongoObject = {
+     putAnyArray(asJavaList)(key, values.map(_.toDBObject))
+    }
+
+    private[akuru] def putAnyArray(f: Seq[AnyRef] => AnyRef)(key: => String, values: => Seq[AnyRef]): MongoObject = {
+      dbo.put(key, f(values))
       copyMongoObject
     }
 
-    private[akuru] def putAnyMongoArray[T](key: => String, values: => Seq[MongoObject]): MongoObject = {
+    private[akuru] def asJavaList(values: Seq[AnyRef]): AnyRef = {
       import scala.collection.JavaConversions._
-      val list:java.util.List[DBObject] = values.map(_.toDBObject).toList
-      dbo.put(key, list)
-      copyMongoObject
+      val list:java.util.List[AnyRef] = values.toList
+      list
     }
+
+    private[akuru] def asJavaObject(values: Seq[AnyRef]): AnyRef =  values.head
 
     private[akuru] def toDBObject: DBObject = new BasicDBObject(dbo.toMap)
 
