@@ -16,10 +16,10 @@ trait MongoFunctions { this:Tools  =>
 
   def collectionName[T <: DomainObject : CollectionName]: String = implicitly[CollectionName[T]].name
 
-  def safeSave[T <: DomainObject : DomaintToMongo : CollectionName](f: => T)(g: MongoWriteResult => Option[String]): UserFunction =
+  def safeSave[T <: DomainObject : DomainToMongo : CollectionName](f: => T)(g: MongoWriteResult => Option[String]): UserFunction =
     col => col(collectionName[T]).save[T](f, g)
 
-  def save[T <: DomainObject : DomaintToMongo : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save[T](f, defaultHandler)
+  def save[T <: DomainObject : DomainToMongo : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save[T](f, defaultHandler)
 
   def findOne[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(g: T => Option[String])(h: => Unit):UserFunction =
     col => col(collectionName[T]).findOne[T](f).fold(l => Some(

@@ -15,7 +15,7 @@ trait DomainSupport { this:Tools =>
 
   type MongoToDomain[T <: DomainObject] = MongoObject => T
 
-  type DomaintToMongo[T <: DomainObject] = T => MongoObject
+  type DomainToMongo[T <: DomainObject] = T => MongoObject
 
 
   case class FieldValue[T](field:Field[T], value:T) {
