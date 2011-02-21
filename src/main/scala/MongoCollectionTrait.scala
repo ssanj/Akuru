@@ -37,12 +37,12 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
       runSafelyWithEither(f.apply).fold(l => Some(l), r => g(r))
     }
 
-    def findAndModify[T <: DomainObject : MongoToDomain](query:MongoObject, sort:MongoObject, update:MongoObject, returnNew:Boolean):
-    Either[String, Option[T]] = {
+    def findAndModify[T <: DomainObject : MongoToDomain](query:MongoObject, sort:MongoObject, remove:Boolean, update:MongoObject,
+      returnNew:Boolean, upsert:Boolean): Either[String, Option[T]] = {
       import MongoObject.empty
       runSafelyWithEither {
         foldOption(
-          nullToOption(dbc.findAndModify(query, empty, sort, false, update, returnNew, false))){
+          nullToOption(dbc.findAndModify(query, empty, sort, remove, update, returnNew, upsert))){
           None:Option[T]}{t => Some(implicitly[MongoToDomain[T]].apply(t)) }
       }
     }
