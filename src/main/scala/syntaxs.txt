@@ -40,5 +40,7 @@ findOne(Blog.titleField -> ("blah.*"/i))
 (Field -> (""/i)) and mongo and (Field -> (""/)) and
 
 QueryObject
-UpdateObject
-SortObject
+UpdateObject *
+SortObject *
+
+find(nameField("blah") and priorityField(5) >
