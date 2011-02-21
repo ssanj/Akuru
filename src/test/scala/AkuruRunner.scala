@@ -8,12 +8,13 @@ package runners
 import _root_.akuru._
 import MongoTypes._
 
-object AkuruRunner extends TestDomainObjects with MongoFunctions with Tools with SideEffects {
+object AkuruRunner extends TestDomainObjects {
 
 
   def main(args: Array[String]) {
-    import MongoTypes.RegexConstants._
+    import MongoTypes._
     import MongoTypes.MongoObject._
+    import MongoTypes.RegexConstants._
     import Blog._
     import Label._
 

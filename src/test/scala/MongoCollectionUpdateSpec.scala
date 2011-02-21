@@ -15,7 +15,7 @@ final class MongoCollectionUpdateSpec extends CommonSpec {
   "A MongoCollection with Updates" should "update an existing value" in {
     ( onTestDB ~~>
             drop[Blog] ~~>
-            safeUpdate[Blog](titleField("Blog updates"))(empty) {wr: MongoWriteResult =>
+            safeUpdate[Blog](titleField("Blog updates"))(set(titleField("Phantom updates"))) {wr: MongoWriteResult =>
               runSafelyWithOptionReturnError {
                 wr.updatedExisting should equal (false)
                 wr.getN should equal (Some(0))

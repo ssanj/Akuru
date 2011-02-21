@@ -15,11 +15,12 @@ trait QueryTypes {
     override val value:MongoObject = implicitly[DomainToMongo[T]].apply(domain)
   }
 
-  case class MongoUpdate(mo:MongoObject) extends UpdateObject {
+  case class MongoUpdateObject(mo:MongoObject) extends UpdateObject {
     override val value:MongoObject = mo
   }
 
-  implicit def domainToUpdateObject[T <: DomainObject : DomainToMongo](value:T): UpdateObject = DomainUpdateObject[T](value)
-
-  //we don't add an implicit def for mongo -> updateObject here as we want to limit it to specific mongo objects.
+  object UpdateObject {
+    implicit def domainToUpdateObject[T <: DomainObject : DomainToMongo](value:T): UpdateObject = DomainUpdateObject[T](value)
+    //we don't add an implicit def for mongo -> updateObject here as we want to limit it to specific mongo objects.
+  }
 }

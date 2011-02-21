@@ -26,8 +26,8 @@ trait MongoFunctions { this:Tools  =>
       l), r => foldOption(r){h;None:Option[String]}(g))
 
   def findAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => MongoObject
-          )(update: => MongoObject)(f: T => Option[String])(h: => Option[String]): UserFunction =
-  { col => col(collectionName[T]).findAndModify[T](query, sort, update, true).fold(l => Some(l), r=> foldOption(r){h}(f)) }
+          )(update: => UpdateObject)(f: T => Option[String])(h: => Option[String]): UserFunction =
+  { col => col(collectionName[T]).findAndModify[T](query, sort, update.value, true).fold(l => Some(l), r=> foldOption(r){h}(f)) }
 
   def ignoreError = () => {}
 
@@ -36,17 +36,17 @@ trait MongoFunctions { this:Tools  =>
   def find[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(g: Seq[T] => Option[String]): UserFunction =
     col => col(collectionName[T]).find[T](f).fold(l => Some(l), r => g(r))
 
-  def update[T <: DomainObject : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction =
-    col => col(collectionName[T]).update3(query = f, update = r, handler = defaultHandler)
+  def update[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject): UserFunction =
+    col => col(collectionName[T]).update3(query = q, update = u.value, handler = defaultHandler)
 
-  def safeUpdate[T <: DomainObject : CollectionName](f: => MongoObject)(r: => MongoObject)(g: MongoWriteResult => Option[String]): UserFunction =
-    col => col(collectionName[T]).update3(query = f, update = r, handler = g)
+  def safeUpdate[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject)(g: MongoWriteResult => Option[String]): UserFunction =
+    col => col(collectionName[T]).update3(query = q, update = u.value, handler = g)
 
-  def upsert[T <: DomainObject : CollectionName](f: => MongoObject)(r: => MongoObject): UserFunction =
-    col => col(collectionName[T]).update3(f, r, true, handler = defaultHandler)
+  def upsert[T <: DomainObject : CollectionName : DomainToMongo](q: => MongoObject)(u: => T): UserFunction =
+    col => col(collectionName[T]).update3(q, u, true, handler = defaultHandler)
 
-  def safeUpsert[T <: DomainObject : CollectionName](f: => MongoObject)(r: => MongoObject)(g: MongoWriteResult => Option[String]):
-    UserFunction = col => col(collectionName[T]).update3(f, r, true, handler = g)
+  def safeUpsert[T <: DomainObject : CollectionName: DomainToMongo](q: => MongoObject)(u: => T)(g: MongoWriteResult => Option[String]):
+    UserFunction = col => col(collectionName[T]).update3(q, u, true, handler = g)
 
   def drop[T <: DomainObject : CollectionName]: UserFunction = col => col(collectionName[T]).drop3
 

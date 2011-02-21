@@ -19,5 +19,6 @@ object MongoTypes extends MongoServerTrait with
                           MongoFunc with
                           MongoTools with
                           MongoRegEx with
-                          DomainSupport {
+                          DomainSupport with
+                          QueryTypes {
 }
