@@ -37,17 +37,8 @@ findOne(nameField("PISC") and printVersionField(3)))
 findOne(combine(nameField("PISC"), printVersionField(3)))
 
 findOne(Blog.titleField -> ("blah.*"/i))
-
-
-
-implicit def blah[T](f:FieldValueRegEx[T]): fromMongo = fromMongo(toMongoRegex(f))
-
-case class fromMongo[T](mo:MongoObject]) {
-
-  def and[R](another:FieldValueRegEx[T]): fromMongo = fromMongo(merge(mo, toMongoRegex(another))))
-
-  def and(mos:MongoObject): fromMongo = fromMongo(mo merge mos)
-}
-
-
 (Field -> (""/i)) and mongo and (Field -> (""/)) and
+
+QueryObject
+UpdateObject
+SortObject

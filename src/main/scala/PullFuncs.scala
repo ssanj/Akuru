@@ -5,6 +5,8 @@
 package akuru
 
 import MongoTypes.MongoObject
+import MongoTypes.FieldValue
+import MongoTypes.MongoUpdateObject
 
 /**
  * { $pull : { field : _value } }
@@ -25,9 +27,9 @@ trait PullFuncs { this:Funcs =>
 
   import PullFuncs._
 
-  def pull(col:String, value:MongoObject): MongoObject =  $funcMongo("$pull", col, value)
+  def pull(col:String, value:MongoObject): MongoUpdateObject =  toMongoUpdateObject($funcMongo("$pull", col, value))
 
-  def pull(col:String, value:AnyRef): MongoObject =  $funcPrimitive("$pull", col, value)
+  def pull(col:String, value:AnyRef): MongoUpdateObject =  toMongoUpdateObject($funcPrimitive("$pull", col, value))
 
-  def pull[T] = anyFunction1[T](functionName)
+  def pull[T]: FieldValue[T] => MongoUpdateObject = fv => toMongoUpdateObject(anyFunction1[T](functionName)(fv))
 }

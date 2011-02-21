@@ -5,8 +5,23 @@
 package akuru
 
 import MongoTypes._
+import MongoTypes.MongoObject.mongo
 
 trait QueryTypes {
+
+  sealed trait SortObject {
+    val value:MongoObject
+  }
+
+  object SortOrder extends Enumeration {
+    val ASC =  Value(1)
+    val DSC  = Value(-1)
+  }
+
+  case class MongoSortObject(mo:MongoObject) extends SortObject {
+    override val value:MongoObject = mo
+  }
+
   sealed trait UpdateObject {
     val value:MongoObject
   }

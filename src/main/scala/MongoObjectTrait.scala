@@ -79,6 +79,7 @@ trait MongoObjectTrait extends Tools {
 
     private[akuru] def asSeqContainer(key: String): Seq[AnyRef] = {
       import scala.collection.JavaConversions._
+
       dbo.get(key).asInstanceOf[BasicDBList].toSeq
     }
 
@@ -105,5 +106,6 @@ trait MongoObjectTrait extends Tools {
   object MongoObject extends
       SetFuncs with
       PullFuncs with
+      SortFuncs with
       Funcs
 }

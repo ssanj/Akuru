@@ -1,6 +1,8 @@
 package akuru
 
 import MongoTypes.MongoObject
+import MongoTypes.MongoUpdateObject
+import MongoTypes.FieldValue
 
 /**
  * { $push : { field : value } }
@@ -15,7 +17,7 @@ trait PushFuncs  { this:Funcs =>
 
   import PushFuncs._
 
-  def push(col:String, value:MongoObject): MongoObject =  $funcMongo(functionName, col, value)
+  def push(col:String, value:MongoObject): MongoUpdateObject =  toMongoUpdateObject($funcMongo(functionName, col, value))
 
-  def push[T] = anyFunction1[T](functionName)
+  def push[T]: FieldValue[T] => MongoUpdateObject = fv => toMongoUpdateObject(anyFunction1[T](functionName)(fv))
 }

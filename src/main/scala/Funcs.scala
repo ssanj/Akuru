@@ -6,6 +6,7 @@
 package akuru
 
 import MongoTypes.MongoObject
+import MongoTypes.MongoUpdateObject
 import MongoTypes.FieldValue
 
 trait Funcs {
@@ -79,4 +80,6 @@ trait Funcs {
 
   def anyFunction3[R, S, T]: String => (FieldValue[R], FieldValue[S], FieldValue[T]) => MongoObject =
     fname => (fv1, fv2, fv3) => $funcMongo(fname, fieldToMongo3[R,S,T](fv1, fv2, fv3))
+
+  def toMongoUpdateObject(mo: => MongoObject): MongoUpdateObject = MongoUpdateObject(mo)
 }

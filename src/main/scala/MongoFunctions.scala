@@ -5,6 +5,7 @@
 
 package akuru
 import MongoTypes._
+import MongoTypes.MongoObject.SortObjectJoiner
 
 trait MongoFunctions { this:Tools  =>
 
@@ -25,9 +26,9 @@ trait MongoFunctions { this:Tools  =>
     col => col(collectionName[T]).findOne[T](f).fold(l => Some(
       l), r => foldOption(r){h;None:Option[String]}(g))
 
-  def findAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => MongoObject
+  def findAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner
           )(update: => UpdateObject)(f: T => Option[String])(h: => Option[String]): UserFunction =
-  { col => col(collectionName[T]).findAndModify[T](query, sort, update.value, true).fold(l => Some(l), r=> foldOption(r){h}(f)) }
+  { col => col(collectionName[T]).findAndModify[T](query, sort.done, update.value, true).fold(l => Some(l), r=> foldOption(r){h}(f)) }
 
   def ignoreError = () => {}
 
