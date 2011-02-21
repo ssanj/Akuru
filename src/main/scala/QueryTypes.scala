@@ -5,7 +5,6 @@
 package akuru
 
 import MongoTypes._
-import MongoTypes.MongoObject.mongo
 
 trait QueryTypes {
 
@@ -13,7 +12,7 @@ trait QueryTypes {
     val value:MongoObject
   }
 
-  object SortOrder extends Enumeration {
+  object SortOrderEnum extends Enumeration {
     val ASC =  Value(1)
     val DSC  = Value(-1)
   }

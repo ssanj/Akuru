@@ -1,6 +1,6 @@
 package akuru
 
-import MongoTypes.SortOrder
+import MongoTypes.SortOrderEnum
 import MongoTypes.Field
 import MongoTypes.MongoSortObject
 import MongoTypes.MongoObject
@@ -8,7 +8,7 @@ import MongoTypes.MongoObject.mongo
 
 trait SortFuncs {
 
-  def sort[T](fv:Field[T], order:SortOrder.Value): MongoSortObject = MongoSortObject(mongo.putPrimitive(fv.name, order.id))
+  def sort[T](fv:Field[T], order:SortOrderEnum.Value): MongoSortObject = MongoSortObject(mongo.putPrimitive(fv.name, order.id))
 
   def noSort: MongoSortObject = MongoSortObject(mongo)
 

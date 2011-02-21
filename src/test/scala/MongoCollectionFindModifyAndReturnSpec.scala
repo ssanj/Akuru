@@ -4,7 +4,7 @@
  */
 package akuru
 
-final class MongoCollectionFindAndModifyAndReturnSpec extends CommonSpec {
+final class MongoCollectionFindModifyAndReturnSpec extends CommonSpec {
 
   import Blog._
   import MongoTypes.MongoObject._
