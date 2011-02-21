@@ -9,7 +9,6 @@ final class MongoCollectionFindModifyAndRemoveSpec extends CommonSpec {
 
   import Blog._
   import MongoTypes.MongoObject._
-  import MongoTypes.SortOrderEnum._
   "A MongoCollection with findModifyAndRemove" should "not find or remove a non-existant object" in {
     var handlerCalled = false
     (onTestDB ~~>
