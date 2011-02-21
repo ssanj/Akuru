@@ -36,6 +36,11 @@ trait MongoFunctions { this:Tools  =>
       col => col(collectionName[T]).findAndModify[T](query, sort.done, true, empty, false, false).fold(l => Some(l), r=> foldOption(r){h}(f))
   }
 
+  def findAndUpsertAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner)
+      (update: => UpdateObject)(f: T => Option[String])(h: => Option[String]): UserFunction = {
+      col => col(collectionName[T]).findAndModify[T](query, sort.done, false, update.value, true, true).fold(l => Some(l), r=> foldOption(r){h}(f))
+  }
+
   def ignoreError = () => {}
 
   def ignoreSuccess: Option[String] = None:Option[String]
