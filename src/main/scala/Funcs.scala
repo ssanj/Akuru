@@ -70,6 +70,8 @@ trait Funcs {
 
     def and(another:MongoObject): MongoJoiner = MongoJoiner(mo.merge(another))
 
+    def and[T](another:FieldValue[T]): MongoJoiner = MongoJoiner(mo.merge(another))
+
     def done: MongoObject = mo
   }
 

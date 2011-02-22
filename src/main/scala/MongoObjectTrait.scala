@@ -107,5 +107,6 @@ trait MongoObjectTrait extends Tools {
       SetFuncs with
       PullFuncs with
       SortFuncs with
+      MongoOperators with
       Funcs
 }
