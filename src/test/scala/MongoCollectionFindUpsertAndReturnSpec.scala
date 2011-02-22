@@ -18,8 +18,8 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec {
                 t.priority.value should equal (5)
                 t.owner.value should equal ("sanj")
                 success
-              } { throw new RuntimeException("Could not upsert Task")
-    } ~~>()) verifySuccess
+              } { throw new RuntimeException("Could not upsert Task") }
+    ) ~~>() verifySuccess
   }
 
   it should "update an existing object" in {
@@ -39,12 +39,13 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec {
               tasks.size should equal (1)
               verifyEqual(tasks(0), createTask)
               success
-            } ~~>
+            } { full } ~~>
             find(nameField("Clean Room") and (priorityField |<>| (7, 10))) { tasks:Seq[Task] =>
               tasks.size should equal (1)
               verifyEqual(tasks(0), createHPTask1)
               success
-    } ~~>()) verifySuccess
+            } { full }
+    ) ~~>() verifySuccess
   }
 
   private def createTask: Task = Task(name = nameField("Clean Room"), priority = priorityField(5), owner = ownerField("sanj"))

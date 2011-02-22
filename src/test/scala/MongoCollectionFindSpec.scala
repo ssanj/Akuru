@@ -13,8 +13,7 @@ final class MongoCollectionFindSpec extends CommonSpec {
   import Blog._
 
   "A MongoCollection with find" should "find all saved objects matching a query" in {
-    ({
-      onTestDB ~~>
+    (onTestDB ~~>
               drop[Blog] ~~>
               save(Blog(title = titleField("sample1"), labels = labelsField(Seq("sample")))) ~~>
               save(Blog(title= titleField("sample2"), labels = labelsField(Seq("sample")))) ~~>
@@ -25,36 +24,35 @@ final class MongoCollectionFindSpec extends CommonSpec {
                 blogs.exists(_.title.value == "sample2") should be (true)
                 blogs.exists(_.title.value == "sample3") should be (true)
                 success
-              })
-    } ~~>()) verifySuccess
+              }) { full }
+    ) ~~>() verifySuccess
   }
 
   it should "return zero results if there are no matches" in {
-    ({
-      onTestDB ~~>
+    (onTestDB ~~>
               drop[Blog] ~~>
               find(Blog.titleField -> ("*"/)){(blogs:Seq[Blog]) =>
                 blogs.size should equal (0)
                 success
-              }
-    } ~~>()) verifySuccess
+              } { full }
+    ) ~~>() verifySuccess
   }
 
   it should "handle exceptions thrown on finder execution" in {
     (
-      onTestDB ~~> find[Person](Person.nameField -> ("*"/))(p => fail("Should not have return results")) ~~>()
+      onTestDB ~~> find[Person](Person.nameField -> ("*"/))(p => fail("Should not have return results")) (full)~~>()
     ) verifyError has (Person.expectedError)
   }
 
   it should "handle exceptions throw on creating a query" in {
     (
-      onTestDB ~~> find[Blog](createExceptionalMongoObject)(b => fail("Should not have return results")) ~~>()
+      onTestDB ~~> find[Blog](createExceptionalMongoObject)(b => fail("Should not have return results")) (full) ~~>()
     ) verifyError has (mongoCreationException)
   }
 
   it should "handle exception thrown by match handler function" in {
     (
-      onTestDB ~~> find(Blog.titleField -> ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) ~~>()
+      onTestDB ~~> find(Blog.titleField -> ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) (full) ~~>()
     ) verifyError has ("Handler threw an Exception")
   }
 
@@ -63,10 +61,10 @@ final class MongoCollectionFindSpec extends CommonSpec {
       onTestDB ~~>
               drop[Blog] ~~>
               save(Blog(title = titleField("Querying with RegEx"), labels = labelsField(Seq("query", "regex")))) ~~>
-              find(Blog.titleField -> ("querying with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (0); success }) ~~>
-              find(Blog.titleField -> ("Querying with RegEx"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
-              find(Blog.titleField -> (".* with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>
-              find(Blog.titleField -> (".*query.*"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) ~~>()
+              find(Blog.titleField -> ("querying with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (0); success }) (full) ~~>
+              find(Blog.titleField -> ("Querying with RegEx"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) (full)~~>
+              find(Blog.titleField -> (".* with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) (full) ~~>
+              find(Blog.titleField -> (".*query.*"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) (full) ~~>()
     ) verifySuccess
   }
 }

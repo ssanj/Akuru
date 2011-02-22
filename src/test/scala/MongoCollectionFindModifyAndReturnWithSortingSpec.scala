@@ -44,8 +44,8 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
                   b.name.value should equal ("Programming in Scala")
                   b.printVersion.value should equal (unUpdatedVersion)
                 }
-                success
-    } ~~>()) verifySuccess
+                success} { full }
+   ) ~~>() verifySuccess
   }
 
   private def createVersion1: Book = {
