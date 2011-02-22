@@ -9,8 +9,6 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec {
 
   import Task._
   import MongoTypes.MongoObject._
-  import MongoTypes.SortOrderEnum._
-  import SortObjectJoiner._
   "A MongoCollection with findUpsertAndReturn" should "create a non-existant object" in {
     var handlerCalled = false
     (onTestDB ~~>

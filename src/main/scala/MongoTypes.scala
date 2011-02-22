@@ -2,7 +2,7 @@
  * Copyright 2010 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-package object akuru extends akuru.MongoImplicits
+package object akuru extends akuru.AkuruImplicits with akuru.AkuruGlobalTypes
 
 package akuru {
   object MongoTypes extends MongoServerTrait with

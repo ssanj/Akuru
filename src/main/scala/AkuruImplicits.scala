@@ -2,6 +2,7 @@ package akuru
 
 import MongoTypes.FieldValue
 import MongoTypes.Field
+import MongoTypes.MongoSortObject
 import MongoTypes.OperatorObject
 import MongoTypes.MongoObject
 import MongoObject.mongo
@@ -9,9 +10,10 @@ import MongoObject.fieldToMongo1
 import MongoObject.DBOToMongo
 import MongoObject.SequencedFVTOMongo
 import MongoObject.MongoJoiner
+import MongoObject.SortObjectJoiner
 
 
-trait MongoImplicits {
+trait AkuruImplicits {
 
   import com.mongodb.DBObject
 
@@ -38,4 +40,5 @@ trait MongoImplicits {
 
   implicit def fieldToOperation[T <% Number](f:Field[T]): OperatorObject[T] = OperatorObject[T](f)
 
+  implicit def mongoSortToSortObjectJoiner(mso:MongoSortObject): SortObjectJoiner = SortObjectJoiner(mso)
 }

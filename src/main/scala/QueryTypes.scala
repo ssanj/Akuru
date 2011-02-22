@@ -4,7 +4,9 @@
  */
 package akuru
 
-import MongoTypes._
+import MongoTypes.MongoObject
+import MongoTypes.DomainToMongo
+import MongoTypes.DomainObject
 
 trait QueryTypes {
 
@@ -12,7 +14,7 @@ trait QueryTypes {
     val value:MongoObject
   }
 
-  object SortOrderEnum extends Enumeration {
+  object SortOrder extends Enumeration {
     val ASC =  Value(1)
     val DSC  = Value(-1)
   }
@@ -20,6 +22,7 @@ trait QueryTypes {
   case class MongoSortObject(mo:MongoObject) extends SortObject {
     override val value:MongoObject = mo
   }
+
 
   sealed trait UpdateObject {
     val value:MongoObject

@@ -9,8 +9,6 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
 
   import Book._
   import MongoTypes.MongoObject._
-  import MongoTypes.SortOrderEnum
-  import MongoTypes.SortOrderEnum._
 
   "A MongoCollection with findAndModifyAndReturnWithSorting" should "find an sorted object sorted ascending" in {
     verifySort(ASC, createVersion1, 2)
@@ -34,7 +32,7 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
               price = priceField(40.00D)))
   }
 
-  private def verifySort(sortOrder:SortOrderEnum.Value, updated:Book, unUpdatedVersion:Int) {
+  private def verifySort(sortOrder:SortOrder, updated:Book, unUpdatedVersion:Int) {
    (setup ~~>
               findAndModifyAndReturn(nameField("Programming in Scala"))(sort(printVersionField, sortOrder)) { updated }{ b:Book =>
                 b.name.value should equal (updated.name.value)
