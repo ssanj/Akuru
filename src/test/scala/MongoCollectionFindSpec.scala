@@ -5,8 +5,6 @@
 
 package akuru
 
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.FlatSpec
 import MongoTypes._
 import MongoTypes.RegexConstants._
 

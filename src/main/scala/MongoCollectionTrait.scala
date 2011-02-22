@@ -15,7 +15,8 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
 
     import com.mongodb.WriteResult
 
-   def save[T <: DomainObject : DomainToMongo](value: => T, handler: MongoWriteResult => Option[String]): Option[String] =  writeResultToOption(() => dbc.save(value.toDBObject), handler)
+   def save[T <: DomainObject : DomainToMongo](value: => T, handler: MongoWriteResult => Option[String]): Option[String] =
+     writeResultToOption(() => dbc.save(value.toDBObject), handler)
 
     def findOne[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Option[T]] = {
       runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => implicitly[MongoToDomain[T]].apply(t)) }
@@ -26,6 +27,10 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
         val mc:MongoCursor = dbc.find(mo)
         mc.asSeq[T]
       }
+    }
+
+    def find2[T <: DomainObject : MongoToDomain](mo:MongoObject)(f: MongoCursor => MongoCursor): Either[String, Seq[T]] = {
+      runSafelyWithEither { f(dbc.find(mo)).asSeq[T] }
     }
 
     def update3(query:MongoObject, update:MongoObject, upsert:Boolean = false, multi:Boolean = false, handler: MongoWriteResult => Option[String]):

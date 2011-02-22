@@ -17,6 +17,8 @@ trait MongoCursorTrait {
         val seq:Seq[DBObject] = dbc.toSeq
         seq.map(implicitly[MongoToDomain[T]].apply(_))
     }
+
+    def limit(hits:Int): MongoCursor = dbc.limit(hits)
   }
 
   object MongoCursor {
