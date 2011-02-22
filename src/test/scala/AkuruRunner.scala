@@ -12,9 +12,7 @@ object AkuruRunner extends TestDomainObjects {
 
 
   def main(args: Array[String]) {
-    import MongoTypes._
-    import MongoTypes.MongoObject._
-    import MongoTypes.RegexConstants._
+    import MongoTypes.MongoObject.set
     import Blog._
     import Label._
 
@@ -29,8 +27,8 @@ object AkuruRunner extends TestDomainObjects {
     val result = {withAkuru ~~>
                     drop[Blog] ~~>
                     drop[Label] ~~>
-                    blogs.map(b => save[Blog](b)) ~~>
-                    (blogs.flatMap(b => b.labels.value.map(l => save[Label](Label(value = valueField(l))))).toList) ~~>
+                    blogs.map(b => save(b)) ~~>
+                    (blogs.flatMap(b => b.labels.value.map(l => save(Label(value = valueField(l))))).toList) ~~>
                     findOne(Blog.titleField("Hello World Lift"))(printBlog)(ignoreError)~~>
                     find { (Blog.labelsField.name ->  ("ubuntu|work"/i), Blog.titleField.name -> ("less"/i)) } { printBlogs } { full } ~~>
                     update[Blog](Blog.titleField("lessons learned"))(set(Blog.titleField("Lessons Learned"))) ~~>
