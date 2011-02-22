@@ -5,6 +5,7 @@
 package akuru
 
 import MongoTypes.FieldValue
+import MongoTypes.Field
 import MongoTypes.MongoObject
 import MongoTypes.MongoObject._
 
@@ -24,5 +25,3 @@ trait MongoOperators { this:Funcs =>
 
   private def operate[T <% Number](fv:FieldValue[T], func:String): MongoObject =  $funcPrimitive(fv.name, func, fv.value)
 }
-
-object MongoOperators extends MongoOperators with Funcs

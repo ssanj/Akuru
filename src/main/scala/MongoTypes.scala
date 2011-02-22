@@ -20,5 +20,5 @@ object MongoTypes extends MongoServerTrait with
                           MongoTools with
                           MongoRegEx with
                           DomainSupport with
-                          QueryTypes {
-}
+                          QueryTypes with
+                          OperatorTypes

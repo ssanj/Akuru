@@ -8,6 +8,8 @@ package akuru
 import MongoTypes.MongoObject
 import MongoTypes.MongoUpdateObject
 import MongoTypes.FieldValue
+import MongoTypes.Field
+import MongoTypes.OperatorObject
 
 trait Funcs {
 
@@ -33,6 +35,8 @@ trait Funcs {
   implicit def fvToMongoJoiner[T](fv:FieldValue[T]): MongoJoiner = MongoJoiner(mongo.putPrimitive[T](fv))
 
   implicit def mongoJoinerToMongo(mj:MongoJoiner): MongoObject = mj.done
+
+  implicit def fieldToOperation[T <% Number](f:Field[T]): OperatorObject[T] = OperatorObject[T](f)
 
   def $funcMongo(action: String, col: String, value: MongoObject): MongoObject = mongo.putMongo(action, mongo.putMongo(col, value))
 

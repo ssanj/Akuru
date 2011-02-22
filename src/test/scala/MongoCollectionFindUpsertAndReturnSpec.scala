@@ -37,12 +37,12 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec {
               t.owner.value should equal ("Litterbug")
               success
             } { throw new RuntimeException("Could not upsert Task") } ~~>
-            find(nameField("Clean Room") and lt(priorityField(6))) {tasks:Seq[Task] =>
+            find(nameField("Clean Room") and (priorityField < 6)) {tasks:Seq[Task] =>
               tasks.size should equal (1)
               verifyEqual(tasks(0), createTask)
               success
             } ~~>
-            find(nameField("Clean Room") and between(priorityField(7), 10)) { tasks:Seq[Task] =>
+            find(nameField("Clean Room") and (priorityField |<>| (7, 10))) { tasks:Seq[Task] =>
               tasks.size should equal (1)
               verifyEqual(tasks(0), createHPTask1)
               success
