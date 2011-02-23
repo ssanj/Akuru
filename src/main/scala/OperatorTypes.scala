@@ -4,7 +4,6 @@
  */
 package akuru
 
-import MongoTypes.Field
 import MongoTypes.MongoObject
 import MongoTypes.MongoObject._
 

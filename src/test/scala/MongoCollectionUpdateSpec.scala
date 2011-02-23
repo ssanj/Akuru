@@ -46,7 +46,7 @@ final class MongoCollectionUpdateSpec extends CommonSpec {
               success
             } { throw new RuntimeException("Could not find Book") } ~~>
             update[Book](publisherField("artima") and printVersionField(2) and priceField(54.95D))
-                      { set(nameField("PISC"), printVersionField(3),priceField(99.99D))} ~~>
+                      { set(nameField("PISC") and printVersionField(3) and priceField(99.99D))} ~~>
             findOne(nameField("Programming in Scala")) {b:Book => throw new RuntimeException("Found old Book") } { noOp } ~~>
             findOne(nameField("PISC") and printVersionField(3)) {b:Book =>
               b.name.value should equal ("PISC")

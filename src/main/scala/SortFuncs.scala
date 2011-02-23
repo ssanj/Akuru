@@ -1,6 +1,5 @@
 package akuru
 
-import MongoTypes.Field
 import MongoTypes.MongoSortObject
 import MongoTypes.MongoObject
 import MongoTypes.MongoObject.mongo

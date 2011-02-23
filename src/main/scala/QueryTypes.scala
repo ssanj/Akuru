@@ -34,8 +34,6 @@ trait QueryTypes {
 
   case class MongoUpdateObject(mo:MongoObject) extends UpdateObject {
     override val value:MongoObject = mo
-
-    def and(other:MongoUpdateObject): MongoUpdateObject = MongoUpdateObject(value.merge(other.value))
   }
 
   object UpdateObject {

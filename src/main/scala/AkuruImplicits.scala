@@ -1,7 +1,5 @@
 package akuru
 
-import MongoTypes.FieldValue
-import MongoTypes.Field
 import MongoTypes.RegexConstants
 import MongoTypes.RegExWithOptions
 import MongoTypes.FieldRegEx

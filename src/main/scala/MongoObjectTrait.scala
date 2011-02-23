@@ -9,8 +9,6 @@ import com.mongodb.{BasicDBList, BasicDBObject, DBObject}
 import org.bson.types.ObjectId
 import MongoTypes.MongoObjectId
 import MongoTypes.DomainObject
-import MongoTypes.FieldValue
-import MongoTypes.Field
 import MongoTypes.MongoToDomain
 
 trait MongoObjectTrait extends Tools {
@@ -107,6 +105,5 @@ trait MongoObjectTrait extends Tools {
       SetFuncs with
       PullFuncs with
       SortFuncs with
-      MongoOperators with
       Funcs
 }

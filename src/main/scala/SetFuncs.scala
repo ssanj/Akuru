@@ -7,7 +7,6 @@ package akuru
 
 import MongoTypes.MongoObject
 import MongoTypes.MongoUpdateObject
-import MongoTypes.FieldValue
 
 /**
  * { $set : { field : value } }

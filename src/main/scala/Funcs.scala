@@ -7,8 +7,6 @@ package akuru
 
 import MongoTypes.MongoObject
 import MongoTypes.MongoUpdateObject
-import MongoTypes.FieldValue
-import MongoTypes.Field
 import MongoTypes.OperatorObject
 
 trait Funcs {

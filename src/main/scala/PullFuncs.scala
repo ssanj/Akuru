@@ -5,7 +5,6 @@
 package akuru
 
 import MongoTypes.MongoObject
-import MongoTypes.FieldValue
 import MongoTypes.MongoUpdateObject
 
 /**
