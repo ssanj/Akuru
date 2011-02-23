@@ -33,6 +33,8 @@ trait MongoObjectTrait extends Tools {
       } else None
     }
 
+    //TODO: Test
+    //We only copy dupes from mo. We need to copy non-dupes as well.
     def mergeDupes(mo:MongoObject): MongoObject = {
       val dupes = getKeySet.filter(mo.getKeySet.contains(_))
       dupes.foldLeft(copyMongoObject)((container, key) =>
@@ -65,10 +67,8 @@ trait MongoObjectTrait extends Tools {
     def putMongo[T <: DomainObject <% MongoObject](fv:FieldValue[T]): MongoObject = { putMongo(fv.name, fv.value) }
 
     //todo: a DomainObject should already have a FieldValue[MongoObjectId]
-    //TODO: Copy and then modify
     def putId(id:MongoObjectId): MongoObject = { map(_.dbo.put("_id", id.toObjectId))  }
 
-    //TODO: Copy and then modify
     def merge(mo:MongoObject): MongoObject = { map(_.dbo.putAll(mo.toDBObject)) }
 
     def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyArray(asJavaList)(key,
@@ -132,6 +132,7 @@ trait MongoObjectTrait extends Tools {
   object MongoObject extends
       SetFuncs with
       PullFuncs with
+      PushFuncs with
       SortFuncs with
       Funcs
 }
