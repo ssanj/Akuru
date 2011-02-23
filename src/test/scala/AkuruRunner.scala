@@ -29,14 +29,14 @@ object AkuruRunner extends TestDomainObjects {
                     drop[Label] ~~>
                     blogs.map(b => save(b)) ~~>
                     (blogs.flatMap(b => b.labels.value.map(l => save(Label(value = valueField(l))))).toList) ~~>
-                    findOne(titleField("Hello World Lift"))(printBlog)(ignoreError)~~>
+                    findOne{ titleField("Hello World Lift") } { printBlog } { noOp } ~~>
                     find { (labelsField.name ->  ("ubuntu|work"/i), titleField.name -> ("less"/i)) } { printBlogs } { full } ~~>
-                    update[Blog](titleField("lessons learned"))(set(titleField("Lessons Learned"))) ~~>
-                    findOne { labelsField.name -> ("work")/i } (printBlog)(ignoreError) ~~>
-                    update[Blog](titleField("Lessons Learned"))(b2) ~~>
-                    findOne(labelsField -> ("work")/i)(printBlog)(ignoreError) ~~>
-                    upsert[Blog](titleField("Semigroup"))(b3) ~~>
-                    findOne(labelsField -> ("functional"/))(printBlog)(ignoreError)
+                    update[Blog]{ titleField("lessons learned") } { set(titleField("Lessons Learned")) } ~~>
+                    findOne { labelsField.name -> ("work")/i } { printBlog } { noOp } ~~>
+                    update[Blog]{ titleField("Lessons Learned") } { b2 } ~~>
+                    findOne{ labelsField -> ("work")/i } { printBlog } { noOp } ~~>
+                    upsert[Blog]{ titleField("Semigroup") } { b3 } ~~>
+                    findOne{ labelsField -> ("functional"/) } { printBlog } { noOp }
                  } ~~>() getOrElse("success >>")
     println(result)
   }

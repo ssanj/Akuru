@@ -24,7 +24,7 @@ final class MongoCollectionUpdateSpec extends CommonSpec {
             save(Blog(title = titleField("Blog updates"), labels = labelsField(Seq("blog, update")))) ~~>
             findOne(titleField("Blog updates")) { b:Blog => ignoreSuccess } {  throw new RuntimeException("Could not find Blog") } ~~>
             update[Blog](titleField("Blog updates")) { set(titleField("Blog Updatees"), labelsField(Seq("bl%%g")).splat) } ~~>
-            findOne(titleField("Blog updates")) { b:Blog => throw new RuntimeException("found old Blog") } {  ignoreError }  ~~>
+            findOne(titleField("Blog updates")) { b:Blog => throw new RuntimeException("found old Blog") } {  noOp }  ~~>
             findOne(titleField("Blog Updatees")) { b:Blog =>
               b.title.value should equal ("Blog Updatees")
               b.labels.value should equal (Seq("bl%%g"))
@@ -47,7 +47,7 @@ final class MongoCollectionUpdateSpec extends CommonSpec {
             } { throw new RuntimeException("Could not find Book") } ~~>
             update[Book](combine(publisherField("artima"), printVersionField(2), priceField(54.95D)))
                       { set(nameField("PISC"), printVersionField(3),priceField(99.99D))} ~~>
-            findOne(nameField("Programming in Scala")) {b:Book => throw new RuntimeException("Found old Book") } { ignoreError } ~~>
+            findOne(nameField("Programming in Scala")) {b:Book => throw new RuntimeException("Found old Book") } { noOp } ~~>
             findOne(nameField("PISC") and printVersionField(3)) {b:Book =>
               b.name.value should equal ("PISC")
               b.authors.value should equal (Seq("Martin Odersky", "Lex Spoon", "Bill Venners"))

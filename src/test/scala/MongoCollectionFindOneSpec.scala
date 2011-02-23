@@ -37,7 +37,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
 
   it should "handle exceptions thrown on finder execution" in {
     (
-      onTestDB ~~> findOne(Person.nameField -> ("*"/)){ p:Person => Some("Should not have return results") } { ignoreError } ~~>()
+      onTestDB ~~> findOne(Person.nameField -> ("*"/)){ p:Person => Some("Should not have return results") } { noOp } ~~>()
     ) verifyError has (Person.expectedError)
   }
 

@@ -41,7 +41,7 @@ trait MongoFunctions { this:Tools  =>
       col => col(collectionName[T]).findAndModify[T](query, sort.done, false, update.value, true, true).fold(l => Some(l), r=> foldOption(r){h}(f))
   }
 
-  def ignoreError = () => {}
+  def noOp = () => {}
 
   def full(mc:MongoCursor): MongoCursor = identity(mc)
 
