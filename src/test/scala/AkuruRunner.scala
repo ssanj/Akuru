@@ -29,14 +29,14 @@ object AkuruRunner extends TestDomainObjects {
                     drop[Label] ~~>
                     blogs.map(b => save(b)) ~~>
                     (blogs.flatMap(b => b.labels.value.map(l => save(Label(value = valueField(l))))).toList) ~~>
-                    findOne(Blog.titleField("Hello World Lift"))(printBlog)(ignoreError)~~>
-                    find { (Blog.labelsField.name ->  ("ubuntu|work"/i), Blog.titleField.name -> ("less"/i)) } { printBlogs } { full } ~~>
-                    update[Blog](Blog.titleField("lessons learned"))(set(Blog.titleField("Lessons Learned"))) ~~>
-                    findOne { Blog.labelsField.name -> ("work")/i } (printBlog)(ignoreError) ~~>
-                    update[Blog](Blog.titleField("Lessons Learned"))(b2) ~~>
-                    findOne(Blog.labelsField -> ("work")/i)(printBlog)(ignoreError) ~~>
-                    upsert[Blog](Blog.titleField("Semigroup"))(b3) ~~>
-                    findOne(Blog.labelsField -> ("functional"/))(printBlog)(ignoreError)
+                    findOne(titleField("Hello World Lift"))(printBlog)(ignoreError)~~>
+                    find { (labelsField.name ->  ("ubuntu|work"/i), titleField.name -> ("less"/i)) } { printBlogs } { full } ~~>
+                    update[Blog](titleField("lessons learned"))(set(titleField("Lessons Learned"))) ~~>
+                    findOne { labelsField.name -> ("work")/i } (printBlog)(ignoreError) ~~>
+                    update[Blog](titleField("Lessons Learned"))(b2) ~~>
+                    findOne(labelsField -> ("work")/i)(printBlog)(ignoreError) ~~>
+                    upsert[Blog](titleField("Semigroup"))(b3) ~~>
+                    findOne(labelsField -> ("functional"/))(printBlog)(ignoreError)
                  } ~~>() getOrElse("success >>")
     println(result)
   }
@@ -50,5 +50,5 @@ object AkuruRunner extends TestDomainObjects {
     None
   }
 
-  def withAkuru: FutureConnection = onDatabase("akuru")
+  def withAkuru: FutureConnection = onDatabase("akuru_test")
 }
