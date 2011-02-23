@@ -23,9 +23,4 @@ trait SetFuncs { this:Funcs =>
   def set(value:MongoObject): MongoUpdateObject =  toMongoUpdateObject($funcMongo(functionName, value))
 
   def set[T]: FieldValue[T] => MongoUpdateObject = fv => toMongoUpdateObject(anyFunction1[T](functionName)(fv))
-
-  def set[R, T]: (FieldValue[R], FieldValue[T]) => MongoUpdateObject = (fv1, fv2) => toMongoUpdateObject(anyFunction2[R, T](functionName)(fv1, fv2))
-
-  def set[R, S, T]: (FieldValue[R], FieldValue[S], FieldValue[T]) => MongoUpdateObject = (fv1, fv2, fv3) =>
-    toMongoUpdateObject(anyFunction3[R, S, T](functionName)(fv1, fv2, fv3))
 }

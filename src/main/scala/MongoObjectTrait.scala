@@ -66,10 +66,10 @@ trait MongoObjectTrait extends Tools {
 
     //todo: a DomainObject should already have a FieldValue[MongoObjectId]
     //TODO: Copy and then modify
-    def putId(id:MongoObjectId): MongoObject = { dbo.put("_id", id.toObjectId); copyMongoObject }
+    def putId(id:MongoObjectId): MongoObject = { map(_.dbo.put("_id", id.toObjectId))  }
 
     //TODO: Copy and then modify
-    def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo.toDBObject); copyMongoObject }
+    def merge(mo:MongoObject): MongoObject = { map(_.dbo.putAll(mo.toDBObject)) }
 
     def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyArray(asJavaList)(key,
       values.map(_.toDBObject))
@@ -121,6 +121,12 @@ trait MongoObjectTrait extends Tools {
     private[akuru] def toDBObject: DBObject = new BasicDBObject(dbo.toMap)
 
     private[akuru] def copyMongoObject: MongoObject = MongoObject(toDBObject)
+
+    private[akuru] def map(f: MongoObject => Unit): MongoObject =  {
+      val copy = copyMongoObject
+      f(copy)
+      copy
+    }
   }
 
   object MongoObject extends

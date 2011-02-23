@@ -33,6 +33,8 @@ trait QueryTypes {
 
   case class MongoUpdateObject(mo:MongoObject) extends UpdateObject {
     override val value:MongoObject = mo
+
+    def and(other:MongoUpdateObject): MongoUpdateObject = MongoUpdateObject(mo.mergeDupes(other.value))
   }
 
   object UpdateObject {
