@@ -25,11 +25,6 @@ trait MongoRegEx {
     val d = Value(Pattern.UNIX_LINES)
     val none = Value(-1) //default
   }
-
-//  type KeyedRegEx = Tuple2[String, RegEx]
-
-  type FieldKeyedRegEx[T] = Tuple2[Field[T], RegEx]
-
   case class RegEx(reg: String, flag: Option[RegexConstants.Value] = None) {
 
     def toMongo(key: String): MongoObject = {
@@ -53,11 +48,6 @@ trait MongoRegEx {
   }
 
   case class FieldRegEx[T](field:Field[T]) {
-    def >>(reg:RegEx): MongoObject = reg.toMongo(field.name)
+    def ?*(reg:RegEx): MongoObject = reg.toMongo(field.name)
   }
-
-//  def regExToMongo(tuples: KeyedRegEx*): MongoObject =  tuples.foldLeft(empty)((a,b) => a.merge(b._2.toMongo(b._1)))
-  def regExToMongo[T](tuple: FieldKeyedRegEx[T]): MongoObject =  tuple._2.toMongo(tuple._1.name)
-//
-//  def regex(tuples: KeyedRegEx*): MongoObject = regExToMongo(tuples:_*)
 }

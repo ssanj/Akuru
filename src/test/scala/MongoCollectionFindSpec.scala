@@ -18,7 +18,7 @@ final class MongoCollectionFindSpec extends CommonSpec {
               save(Blog(title = titleField("sample1"), labels = labelsField(Seq("sample")))) ~~>
               save(Blog(title= titleField("sample2"), labels = labelsField(Seq("sample")))) ~~>
               save(Blog(title = titleField("sample3"), labels = labelsField(Seq("sample")))) ~~>
-              find(Blog.titleField -> ("sample*"/))((blogs:Seq[Blog]) => {
+              find(titleField ?* ("sample*"/))((blogs:Seq[Blog]) => {
                 blogs.size should equal (3)
                 blogs.exists(_.title.value == "sample1") should be (true)
                 blogs.exists(_.title.value == "sample2") should be (true)
@@ -31,7 +31,7 @@ final class MongoCollectionFindSpec extends CommonSpec {
   it should "return zero results if there are no matches" in {
     (onTestDB ~~>
               drop[Blog] ~~>
-              find(Blog.titleField -> ("*"/)){(blogs:Seq[Blog]) =>
+              find(titleField ?* ("*"/)){(blogs:Seq[Blog]) =>
                 blogs.size should equal (0)
                 success
               } { full }
@@ -40,7 +40,7 @@ final class MongoCollectionFindSpec extends CommonSpec {
 
   it should "handle exceptions thrown on finder execution" in {
     (
-      onTestDB ~~> find[Person](Person.nameField -> ("*"/))(p => fail("Should not have return results")) (full)~~>()
+      onTestDB ~~> find[Person](Person.nameField ?* ("*"/))(p => fail("Should not have return results")) (full)~~>()
     ) verifyError has (Person.expectedError)
   }
 
@@ -52,7 +52,7 @@ final class MongoCollectionFindSpec extends CommonSpec {
 
   it should "handle exception thrown by match handler function" in {
     (
-      onTestDB ~~> find(Blog.titleField -> ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) (full) ~~>()
+      onTestDB ~~> find(titleField ?* ("*"/))((blogs:Seq[Blog]) => throw new RuntimeException("Handler threw an Exception")) (full) ~~>()
     ) verifyError has ("Handler threw an Exception")
   }
 
@@ -61,10 +61,10 @@ final class MongoCollectionFindSpec extends CommonSpec {
       onTestDB ~~>
               drop[Blog] ~~>
               save(Blog(title = titleField("Querying with RegEx"), labels = labelsField(Seq("query", "regex")))) ~~>
-              find(Blog.titleField -> ("querying with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (0); success }) (full) ~~>
-              find(Blog.titleField -> ("Querying with RegEx"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) (full)~~>
-              find(Blog.titleField -> (".* with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) (full) ~~>
-              find(Blog.titleField -> (".*query.*"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) (full) ~~>()
+              find(titleField ?* ("querying with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (0); success }) (full) ~~>
+              find(titleField ?* ("Querying with RegEx"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) (full)~~>
+              find(titleField ?* (".* with RegEx"/))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) (full) ~~>
+              find(titleField ?* (".*query.*"/i))((blogs:Seq[Blog]) => { blogs.size should equal (1); success }) (full) ~~>()
     ) verifySuccess
   }
 }

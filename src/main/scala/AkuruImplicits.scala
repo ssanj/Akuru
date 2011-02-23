@@ -4,9 +4,7 @@ import MongoTypes.FieldValue
 import MongoTypes.Field
 import MongoTypes.RegexConstants
 import MongoTypes.RegExWithOptions
-import MongoTypes.FieldKeyedRegEx
 import MongoTypes.FieldRegEx
-import MongoTypes.regExToMongo
 import MongoTypes.MongoSortObject
 import MongoTypes.OperatorObject
 import MongoTypes.MongoObject
@@ -51,20 +49,5 @@ trait AkuruImplicits {
 
   implicit def stringToRegX(reg: String): RegExWithOptions = RegExWithOptions(reg)
 
-//  implicit def regexTuple1ToMongoObject(tuple: KeyedRegEx): MongoObject = regExToMongo(tuple)
-
-  implicit def fieldRegexTuple1ToMongoObject[T](tuple: FieldKeyedRegEx[T]): MongoObject = regExToMongo[T](tuple)
-
   implicit def fieldToFieldRegEx[T](f:Field[T]): FieldRegEx[T] = FieldRegEx[T](f)
-
-//  implicit def regexTuple2ToMongoObject(tuples: Tuple2[KeyedRegEx, KeyedRegEx]): MongoObject = regExToMongo(tuples._1, tuples._2)
-//
-//  implicit def regexTuple3ToMongoObject(tuples: Tuple3[KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
-//    regExToMongo(tuples._1, tuples._2, tuples._3)
-//
-//  implicit def regexTuple4ToMongoObject(tuples: Tuple4[KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
-//    regExToMongo(tuples._1, tuples._2, tuples._3, tuples._4)
-//
-//  implicit def regexTuple5ToMongoObject(tuples: Tuple5[KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
-//    regExToMongo(tuples._1, tuples._2, tuples._3, tuples._4, tuples._5)
 }
