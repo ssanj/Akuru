@@ -12,13 +12,13 @@ final class MongoCollectionFindModifyAndReturnSpec extends CommonSpec {
     (onTestDB ~~>
             drop[Blog] ~~>
             save(Blog(title = titleField("Parry Hotter"), labels = labelsField(Seq("book", "movie")))) ~~>
-            findAndModifyAndReturn(titleField("Parry Hotter"))(noSort) {
-              Blog(title = titleField("Harry Potter"), labels = labelsField(Seq("books", "movies"))) }{ b:Blog =>
+            findAndModifyAndReturn[Blog](titleField("Parry Hotter")) { noSort } {
+              Blog(title = titleField("Harry Potter"), labels = labelsField(Seq("books", "movies"))) }{ b =>
               b.title.value should equal ("Harry Potter")
               b.labels.value should equal (Seq("books", "movies"))
               success
             } { Some("Parry Hotter was not updated!!") } ~~>
-            findAndModifyAndReturn(titleField("Harry Potter"))(noSort)( set(titleField("Rahhy Ropper"))) { b: Blog =>
+            findAndModifyAndReturn[Blog](titleField("Harry Potter")) { noSort } ( set(titleField("Rahhy Ropper"))) { b =>
               b.title.value should equal ("Rahhy Ropper") //only title has changed
               b.labels.value should equal (Seq("books", "movies")) //has not changed
               success

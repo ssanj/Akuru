@@ -13,7 +13,7 @@ final class MongoCollectionFindModifyAndRemoveSpec extends CommonSpec {
     var handlerCalled = false
     (onTestDB ~~>
             drop[Blog] ~~>
-            findAndModifyAndRemove(titleField("Storms")) (noSort) {b:Blog => Some("Found an non-existant blog " + b)} {
+            findAndModifyAndRemove[Blog](titleField("Storms")) (noSort) {b => Some("Found an non-existant blog " + b)} {
               handlerCalled = true
               success
             }
@@ -27,7 +27,7 @@ final class MongoCollectionFindModifyAndRemoveSpec extends CommonSpec {
     (onTestDB ~~>
             drop[Blog] ~~>
             save(Blog(title = titleField("Storms"), labels = labelsField(Seq("qld", "weather")))) ~~>
-            findAndModifyAndRemove(titleField("Storms")) (noSort) {b:Blog =>
+            findAndModifyAndRemove[Blog](titleField("Storms")) (noSort) {b =>
               b.title.value should equal ("Storms")
               b.labels.value should equal (Seq("qld", "weather"))
               success

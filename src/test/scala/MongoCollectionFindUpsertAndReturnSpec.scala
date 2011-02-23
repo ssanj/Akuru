@@ -13,7 +13,7 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec {
     var handlerCalled = false
     (onTestDB ~~>
             drop[Task] ~~>
-            findAndUpsertAndReturn(nameField("Clean Room")) (noSort) { createTask } { t:Task =>
+            findAndUpsertAndReturn[Task](nameField("Clean Room")) (noSort) { createTask } { t =>
                 t.name.value should equal ("Clean Room")
                 t.priority.value should equal (5)
                 t.owner.value should equal ("sanj")
@@ -28,23 +28,23 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec {
             save(createTask) ~~>
             save(createHPTask1) ~~>
             save(createHPTask2) ~~>
-            findAndUpsertAndReturn(nameField("Clean Room")) { sort(priorityField, DSC) and sort(ownerField, ASC) } {
-              set(nameField("Clean Den"), priorityField(6)) } {t: Task =>
+            findAndUpsertAndReturn[Task](nameField("Clean Room")) { sort(priorityField, DSC) and sort(ownerField, ASC) } {
+              set(nameField("Clean Den"), priorityField(6)) } {t =>
               t.name.value should equal ("Clean Den")
               t.priority.value should equal (6)
               t.owner.value should equal ("Litterbug")
               success
             } { throw new RuntimeException("Could not upsert Task") } ~~>
-            find(nameField("Clean Room") and (priorityField < 6)) {tasks:Seq[Task] =>
+            find[Task](nameField("Clean Room") and (priorityField < 6)) { all } {tasks =>
               tasks.size should equal (1)
               verifyEqual(tasks(0), createTask)
               success
-            } { full } ~~>
-            find(nameField("Clean Room") and (priorityField |<>| (7, 10))) { tasks:Seq[Task] =>
+            } ~~>
+            find[Task](nameField("Clean Room") and (priorityField |<>| (7, 10))) { all } { tasks =>
               tasks.size should equal (1)
               verifyEqual(tasks(0), createHPTask1)
               success
-            } { full }
+            }
     ) ~~>() verifySuccess
   }
 

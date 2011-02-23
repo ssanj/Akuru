@@ -17,7 +17,7 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
   "A MongoCollection with findAndModifyAndReturnWithSorting" should "find an sorted object sorted descending" in {
     verifySort(DSC, createVersion2, 1)
   }
-  private def setup:FutureConnection = {
+  private def setup: FutureConnection = {
     onTestDB ~~>
     drop[Book] ~~>
     save(Book(name = nameField("Programming in Scala"),
@@ -34,17 +34,17 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
 
   private def verifySort(sortOrder:SortOrder, updated:Book, unUpdatedVersion:Int) {
    (setup ~~>
-              findAndModifyAndReturn(nameField("Programming in Scala"))(sort(printVersionField, sortOrder)) { updated }{ b:Book =>
+              findAndModifyAndReturn[Book](nameField("Programming in Scala"))(sort(printVersionField, sortOrder)) { updated }{ b =>
                 b.name.value should equal (updated.name.value)
                 success
               } { Some("Book was not updated!!") } ~~>
-              find(nameField("Programming in Scala")) { books:Seq[Book] =>
+              find[Book](nameField("Programming in Scala")) { all }  { books =>
                 books.size should equal (1)
                 books.foreach { b:Book =>
                   b.name.value should equal ("Programming in Scala")
                   b.printVersion.value should equal (unUpdatedVersion)
                 }
-                success} { full }
+                success}
    ) ~~>() verifySuccess
   }
 

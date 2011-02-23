@@ -10,19 +10,19 @@ final class MongoCursorSpec extends CommonSpec {
   import MongoTypes.MongoObject.sort
   "A MongoCursor" should "limit results on finds" in {
     (setup ~~>
-      find(priorityField > 1) {tasks: Seq[Task] => tasks.size should equal (2);  success } (_.limit(2)) ~~>
-      find(priorityField > 1) {tasks: Seq[Task] => tasks.size should equal (4);  success } (_.limit(4))
+      find(priorityField > 1) (_.limit(2)) {tasks: Seq[Task] => tasks.size should equal (2);  success }  ~~>
+      find(priorityField > 1) (_.limit(4)) {tasks: Seq[Task] => tasks.size should equal (4);  success }
     ) ~~>() verifySuccess
   }
 
   it should "sort by the fields supplied" in {
     (setup ~~>
-      find(priorityField > 1) {tasks:Seq[Task] =>
+      find(priorityField > 1) (_.orderBy(sort(ownerField, ASC) and sort(priorityField, DSC)).limit(2)) {tasks:Seq[Task] =>
         tasks.size should equal (2)
         tasks(0).name.value should equal ("Polish Ring")
         tasks(1).name.value should equal ("Eat second-breakfast")
         success
-      } (_.orderBy(sort(ownerField, ASC) and sort(priorityField, DSC)).limit(2))
+      }
     ) ~~>() verifySuccess
   }
 

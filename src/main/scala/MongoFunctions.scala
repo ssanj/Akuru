@@ -43,14 +43,11 @@ trait MongoFunctions { this:Tools  =>
 
   def noOp = () => {}
 
-  def full(mc:MongoCursor): MongoCursor = identity(mc)
+  def all(mc:MongoCursor): MongoCursor = identity(mc)
 
   def ignoreSuccess: Option[String] = None:Option[String]
 
-//  def find[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(g: Seq[T] => Option[String]): UserFunction =
-//    col => col(collectionName[T]).find[T](f).fold(l => Some(l), r => g(r))
-
-  def find[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(g: Seq[T] => Option[String])(c: MongoCursor => MongoCursor):
+  def find[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(c: MongoCursor => MongoCursor)(g: Seq[T] => Option[String]):
     UserFunction = col => col(collectionName[T]).find[T](f)(c).fold(l => Some(l), r => g(r))
 
   def update[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject): UserFunction =

@@ -18,7 +18,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
     (onTestDB ~~>
             drop[Blog] ~~>
             save(Blog(title = titleField("blah1"))) ~~> save(Blog(title = titleField("blah2"))) ~~> save(Blog(title = titleField("blah3"))) ~~>
-            findOne(titleField ?* ("blah.*"/i)) { blog:Blog =>
+            findOne[Blog](titleField ?* ("blah.*"/i)) { blog =>
                 blog.title.value should include regex ("blah")
                 success
             } { fail("Should have found hits") }
@@ -28,7 +28,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
   it  should "call a nomatches handler function if it does not have any matches" in {
     var handlerCalled = false
     (
-      onTestDB ~~> drop[Blog] ~~> findOne(titleField ?* ("blah"/)) { b:Blog => Some("Unexpected blog returned -> " + b) }
+      onTestDB ~~> drop[Blog] ~~> findOne[Blog](titleField ?* ("blah"/)) { b => Some("Unexpected blog returned -> " + b) }
                 { handlerCalled = true } ~~>()
     ) verifySuccess()
 
@@ -37,13 +37,13 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
 
   it should "handle exceptions thrown on finder execution" in {
     (
-      onTestDB ~~> findOne(Person.nameField ?* ("*"/)){ p:Person => Some("Should not have return results") } { noOp } ~~>()
+      onTestDB ~~> findOne[Person](Person.nameField ?* ("*"/)){ _ => Some("Should not have return results") } { noOp } ~~>()
     ) verifyError has (Person.expectedError)
   }
 
   it should "handle exceptions thrown on creating a query" in {
     (
-      onTestDB ~~> findOne(createExceptionalMongoObject) { b:Blog => Some("Should not have return results") }
+      onTestDB ~~> findOne[Blog](createExceptionalMongoObject) { _ => Some("Should not have return results") }
                 { throw new RuntimeException("Handler should not be called on error") } ~~>()
     ) verifyError has (mongoCreationException)
   }
@@ -53,7 +53,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
       onTestDB ~~>
               drop[Blog] ~~>
               save(Blog(title = titleField("blah1"))) ~~>
-              findOne(titleField ?* (".*"/)) { b:Blog => throw new RuntimeException("Exception thrown handling match") }
+              findOne[Blog](titleField ?* (".*"/)) { _ => throw new RuntimeException("Exception thrown handling match") }
                         { throw new RuntimeException("Handler should not be called on error") } ~~>()
     ) verifyError has ("Exception thrown handling match")
   }
@@ -62,7 +62,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              findOne(titleField ?* (".*"/)) { b:Blog => Some("Should not have return results -> " + b) }
+              findOne[Blog](titleField ?* (".*"/)) { b => Some("Should not have return results -> " + b) }
                         { throw new RuntimeException("Handler function threw an Exception") } ~~>()
     ) verifyError has ("Handler function threw an Exception")
   }
