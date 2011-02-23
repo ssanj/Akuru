@@ -21,7 +21,7 @@ trait SetFuncs { this:Funcs =>
 
   import SetFuncs._
 
-  def set(value:MongoObject*): MongoUpdateObject =  toMongoUpdateObject($funcMongo(functionName, combine(value:_*)))
+  def set(value:MongoObject): MongoUpdateObject =  toMongoUpdateObject($funcMongo(functionName, value))
 
   def set[T]: FieldValue[T] => MongoUpdateObject = fv => toMongoUpdateObject(anyFunction1[T](functionName)(fv))
 
