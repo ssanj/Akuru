@@ -90,6 +90,12 @@ trait Tools {
   //TODO: Test
   def foldOption[T, R](op:Option[T])(n: => R)(s:T => R): R = if (op.isEmpty) n else s(op.get)
 
+  case class FoldOption[T](op:Option[T]) {
+    def fold[R](n: => R, s: T => R): R = foldOption[T, R](op)(n)(s)
+  }
+
+  implicit def toFoldOption[T](op:Option[T]): FoldOption[T] = FoldOption[T](op)
+
   def toBoolean(value:AnyRef): Boolean = value.toString.toLowerCase match {
     case "true" => true
     case "1.0" => true

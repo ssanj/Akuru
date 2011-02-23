@@ -23,7 +23,6 @@ trait QueryTypes {
     override val value:MongoObject = mo
   }
 
-
   sealed trait UpdateObject {
     val value:MongoObject
   }

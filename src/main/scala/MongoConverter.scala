@@ -32,4 +32,8 @@ object AnyRefConverter {
       case _ => false
     }
   }
+
+  implicit object AnyRefIdentity extends AnyRefConverter[AnyRef] {
+    def convert(anyRef:AnyRef): AnyRef = identity[AnyRef](anyRef)
+  }
 }

@@ -19,6 +19,26 @@ trait MongoObjectTrait extends Tools {
 
     def this(tuples:Seq[Tuple2[String, Any]]) = this(new BasicDBObject(scala.collection.JavaConversions.asJavaMap(tuples.toMap)))
 
+    def getKeySet: Set[String] = {
+      import scala.collection.JavaConversions._
+      dbo.keySet.toSet
+    }
+
+    def getMongo(key:String): Option[MongoObject] = {
+      if (dbo.keySet.contains(key)) {
+        dbo.get(key) match {
+          case o:DBObject => Some(new MongoObject(o))
+          case _ => None
+        }
+      } else None
+    }
+
+    def mergeDupes(mo:MongoObject): MongoObject = {
+      val dupes = getKeySet.filter(mo.getKeySet.contains(_))
+      dupes.foldLeft(copyMongoObject)((container, key) =>
+        container.getMongo(key) fold (container, m1 => mo.getMongo(key) fold (container, m2 => container.putMongo(key, m1.merge(m2)))))
+    }
+
     def getPrimitive[T : AnyRefConverter](key:String): T = getAnyArrayType[T](asSingleElementContainer(key))(getPrimitiveConverter[T]).head
 
     def getPrimitive[T : AnyRefConverter](f:Field[T]): T = getPrimitive[T](f.name)
@@ -45,8 +65,10 @@ trait MongoObjectTrait extends Tools {
     def putMongo[T <: DomainObject <% MongoObject](fv:FieldValue[T]): MongoObject = { putMongo(fv.name, fv.value) }
 
     //todo: a DomainObject should already have a FieldValue[MongoObjectId]
+    //TODO: Copy and then modify
     def putId(id:MongoObjectId): MongoObject = { dbo.put("_id", id.toObjectId); copyMongoObject }
 
+    //TODO: Copy and then modify
     def merge(mo:MongoObject): MongoObject = { dbo.putAll(mo.toDBObject); copyMongoObject }
 
     def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyArray(asJavaList)(key,
