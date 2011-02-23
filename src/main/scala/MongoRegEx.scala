@@ -26,7 +26,7 @@ trait MongoRegEx {
     val none = Value(-1) //default
   }
 
-  type KeyedRegEx = Tuple2[String, RegEx]
+//  type KeyedRegEx = Tuple2[String, RegEx]
 
   type FieldKeyedRegEx[T] = Tuple2[Field[T], RegEx]
 
@@ -52,26 +52,12 @@ trait MongoRegEx {
     }
   }
 
-  def regExToMongo(tuples: KeyedRegEx*): MongoObject =  tuples.foldLeft(empty)((a,b) => a.merge(b._2.toMongo(b._1)))
+  case class FieldRegEx[T](field:Field[T]) {
+    def >>(reg:RegEx): MongoObject = reg.toMongo(field.name)
+  }
 
-  def regex(tuples: KeyedRegEx*): MongoObject = regExToMongo(tuples:_*)
-
-  implicit def defaultRegExOption: RegexConstants.Value = RegexConstants.none
-
-  implicit def stringToRegX(reg: String): RegExWithOptions = RegExWithOptions(reg)
-
-  implicit def regexTuple1ToMongoObject(tuple: KeyedRegEx): MongoObject = regExToMongo(tuple)
-
-  implicit def fieldRegexTuple1ToMongoObject[T](tuple: FieldKeyedRegEx[T]): MongoObject = regExToMongo(new KeyedRegEx(tuple._1.name, tuple._2))
-
-  implicit def regexTuple2ToMongoObject(tuples: Tuple2[KeyedRegEx, KeyedRegEx]): MongoObject = regExToMongo(tuples._1, tuples._2)
-
-  implicit def regexTuple3ToMongoObject(tuples: Tuple3[KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
-    regExToMongo(tuples._1, tuples._2, tuples._3)
-
-  implicit def regexTuple4ToMongoObject(tuples: Tuple4[KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
-    regExToMongo(tuples._1, tuples._2, tuples._3, tuples._4)
-
-  implicit def regexTuple5ToMongoObject(tuples: Tuple5[KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx, KeyedRegEx]): MongoObject =
-    regExToMongo(tuples._1, tuples._2, tuples._3, tuples._4, tuples._5)
+//  def regExToMongo(tuples: KeyedRegEx*): MongoObject =  tuples.foldLeft(empty)((a,b) => a.merge(b._2.toMongo(b._1)))
+  def regExToMongo[T](tuple: FieldKeyedRegEx[T]): MongoObject =  tuple._2.toMongo(tuple._1.name)
+//
+//  def regex(tuples: KeyedRegEx*): MongoObject = regExToMongo(tuples:_*)
 }

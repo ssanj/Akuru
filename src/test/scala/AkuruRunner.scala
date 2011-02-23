@@ -30,9 +30,9 @@ object AkuruRunner extends TestDomainObjects {
                     blogs.map(b => save(b)) ~~>
                     (blogs.flatMap(b => b.labels.value.map(l => save(Label(value = valueField(l))))).toList) ~~>
                     findOne{ titleField("Hello World Lift") } { printBlog } { noOp } ~~>
-                    find { (labelsField.name ->  ("ubuntu|work"/i), titleField.name -> ("less"/i)) } { printBlogs } { full } ~~>
+                    find { (labelsField >> ("ubuntu|work"/i) and titleField >> ("less"/i)) } { printBlogs } { full } ~~>
                     update[Blog]{ titleField("lessons learned") } { set(titleField("Lessons Learned")) } ~~>
-                    findOne { labelsField.name -> ("work")/i } { printBlog } { noOp } ~~>
+                    findOne { labelsField -> ("work")/i } { printBlog } { noOp } ~~>
                     update[Blog]{ titleField("Lessons Learned") } { b2 } ~~>
                     findOne{ labelsField -> ("work")/i } { printBlog } { noOp } ~~>
                     upsert[Blog]{ titleField("Semigroup") } { b3 } ~~>

@@ -44,3 +44,5 @@ UpdateObject *
 SortObject *
 
 find(nameField("blah") and priorityField(5) >
+
+find(labelsField >> "(ubuntu|work"/i) && nameField >> ("blah*"/)
