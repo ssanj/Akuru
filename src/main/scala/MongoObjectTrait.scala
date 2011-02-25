@@ -36,9 +36,11 @@ trait MongoObjectTrait extends Tools {
     //TODO: Test
     //We only copy dupes from mo. We need to copy non-dupes as well.
     def mergeDupes(mo:MongoObject): MongoObject = {
-      val dupes = getKeySet.filter(mo.getKeySet.contains(_))
-      dupes.foldLeft(copyMongoObject)((container, key) =>
+      val dupes = getKeySet filter (mo.getKeySet.contains(_))
+      val allDupes = dupes.foldLeft(copyMongoObject)((container, key) =>
         container.getMongo(key) fold (container, m1 => mo.getMongo(key) fold (container, m2 => container.putMongo(key, m1.merge(m2)))))
+
+      allDupes merge mo.filterNot(t => dupes.contains(t._1))
     }
 
     def getPrimitive[T : AnyRefConverter](key:String): T = getAnyArrayType[T](asSingleElementContainer(key))(getPrimitiveConverter[T]).head
@@ -71,14 +73,14 @@ trait MongoObjectTrait extends Tools {
 
     def merge(mo:MongoObject): MongoObject = { map(_.dbo.putAll(mo.toDBObject)) }
 
-    def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyArray(asJavaList)(key,
+    def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyArray(convertToJavaList)(key,
       values.map(_.toDBObject))
 
     def putMongoArray[T <: DomainObject <% MongoObject](fv:FieldValue[Seq[T]]): MongoObject = putMongoArray(fv.name,
       fv.value.map(implicitly[MongoObject](_)))
 
     //TODO: Test
-    def putPrimitiveArray[T](key:String, values: => Seq[T]): MongoObject = putAnyArray(asJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
+    def putPrimitiveArray[T](key:String, values: => Seq[T]): MongoObject = putAnyArray(convertToJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
 
     //TODO: Test
     def putPrimitiveArray[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveArray[T](fv.name, fv.value)
@@ -99,21 +101,22 @@ trait MongoObjectTrait extends Tools {
 
     private[akuru] def asSeqContainer(key: String): Seq[AnyRef] = {
       import scala.collection.JavaConversions._
-
-      dbo.get(key).asInstanceOf[BasicDBList].toSeq
+      if (dbo.containsField(key)) dbo.get(key).asInstanceOf[BasicDBList].toSeq else Seq[AnyRef]()
     }
 
     private[akuru] def asSingleElementContainer(key: String): Seq[AnyRef] =  Seq(dbo.get(key))
 
     private[akuru] def putAnyArray(f: Seq[AnyRef] => AnyRef)(key: => String, values: => Seq[AnyRef]): MongoObject = {
-      dbo.put(key, f(values))
-      copyMongoObject
+      val converted = f(values)
+      map(_.dbo.put(key, converted))
     }
 
-    private[akuru] def asJavaList(values: Seq[AnyRef]): AnyRef = {
-      import scala.collection.JavaConversions._
+    private[akuru] def convertToJavaList(values: Seq[AnyRef]): AnyRef = {
+      import scala.collection.JavaConversions.asJavaList
       val list:java.util.List[AnyRef] = values.toList
-      list
+      val bslist:BasicDBList = new BasicDBList()
+      bslist.addAll(list)
+      bslist
     }
 
     private[akuru] def asJavaObject(values: Seq[AnyRef]): AnyRef =  values.head
@@ -127,6 +130,17 @@ trait MongoObjectTrait extends Tools {
       f(copy)
       copy
     }
+
+    private[akuru] def blankDBO: DBObject = new BasicDBObject
+
+    private[akuru] def filter(f: Tuple2[String, AnyRef] => Boolean): MongoObject = {
+      MongoObject(dbo.getKeySet.foldLeft(blankDBO)((slate, key) => if (f(key, dbo.get(key).asInstanceOf[AnyRef])) {
+        slate.put(key, dbo.get(key).asInstanceOf[AnyRef])
+        slate
+      } else slate))
+    }
+
+    private[akuru] def filterNot(f: Tuple2[String, AnyRef] => Boolean): MongoObject = filter(!f(_))
   }
 
   object MongoObject extends
