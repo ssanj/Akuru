@@ -34,7 +34,6 @@ trait MongoObjectTrait extends Tools {
     }
 
     //TODO: Test
-    //We only copy dupes from mo. We need to copy non-dupes as well.
     def mergeDupes(mo:MongoObject): MongoObject = {
       val dupes = getKeySet filter (mo.getKeySet.contains(_))
       val allDupes = dupes.foldLeft(copyMongoObject)((container, key) =>
