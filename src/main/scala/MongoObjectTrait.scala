@@ -33,7 +33,22 @@ trait MongoObjectTrait extends Tools {
       } else None
     }
 
-    //TODO: Test
+    /**
+     * This method only works if the duplicate keys have values of MongoObjects themselves. If the values themselves are not MongoObjects
+     * they can't be merged.
+     *
+     * Eg.
+     * {key1: {field1:value1, field2:value2}} mergeDupes {key1: {field3:value3, field4:value4}} will give:
+     * {key1: {field1:value1, field2:value2, field3:value3, field4:value4}}.
+     *
+     * Any values in duplicate keys within the values are trashed by the last value:
+     * {key1: {field1:value1, field2:value2}} mergeDupes {key1: {field1:value3, field2:value4}} will give:
+     * {key1: {field1:value3, field2:value4}}
+     *
+     * While with non-mongo values the original document unchanged.:
+     * {key1: value1} mergeDupes {key1: value2} will give:
+     * {key1: value1}
+     */
     def mergeDupes(mo:MongoObject): MongoObject = {
       val dupes = getKeySet filter (mo.getKeySet.contains(_))
       val allDupes = dupes.foldLeft(copyMongoObject)((container, key) =>
