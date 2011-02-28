@@ -28,10 +28,10 @@ final class MongoCursorSpec extends CommonSpec {
 
   private def setup: FutureConnection = {
     onTestDB ~~> drop[Task] ~~>
-        save(Task(name = nameField("fix roof"), priority = priorityField(10), owner = ownerField("Jazzy"))) ~~>
-        save(Task(name = nameField("paint lounge"), priority = priorityField(7), owner = ownerField("Leaf"))) ~~>
-        save(Task(name = nameField("Polish Ring"), priority = priorityField(5), owner = ownerField("Bilbo"))) ~~>
-        save(Task(name = nameField("Take a snooze"), priority = priorityField(3), owner = ownerField("Frodo"))) ~~>
-        save(Task(name = nameField("Eat second-breakfast"), priority = priorityField(5), owner = ownerField("Frodo")))
+        save(Task(nameField("fix roof"), priorityField(10), ownerField("Jazzy"))) ~~>
+        save(Task(nameField("paint lounge"), priorityField(7), ownerField("Leaf"))) ~~>
+        save(Task(nameField("Polish Ring"), priorityField(5), ownerField("Bilbo"))) ~~>
+        save(Task(nameField("Take a snooze"), priorityField(3), ownerField("Frodo"))) ~~>
+        save(Task(nameField("Eat second-breakfast"), priorityField(5), ownerField("Frodo")))
   }
 }

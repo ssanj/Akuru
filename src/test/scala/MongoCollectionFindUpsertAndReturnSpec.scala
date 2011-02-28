@@ -48,11 +48,11 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec {
     ) ~~>() verifySuccess
   }
 
-  private def createTask: Task = Task(name = nameField("Clean Room"), priority = priorityField(5), owner = ownerField("sanj"))
+  private def createTask: Task = Task(nameField("Clean Room"), priorityField(5), ownerField("sanj"))
 
-  private def createHPTask1: Task = Task(name = nameField("Clean Room"), priority = priorityField(10), owner = ownerField("Meow"))
+  private def createHPTask1: Task = Task(nameField("Clean Room"), priorityField(10), ownerField("Meow"))
 
-  private def createHPTask2: Task = Task(name = nameField("Clean Room"), priority = priorityField(10), owner = ownerField("Litterbug"))
+  private def createHPTask2: Task = Task(nameField("Clean Room"), priorityField(10), ownerField("Litterbug"))
 
   private def verifyEqual(task:Task, original:Task) {
     task.name.value should equal (original.name.value)

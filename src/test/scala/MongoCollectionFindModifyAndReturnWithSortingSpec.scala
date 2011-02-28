@@ -20,16 +20,16 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
   private def setup: FutureConnection = {
     onTestDB ~~>
     drop[Book] ~~>
-    save(Book(name = nameField("Programming in Scala"),
-              authors = authorsField(Seq("Martin Odersky", "Lex Spoon", "Bill Venners")),
-              publisher = publisherField("artima"),
-              printVersion = printVersionField(2), /* v2 */
-              price = priceField(54.95D))) ~~>
-    save(Book(name = nameField("Programming in Scala"),
-              authors = authorsField(Seq("Martin Odersky", "Lex Spoon", "Bill Venners")),
-              publisher = publisherField("artima"),
-              printVersion = printVersionField(1), /* v1 */
-              price = priceField(40.00D)))
+    save(Book(nameField("Programming in Scala"),
+              authorsField(Seq("Martin Odersky", "Lex Spoon", "Bill Venners")),
+              publisherField("artima"),
+              printVersionField(2), /* v2 */
+              priceField(54.95D))) ~~>
+    save(Book(nameField("Programming in Scala"),
+              authorsField(Seq("Martin Odersky", "Lex Spoon", "Bill Venners")),
+              publisherField("artima"),
+              printVersionField(1), /* v1 */
+              priceField(40.00D)))
   }
 
   private def verifySort(sortOrder:SortOrder, updated:Book, unUpdatedVersion:Int) {
@@ -49,19 +49,18 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
   }
 
   private def createVersion1: Book = {
-    Book(name = nameField("Programming in Scala v1"),
-          authors = authorsField(Seq("Martin Odersky", "Lex Spoon", "Bill Venners")),
-          publisher = publisherField("artima"),
-          printVersion = printVersionField(1),
-          price = priceField(40.00D))
-
+    Book(nameField("Programming in Scala v1"),
+          authorsField(Seq("Martin Odersky", "Lex Spoon", "Bill Venners")),
+          publisherField("artima"),
+          printVersionField(1),
+          priceField(40.00D))
   }
 
   private def createVersion2: Book = {
-    Book(name = nameField("Programming in Scala v2"),
-          authors = authorsField(Seq("Martin Odersky", "Lex Spoon", "Bill Venners")),
-          publisher = publisherField("artima"),
-          printVersion = printVersionField(2),
-          price = priceField(40.00D))
+    Book(nameField("Programming in Scala v2"),
+          authorsField(Seq("Martin Odersky", "Lex Spoon", "Bill Venners")),
+          publisherField("artima"),
+          printVersionField(2),
+          priceField(40.00D))
   }
 }

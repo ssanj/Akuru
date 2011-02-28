@@ -36,6 +36,6 @@ final class MongoCollectionSaveSpec extends CommonSpec {
 
   it should ("handle errors that occur during function execution") in {
     import Person._
-    (onTestDB ~~> save(Person(name = nameField("sanj"))) ~~>()) verifyError has (Person.expectedError)
+    (onTestDB ~~> save(Person(nameField("sanj"))) ~~>()) verifyError has (Person.expectedError)
   }
 }
