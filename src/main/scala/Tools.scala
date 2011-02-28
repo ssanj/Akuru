@@ -102,4 +102,21 @@ trait Tools {
     case "1" => true
     case _ => false
   }
+
+  def isMatch[T : ClassManifest](value:AnyRef): Boolean = {
+
+    def sameType[T : ClassManifest, U : ClassManifest]: Boolean = implicitly[ClassManifest[T]] >:> implicitly[ClassManifest[U]]
+
+    value.asInstanceOf[Any]  match {
+      case n:Int => sameType[T, Int]
+      case l:Long => sameType[T, Long]
+      case s:Short => sameType[T, Short]
+      case by:Byte => sameType[T, Byte]
+      case b:Boolean => sameType[T, Boolean]
+      case c:Char => sameType[T, Char]
+      case f:Float => sameType[T, Float]
+      case d:Double => sameType[T, Double]
+      case x:Any => implicitly[ClassManifest[T]].erasure.isAssignableFrom(x.asInstanceOf[AnyRef].getClass)
+    }
+  }
 }
