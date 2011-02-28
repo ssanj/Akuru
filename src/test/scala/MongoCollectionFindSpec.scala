@@ -15,9 +15,9 @@ final class MongoCollectionFindSpec extends CommonSpec {
   "A MongoCollection with find" should "find all saved objects matching a query" in {
     (onTestDB ~~>
               drop[Blog] ~~>
-              save(Blog(title = titleField("sample1"), labels = labelsField(Seq("sample")))) ~~>
-              save(Blog(title= titleField("sample2"), labels = labelsField(Seq("sample")))) ~~>
-              save(Blog(title = titleField("sample3"), labels = labelsField(Seq("sample")))) ~~>
+              save(Blog(titleField("sample1"), labelsField(Seq("sample")))) ~~>
+              save(Blog(titleField("sample2"), labelsField(Seq("sample")))) ~~>
+              save(Blog(titleField("sample3"), labelsField(Seq("sample")))) ~~>
               find[Blog](titleField ?* ("sample*"/)) { all } { blogs =>
                 blogs.size should equal (3)
                 blogs.exists(_.title.value == "sample1") should be (true)
@@ -60,7 +60,7 @@ final class MongoCollectionFindSpec extends CommonSpec {
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              save(Blog(title = titleField("Querying with RegEx"), labels = labelsField(Seq("query", "regex")))) ~~>
+              save(Blog(titleField("Querying with RegEx"), labelsField(Seq("query", "regex")))) ~~>
               find[Blog](titleField ?* ("querying with RegEx"/)) { all } { blogs => { blogs.size should equal (0); success } } ~~>
               find[Blog](titleField ?* ("Querying with RegEx"/i)) { all } { blogs => { blogs.size should equal (1); success } } ~~>
               find[Blog](titleField ?* (".* with RegEx"/)) { all } { blogs => { blogs.size should equal (1); success } } ~~>

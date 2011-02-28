@@ -17,7 +17,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
   "A MongoCollection with findOne" should "find a single match even if multiple matches exist" in {
     (onTestDB ~~>
             drop[Blog] ~~>
-            save(Blog(title = titleField("blah1"))) ~~> save(Blog(title = titleField("blah2"))) ~~> save(Blog(title = titleField("blah3"))) ~~>
+            save(Blog(titleField("blah1"))) ~~> save(Blog(titleField("blah2"))) ~~> save(Blog(titleField("blah3"))) ~~>
             findOne[Blog](titleField ?* ("blah.*"/i)) { blog =>
                 blog.title.value should include regex ("blah")
                 success
@@ -52,7 +52,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              save(Blog(title = titleField("blah1"))) ~~>
+              save(Blog(titleField("blah1"))) ~~>
               findOne[Blog](titleField ?* (".*"/)) { _ => throw new RuntimeException("Exception thrown handling match") }
                         { throw new RuntimeException("Handler should not be called on error") } ~~>()
     ) verifyError has ("Exception thrown handling match")

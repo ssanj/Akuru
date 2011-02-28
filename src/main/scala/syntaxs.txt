@@ -46,3 +46,61 @@ SortObject *
 find(nameField("blah") and priorityField(5) >
 
 find(labelsField >> "(ubuntu|work"/i) && nameField >> ("blah*"/)
+
+----------------------------------------
+
+
+sealed trait FieldTypes
+sealed case class FieldDefinition[T](name:String) extends FieldTypes {
+  def apply(value:T) = FieldValue[this.type, T](this, value)
+}
+
+final case class NestedFieldDefinition[P, T](pfd:FieldDefinition[P], _name:String) extends FieldDefinition[T](_name) {
+  val name = pdf.name + "." + _name
+}
+
+case class FieldValue[FD <: FieldDefinition[T], T](fd:FD, value:T)
+
+
+val TitleType = FieldDefinition[String]("title")
+case class Title(value:String) extends FieldValue[String](TitleType, value)
+case class Name(value:String) extends FieldValue[String](TitleType, value)
+case class Labels(value:Seq[String]) extends FieldValue[Seq[String]](LabelType, value)
+
+Blog(title:Title)
+
+Blog(Title("functor"), Label(Seq("", "")))
+
+----------------------------------------------------------------------
+
+case class DailySpend(date:Date, spends:Spends)
+
+object DailySpend {
+ import Spend._
+  val DateType = FieldDefinition[Long]("date")
+  val SpendsType = FieldDefinition[Seq[Spend]]("spends")
+
+  case class Date(value:Long) extends FieldValue(DateType, value)
+  case class Spends(value:Seq[Spend]) extends FieldValue(SpendsType, value)
+
+  object Spend {
+    val CostType = NestedFieldDefinition[Double](SpendsType, "cost")
+    val DescType = NestedFieldDefinition[String](SpendsType, "desc")
+    val LabelsType = NestedFieldDefinition[Seq[String]](SpendsType, "labels")
+
+    case class Cost(value:Double) extends FieldValue(CostType, value)
+    case class Desc(value:String) extends FieldValue(DescType, value)
+    case class Labels(value:Seq[String]]) extends FieldValue(LabelsType, value)
+  }
+}
+
+case class Spend(cost:Cost, desc:Desc, labels:Labels)
+
+ds = DailySpend(Date(120020), Spends(Seq(Spend(Cost(23.3D), Desc(""), Labels(Seq("ff","ff","ff"))))))
+
+find(Spend.CostType > 200.00D)
+
+(spends.cost $gt 200.00)
+
+
+

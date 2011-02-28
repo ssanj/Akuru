@@ -11,17 +11,19 @@ import DomainObject._
 
 trait TestDomainObjects {
 
-  case class Blog(override val id:FieldValue[MID] = defaultId,
-                  title:FieldValue[String],
-                  labels:FieldValue[Seq[String]] = Blog.labelsField(Seq[String]())) extends DomainObject
+  case class Blog(title:FieldValue[String],
+                  labels:FieldValue[Seq[String]] = Blog.labelsField(Seq[String]()), override val id:FieldValue[MID] = defaultId) extends DomainObject
 
   object Blog {
+
+    type TitleField = Field[String]
+    type LabelsField = Field[Seq[String]]
 
     val titleField = Field[String]("title")
     val labelsField = Field[Seq[String]]("labels")
 
     implicit def mongoToBlogConverter(mo:MongoObject): Blog =  {
-      Blog(idField(Some(mo.getId)), titleField(mo.getPrimitive(titleField)), labelsField(mo.getPrimitiveArray(labelsField)))
+      Blog(titleField(mo.getPrimitive(titleField)), labelsField(mo.getPrimitiveArray(labelsField)), idField(Some(mo.getId)))
     }
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = putDomainId(domain).putPrimitive(domain.title).putPrimitiveArray(domain.labels)

@@ -16,13 +16,13 @@ object AkuruRunner extends TestDomainObjects {
     import Blog._
     import Label._
 
-    val b1 = Blog(title = titleField("lessons learned"), labels = labelsField(Seq("jobs", "lessons", "work")))
-    val b2 = Blog(title = titleField("lessons learned"), labels = labelsField(Seq("jobs", "work")))
-    val b3 = Blog(title = titleField("Semigroup"), labels = labelsField(Seq("functional", "scala", "concepts", "semigroup")))
+    val b1 = Blog(titleField("lessons learned"), labelsField(Seq("jobs", "lessons", "work")))
+    val b2 = Blog(titleField("lessons learned"), labelsField(Seq("jobs", "work")))
+    val b3 = Blog(titleField("Semigroup"), labelsField(Seq("functional", "scala", "concepts", "semigroup")))
 
     val blogs = List(b1,
-                     Blog(title = titleField("Hello World Lift"), labels = labelsField(Seq("lift", "scala", "sbt"))),
-                     Blog(title = titleField("Linux RAID Failed on Boot"), labels = labelsField(Seq("boot", "degraded", "ubuntu"))))
+                     Blog(titleField("Hello World Lift"), labelsField(Seq("lift", "scala", "sbt"))),
+                     Blog(titleField("Linux RAID Failed on Boot"), labelsField(Seq("boot", "degraded", "ubuntu"))))
 
     val result = {withAkuru ~~>
                     drop[Blog] ~~>

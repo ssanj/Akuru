@@ -21,7 +21,7 @@ final class MongoCollectionUpdateSpec extends CommonSpec {
                 wr.getN should equal (Some(0))
                 wr.ok should equal (true)
             }} ~~>
-            save(Blog(title = titleField("Blog updates"), labels = labelsField(Seq("blog, update")))) ~~>
+            save(Blog(titleField("Blog updates"), labelsField(Seq("blog, update")))) ~~>
             findOne(titleField("Blog updates")) { b:Blog => ignoreSuccess } {  throw new RuntimeException("Could not find Blog") } ~~>
             update[Blog](titleField("Blog updates")) { set(titleField("Blog Updatees")) and set(labelsField(Seq("bl%%g")).splat) } ~~>
             findOne(titleField("Blog updates")) { b:Blog => throw new RuntimeException("found old Blog") } {  noOp }  ~~>

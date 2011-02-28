@@ -26,7 +26,7 @@ final class MongoCollectionFindModifyAndRemoveSpec extends CommonSpec {
     var handlerCalled = false
     (onTestDB ~~>
             drop[Blog] ~~>
-            save(Blog(title = titleField("Storms"), labels = labelsField(Seq("qld", "weather")))) ~~>
+            save(Blog(titleField("Storms"), labelsField(Seq("qld", "weather")))) ~~>
             findAndModifyAndRemove[Blog](titleField("Storms")) (noSort) {b =>
               b.title.value should equal ("Storms")
               b.labels.value should equal (Seq("qld", "weather"))

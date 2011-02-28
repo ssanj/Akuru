@@ -17,7 +17,7 @@ final class MongoCollectionSaveSpec extends CommonSpec {
      ({ onTestDB ~~>
           drop[Blog] ~~>
           findOne[Blog](titleField("blah")) { _ => fail("Shouldn't have found Blog") } { noOp } ~~>
-          save(Blog(title = titleField("blah"), labels = labelsField(Seq("test", "random")))) ~~>
+          save(Blog(titleField("blah"), labelsField(Seq("test", "random")))) ~~>
           findOne[Blog](titleField("blah")) { t =>
               t.title.value should equal ("blah")
               t.labels.value should equal (Seq("test", "random"))

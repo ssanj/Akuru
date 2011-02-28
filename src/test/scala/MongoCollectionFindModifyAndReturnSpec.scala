@@ -11,9 +11,9 @@ final class MongoCollectionFindModifyAndReturnSpec extends CommonSpec {
   "A MongoCollection with findAndModify" should "find and modify an existing object" in {
     (onTestDB ~~>
             drop[Blog] ~~>
-            save(Blog(title = titleField("Parry Hotter"), labels = labelsField(Seq("book", "movie")))) ~~>
+            save(Blog(titleField("Parry Hotter"), labelsField(Seq("book", "movie")))) ~~>
             findAndModifyAndReturn[Blog](titleField("Parry Hotter")) { noSort } {
-              Blog(title = titleField("Harry Potter"), labels = labelsField(Seq("books", "movies"))) }{ b =>
+              Blog(titleField("Harry Potter"), labelsField(Seq("books", "movies"))) }{ b =>
               b.title.value should equal ("Harry Potter")
               b.labels.value should equal (Seq("books", "movies"))
               success
