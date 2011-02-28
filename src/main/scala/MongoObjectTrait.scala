@@ -35,7 +35,7 @@ trait MongoObjectTrait extends Tools {
 
     /**
      * This method only works if the duplicate keys have values of MongoObjects themselves. If the values themselves are not MongoObjects
-     * they can't be merged.
+     * the original key/values are returned unmerged.
      *
      * Eg.
      * {key1: {field1:value1, field2:value2}} mergeDupes {key1: {field3:value3, field4:value4}} will give:
@@ -58,6 +58,10 @@ trait MongoObjectTrait extends Tools {
     }
 
     def getPrimitive[T : AnyRefConverter](key:String): T = getAnyArrayType[T](asSingleElementContainer(key))(getPrimitiveConverter[T]).head
+
+    def getTypeSafePrimitive[T : AnyRefConverter : ClassManifest](key:String): Option[T] = {
+      if (dbo.containsField(key)) getElement[T](dbo.get(key)) else None
+    }
 
     def getPrimitive[T : AnyRefConverter](f:Field[T]): T = getPrimitive[T](f.name)
 

@@ -103,20 +103,28 @@ trait Tools {
     case _ => false
   }
 
-  def isMatch[T : ClassManifest](value:AnyRef): Boolean = {
+  def sameType[T : ClassManifest, U : ClassManifest]: Boolean = implicitly[ClassManifest[T]] >:> implicitly[ClassManifest[U]]
 
-    def sameType[T : ClassManifest, U : ClassManifest]: Boolean = implicitly[ClassManifest[T]] >:> implicitly[ClassManifest[U]]
-
-    value.asInstanceOf[Any]  match {
-      case n:Int => sameType[T, Int]
-      case l:Long => sameType[T, Long]
-      case s:Short => sameType[T, Short]
-      case by:Byte => sameType[T, Byte]
-      case b:Boolean => sameType[T, Boolean]
-      case c:Char => sameType[T, Char]
-      case f:Float => sameType[T, Float]
-      case d:Double => sameType[T, Double]
-      case x:Any => implicitly[ClassManifest[T]].erasure.isAssignableFrom(x.asInstanceOf[AnyRef].getClass)
+  def isMatch[T : ClassManifest](value:AnyRef): Boolean =
+    getMatchedElement[T](value)(Some(_)) match {
+      case Some(_) => true
+      case None => false
     }
-  }
+
+    def getMatchedElement[T : ClassManifest](value:AnyRef)(f: T => Option[T]): Option[T] = {
+      value.asInstanceOf[Any]  match {
+        case n:Int => if (sameType[T, Int]) f(n.asInstanceOf[T]) else None
+        case l:Long => if (sameType[T, Long]) f(l.asInstanceOf[T]) else None
+        case s:Short => if (sameType[T, Short]) f(s.asInstanceOf[T]) else None
+        case by:Byte => if (sameType[T, Byte]) f(by.asInstanceOf[T]) else None
+        case b:Boolean => if (sameType[T, Boolean]) f(b.asInstanceOf[T]) else None
+        case c:Char => if (sameType[T, Char]) f(c.asInstanceOf[T]) else None
+        case fl:Float => if (sameType[T, Float]) f(fl.asInstanceOf[T]) else None
+        case d:Double => if (sameType[T, Double]) f(d.asInstanceOf[T]) else None
+        case x:Any => if (implicitly[ClassManifest[T]].erasure.isAssignableFrom(x.asInstanceOf[AnyRef].getClass)) f(x.asInstanceOf[T]) else None
+      }
+    }
+
+    def getElement[T : ClassManifest](value:AnyRef) : Option[T] = getMatchedElement[T](value)(Some(_))
+
 }
