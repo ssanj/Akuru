@@ -19,7 +19,7 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
      writeResultToOption(() => dbc.save(value.toDBObject), handler)
 
     def findOne[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Option[T]] = {
-      runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).map(t => implicitly[MongoToDomain[T]].apply(t)) }
+      runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).flatMap(t => implicitly[MongoToDomain[T]].apply(t)) }
     }
 
 //    def find[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Seq[T]] = {
@@ -48,7 +48,7 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
       runSafelyWithEither {
         foldOption(
           nullToOption(dbc.findAndModify(query, empty, sort, remove, update, returnNew, upsert))){
-          None:Option[T]}{t => Some(implicitly[MongoToDomain[T]].apply(t)) }
+          None:Option[T]}{t => implicitly[MongoToDomain[T]].apply(t) }
       }
     }
 

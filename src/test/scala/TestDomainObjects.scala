@@ -18,9 +18,11 @@ trait TestDomainObjects {
     val titleField = Field[String]("title")
     val labelsField = Field[Seq[String]]("labels")
 
-    implicit def mongoToBlogConverter(mo:MongoObject): Blog =  {
-      Blog(titleField(mo.getPrimitive(titleField)), labelsField(mo.getPrimitiveArray(labelsField)), idField(Some(mo.getId)))
-    }
+    implicit def mongoToBlogConverter(mo:MongoObject): Option[Blog] =
+       for {
+        title <- mo.getTypeSafePrimitive(titleField.name)
+        labels <- mo.getTypeSafePrimitive(labelsField.name)
+      } yield Blog(titleField(title), labelsField(labels), idField(mo.getId))
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = putDomainId(domain).putPrimitive(domain.title).putPrimitiveArray(domain.labels)
 

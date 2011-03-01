@@ -13,7 +13,7 @@ trait DomainSupport { this:Tools =>
 
   type MID = Option[MongoObjectId]
 
-  type MongoToDomain[T <: DomainObject] = MongoObject => T
+  type MongoToDomain[T <: DomainObject] = MongoObject => Option[T]
 
   type DomainToMongo[T <: DomainObject] = T => MongoObject
 

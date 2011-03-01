@@ -33,6 +33,24 @@ trait MongoObjectTrait extends Tools {
       } else None
     }
 
+    def getBlah[T](key:String, pf:PartialFunction[DBObject, Option[T]]): Option[T] = {
+      if (dbo.keySet.contains(key)) {
+        dbo.get(key) match {
+          case x:DBObject if (pf.isDefinedAt(x)) => pf.apply(x)
+          case _ => None
+        }
+      } else None
+    }
+
+    //def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = implicitly[MongoToDomain[T]].apply(getMongo(f.name))
+    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getBlah(f.name, {
+      case o:DBObject => implicitly[MongoToDomain[T]].apply(MongoTypes.MongoObject(o)) })
+
+    def getMongoArray[T <: DomainObject : MongoToDomain](key:String): Seq[T] = getBlah(key, {
+      case o:BasicDBList => Some(MongoObject.fromList[T](o)) }) getOrElse(Seq.empty[T])
+
+    def getMongoArray[T <: DomainObject : MongoToDomain, R](f:Field[R]): Seq[T] = getMongoArray[T](f.name)
+
     /**
      * This method only works if the duplicate keys have values of MongoObjects themselves. If the values themselves are not MongoObjects
      * the original key/values are returned unmerged.
@@ -59,9 +77,11 @@ trait MongoObjectTrait extends Tools {
 
     def getPrimitive[T : AnyRefConverter](key:String): T = getAnyArrayType[T](asSingleElementContainer(key))(getPrimitiveConverter[T]).head
 
-    def getTypeSafePrimitive[T : AnyRefConverter : ClassManifest](key:String): Option[T] = {
+    def getTypeSafePrimitive[T : ClassManifest](key:String): Option[T] = {
       if (dbo.containsField(key)) getElement[T](dbo.get(key)) else None
     }
+
+    def getId: Option[MongoObjectId] = getTypeSafePrimitive[ObjectId]("_id") map (MongoObjectId(_))
 
     def getPrimitive[T : AnyRefConverter](f:Field[T]): T = getPrimitive[T](f.name)
 
@@ -69,14 +89,12 @@ trait MongoObjectTrait extends Tools {
 
     def getPrimitiveArray[T](f:Field[Seq[T]])(implicit con:AnyRefConverter[T]): Seq[T] = getPrimitiveArray[T](f.name)
 
-    //TODO: Test
-    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): T = getAnyArrayType[T](asSingleElementContainer(f.name))(mongoConverter[T]).head
+//    //TODO: Test
+//    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getAnyArrayType[T](asSingleElementContainer(f.name))(mongoConverter[T])
 
-    def getMongoArray[T <: DomainObject : MongoToDomain](key:String): Seq[T] = getAnyArrayType[T](asSeqContainer(key))(mongoConverter[T])
-
-    def getMongoArray[T <: DomainObject : MongoToDomain](f:Field[T]): Seq[T] = getMongoArray[T](f.name)
-
-    def getId: MongoObjectId = MongoObjectId(dbo.get("_id").asInstanceOf[ObjectId])
+//    def getMongoArray[T <: DomainObject : MongoToDomain](key:String): Seq[T] = getAnyArrayType[T](asSeqContainer(key))(mongoConverter[T])
+//
+//    def getMongoArray[T <: DomainObject : MongoToDomain](f:Field[T]): Seq[T] = getMongoArray[T](f.name)
 
     def putPrimitive[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
 
@@ -103,7 +121,7 @@ trait MongoObjectTrait extends Tools {
     //TODO: Test
     def putPrimitiveArray[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveArray[T](fv.name, fv.value)
 
-    private[akuru] def mongoConverter[T <: DomainObject : MongoToDomain](element: AnyRef): T =
+    private[akuru] def mongoConverter[T <: DomainObject : MongoToDomain](element: AnyRef): Option[T] =
       implicitly[MongoToDomain[T]].apply(element.asInstanceOf[DBObject])
 
     private[akuru] def getPrimitiveConverter[T : AnyRefConverter](element:AnyRef): T = implicitly[AnyRefConverter[T]].convert(element)
@@ -167,4 +185,6 @@ trait MongoObjectTrait extends Tools {
       PushFuncs with
       SortFuncs with
       Funcs
+
+
 }

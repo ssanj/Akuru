@@ -7,11 +7,13 @@ package akuru
 
 import MongoTypes.MongoObject
 import MongoTypes.MongoUpdateObject
+import MongoTypes.DomainObject
+import MongoTypes.MongoToDomain
 import MongoTypes.OperatorObject
 
 trait Funcs {
 
-  import com.mongodb.DBObject
+  import com.mongodb.{BasicDBList, DBObject}
 
   def $funcMongo(action: String, col: String, value: MongoObject): MongoObject = mongo.putMongo(action, mongo.putMongo(col, value))
 
@@ -63,4 +65,10 @@ trait Funcs {
     fname => (fv1, fv2, fv3) => $funcMongo(fname, fieldToMongo3[R,S,T](fv1, fv2, fv3))
 
   def toMongoUpdateObject(mo: => MongoObject): MongoUpdateObject = MongoUpdateObject(mo)
+
+  def fromList[T <: DomainObject : MongoToDomain](list:BasicDBList): Seq[T] = {
+    import scala.collection.JavaConversions._
+    val seq:Seq[AnyRef] = list.toSeq
+    seq collect { case x:DBObject => implicitly[MongoToDomain[T]].apply(x) } flatten
+  }
 }

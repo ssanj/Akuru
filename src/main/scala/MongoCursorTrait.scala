@@ -16,7 +16,7 @@ trait MongoCursorTrait {
     def asSeq[T <: DomainObject : MongoToDomain]: Seq[T] = {
         import scala.collection.JavaConversions.asScalaIterable
         val seq:Seq[DBObject] = dbc.toSeq
-        seq.map(implicitly[MongoToDomain[T]].apply(_))
+        seq.foldLeft(Seq[T]())((acc, element) =>  implicitly[MongoToDomain[T]].apply(element) fold (acc, acc :+ _))
     }
 
     def limit(hits: => Int): MongoCursor = dbc.limit(hits)

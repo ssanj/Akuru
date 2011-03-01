@@ -24,8 +24,7 @@ trait MongoFunctions { this:Tools  =>
   def save[T <: DomainObject : DomainToMongo : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save[T](f, defaultHandler)
 
   def findOne[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(g: T => Option[String])(h: => Unit):UserFunction =
-    col => col(collectionName[T]).findOne[T](f).fold(l => Some(
-      l), r => foldOption(r){h;None:Option[String]}(g))
+    col => col(collectionName[T]).findOne[T](f).fold(l => Some(l), r => foldOption(r){h;None:Option[String]}(g))
 
   def findAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner
           )(update: => UpdateObject)(f: T => Option[String])(h: => Option[String]): UserFunction =
