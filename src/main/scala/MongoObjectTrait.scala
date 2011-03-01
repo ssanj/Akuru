@@ -56,6 +56,7 @@ trait MongoObjectTrait extends Tools {
      * the original key/values are returned unmerged.
      *
      * Eg.
+     *
      * {key1: {field1:value1, field2:value2}} mergeDupes {key1: {field3:value3, field4:value4}} will give:
      * {key1: {field1:value1, field2:value2, field3:value3, field4:value4}}.
      *
@@ -75,26 +76,19 @@ trait MongoObjectTrait extends Tools {
       allDupes merge mo.filterNot(t => dupes.contains(t._1))
     }
 
-    def getPrimitive[T : AnyRefConverter](key:String): T = getAnyArrayType[T](asSingleElementContainer(key))(getPrimitiveConverter[T]).head
-
     def getTypeSafePrimitive[T : ClassManifest](key:String): Option[T] = {
       if (dbo.containsField(key)) getElement[T](dbo.get(key)) else None
     }
 
+    def getTypeSafePrimitive[T : ClassManifest](f:Field[T]): Option[T] = getTypeSafePrimitive[T](f.name)
+
     def getId: Option[MongoObjectId] = getTypeSafePrimitive[ObjectId]("_id") map (MongoObjectId(_))
 
-    def getPrimitive[T : AnyRefConverter](f:Field[T]): T = getPrimitive[T](f.name)
+    def getTypeSafePrimitiveArray[T : ClassManifest](key:String): Seq[T] = {
+      getBlah(key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) }) getOrElse(Seq.empty[T])
+    }
 
-    def getPrimitiveArray[T : AnyRefConverter](key:String): Seq[T] = getAnyArrayType[T](asSeqContainer(key))(getPrimitiveConverter[T])
-
-    def getPrimitiveArray[T](f:Field[Seq[T]])(implicit con:AnyRefConverter[T]): Seq[T] = getPrimitiveArray[T](f.name)
-
-//    //TODO: Test
-//    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getAnyArrayType[T](asSingleElementContainer(f.name))(mongoConverter[T])
-
-//    def getMongoArray[T <: DomainObject : MongoToDomain](key:String): Seq[T] = getAnyArrayType[T](asSeqContainer(key))(mongoConverter[T])
-//
-//    def getMongoArray[T <: DomainObject : MongoToDomain](f:Field[T]): Seq[T] = getMongoArray[T](f.name)
+    def getTypeSafePrimitiveArray[T : ClassManifest](f:Field[Seq[T]]): Seq[T] = getTypeSafePrimitiveArray[T](f.name)
 
     def putPrimitive[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
 

@@ -10,6 +10,7 @@ import MongoTypes.MongoUpdateObject
 import MongoTypes.DomainObject
 import MongoTypes.MongoToDomain
 import MongoTypes.OperatorObject
+import MongoTypes.getElement
 
 trait Funcs {
 
@@ -70,5 +71,11 @@ trait Funcs {
     import scala.collection.JavaConversions._
     val seq:Seq[AnyRef] = list.toSeq
     seq collect { case x:DBObject => implicitly[MongoToDomain[T]].apply(x) } flatten
+  }
+
+  def fromPrimitiveList[T : ClassManifest](list:BasicDBList): Seq[T] = {
+    import scala.collection.JavaConversions._
+    val seq:Seq[AnyRef] = list.toSeq
+    seq map (getElement[T](_)) flatten
   }
 }
