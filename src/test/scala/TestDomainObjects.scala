@@ -20,11 +20,11 @@ trait TestDomainObjects {
 
     implicit def mongoToBlogConverter(mo:MongoObject): Option[Blog] =
        for {
-        title <- mo.getPrimitive(titleField)
-        labels <- mo.getPrimitives(labelsField)
+        title <- mo.getPrimitiveObject(titleField)
+        labels <- mo.getPrimitiveObjects(labelsField)
       } yield (Blog(titleField(title), labelsField(labels), idField(mo.getId)))
 
-    implicit def blogToMongoConverter(domain:Blog): MongoObject = putDomainId(domain).putPrimitive(domain.title).putPrimitiveArray(domain.labels)
+    implicit def blogToMongoConverter(domain:Blog): MongoObject = putDomainId(domain).putPrimitiveObject(domain.title).putPrimitiveObjects(domain.labels)
 
     implicit object BlogCollection extends CollectionName[Blog] {
       override val name = "blog"
@@ -39,10 +39,10 @@ trait TestDomainObjects {
 
     implicit def mongoToLabelConverter(mo:MongoObject): Option[Label] =
       for {
-        value <- mo.getPrimitive(valueField)
+        value <- mo.getPrimitiveObject(valueField)
       } yield Label(valueField(value), idField(mo.getId))
 
-    implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).putPrimitive(domain.value)
+    implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).putPrimitiveObject(domain.value)
 
     implicit object LabelCollection extends CollectionName[Label] {
       override val name = "label"
@@ -86,15 +86,15 @@ trait TestDomainObjects {
     val priceField = Field[Double]("price")
 
     implicit def bookToMongo(b:Book): MongoObject = putDomainId(b).
-            putPrimitive(b.name).putPrimitiveArray(b.authors).putPrimitive(b.publisher).putPrimitive(b.printVersion).putPrimitive(b.price)
+            putPrimitiveObject(b.name).putPrimitiveObjects(b.authors).putPrimitiveObject(b.publisher).putPrimitiveObject(b.printVersion).putPrimitiveObject(b.price)
 
     implicit def mongoToBook(mo:MongoObject): Option[Book] =
     for {
-      name <- mo.getPrimitive(nameField)
-      authors <- mo.getPrimitives(authorsField)
-      publisher <- mo.getPrimitive(publisherField)
-      printVersion <- mo.getPrimitive(printVersionField)
-      price <- mo.getPrimitive(priceField)
+      name <- mo.getPrimitiveObject(nameField)
+      authors <- mo.getPrimitiveObjects(authorsField)
+      publisher <- mo.getPrimitiveObject(publisherField)
+      printVersion <- mo.getPrimitiveObject(printVersionField)
+      price <- mo.getPrimitiveObject(priceField)
     } yield
       Book(nameField(name), authorsField(authors), publisherField(publisher), printVersionField(printVersion), priceField(price), idField(mo.getId))
   }
@@ -115,13 +115,13 @@ trait TestDomainObjects {
     val ownerField = Field[String]("owner")
 
     implicit def taskToMongoObject(task:Task): MongoObject =
-      putDomainId(task).putPrimitive(task.name).putPrimitive(task.priority).putPrimitive(task.owner)
+      putDomainId(task).putPrimitiveObject(task.name).putPrimitiveObject(task.priority).putPrimitiveObject(task.owner)
 
     implicit def mongoToTask(mo:MongoObject): Option[Task] =
      for {
-      name <- mo.getPrimitive(nameField)
-      priority <- mo.getPrimitive(priorityField)
-      owner <-mo.getPrimitive(ownerField)
+      name <- mo.getPrimitiveObject(nameField)
+      priority <- mo.getPrimitiveObject(priorityField)
+      owner <-mo.getPrimitiveObject(ownerField)
      } yield Task(nameField(name), priorityField(priority), ownerField(owner), idField(mo.getId))
 
     implicit object TaskCollection extends CollectionName[Task] {

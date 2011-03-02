@@ -24,7 +24,7 @@ trait AkuruImplicits {
 
   implicit def MongoObjectToDBObject(mo: MongoObject): DBObject = mo.toDBObject
 
-  implicit def tuple2PrimitiveToMongoObject(tuple2: Tuple2[String, AnyRef]): MongoObject = mongo.putPrimitive(tuple2._1, tuple2._2)
+  implicit def tuple2PrimitiveToMongoObject(tuple2: Tuple2[String, AnyRef]): MongoObject = mongo.putPrimitiveObject(tuple2._1, tuple2._2)
 
   implicit def tuple2MongoToMongoObject(tuple2: Tuple2[String, MongoObject]): MongoObject = mongo.putMongo(tuple2._1, tuple2._2)
 
@@ -35,7 +35,7 @@ trait AkuruImplicits {
 
   implicit def mongoToMongoJoiner(mo:MongoObject): MongoJoiner = MongoJoiner(mo)
 
-  implicit def fvToMongoJoiner[T](fv:FieldValue[T]): MongoJoiner = MongoJoiner(mongo.putPrimitive[T](fv))
+  implicit def fvToMongoJoiner[T](fv:FieldValue[T]): MongoJoiner = MongoJoiner(mongo.putPrimitiveObject[T](fv))
 
   implicit def mongoJoinerToMongo(mj:MongoJoiner): MongoObject = mj.done
 

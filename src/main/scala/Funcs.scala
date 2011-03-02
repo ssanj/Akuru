@@ -20,14 +20,14 @@ trait Funcs {
 
   def $funcMongo(action: String, value: MongoObject): MongoObject = mongo.putMongo(action, value)
 
-  def $funcPrimitive(action: String, col: String, value: AnyRef): MongoObject = mongo.putMongo(action, mongo.putPrimitive(col, value))
+  def $funcPrimitive(action: String, col: String, value: AnyRef): MongoObject = mongo.putMongo(action, mongo.putPrimitiveObject(col, value))
 
-  def fieldToMongo1[T](fv: FieldValue[T]): MongoObject = mongo.putPrimitive[T](fv)
+  def fieldToMongo1[T](fv: FieldValue[T]): MongoObject = mongo.putPrimitiveObject[T](fv)
 
-  def fieldToMongo2[R, T](fv1: FieldValue[R], fv2: FieldValue[T]): MongoObject = mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2))
+  def fieldToMongo2[R, T](fv1: FieldValue[R], fv2: FieldValue[T]): MongoObject = mongo.putPrimitiveObject(fv1).merge(mongo.putPrimitiveObject(fv2))
 
   def fieldToMongo3[R, S, T](fv1: FieldValue[R], fv2: FieldValue[S], fv3: FieldValue[T]): MongoObject =
-    mongo.putPrimitive(fv1).merge(mongo.putPrimitive(fv2)).merge(mongo.putPrimitive(fv3))
+    mongo.putPrimitiveObject(fv1).merge(mongo.putPrimitiveObject(fv2)).merge(mongo.putPrimitiveObject(fv3))
 
   def empty = new MongoObject
 
@@ -45,7 +45,7 @@ trait Funcs {
   }
 
   case class SequencedFVTOMongo[T](fv:FieldValue[Seq[T]]) {
-    def splat(): MongoObject = mongo.putPrimitiveArray[T](fv)
+    def splat(): MongoObject = mongo.putPrimitiveObjects[T](fv)
   }
 
   case class MongoJoiner(mo:MongoObject) {

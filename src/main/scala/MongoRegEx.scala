@@ -28,8 +28,8 @@ trait MongoRegEx {
   case class RegEx(reg: String, flag: Option[RegexConstants.Value] = None) {
 
     def toMongo(key: String): MongoObject = {
-      val mo = mongo.putPrimitive("$regex", reg)
-      mongo.putMongo(key, foldOption(flag)(mo)(f => foldOption(getRegexFlags(f.id))(mo)(mo.putPrimitive("$options", _))))
+      val mo = mongo.putPrimitiveObject("$regex", reg)
+      mongo.putMongo(key, foldOption(flag)(mo)(f => foldOption(getRegexFlags(f.id))(mo)(mo.putPrimitiveObject("$options", _))))
     }
 
     private def getRegexFlags(f: Int): Option[String] = {

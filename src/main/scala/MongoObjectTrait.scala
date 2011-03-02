@@ -4,12 +4,12 @@
  */
 package akuru
 
-import collection.mutable.ListBuffer
 import com.mongodb.{BasicDBList, BasicDBObject, DBObject}
 import org.bson.types.ObjectId
 import MongoTypes.MongoObjectId
 import MongoTypes.DomainObject
 import MongoTypes.MongoToDomain
+import MongoTypes.DomainToMongo
 
 trait MongoObjectTrait extends Tools {
 
@@ -34,19 +34,19 @@ trait MongoObjectTrait extends Tools {
 
     def getDomainObjects[T <: DomainObject : MongoToDomain : ClassManifest, R](f:Field[R]): Seq[T] = getDomainObjects[T](f.name)
 
-    def getPrimitive[T : ClassManifest](key:String): Option[T] = {
+    def getPrimitiveObject[T : ClassManifest](key:String): Option[T] = {
       getTypeSafeObject[T](key, { case x:AnyRef => getElement[T](x) })
     }
 
-    def getPrimitive[T : ClassManifest](f:Field[T]): Option[T] = getPrimitive[T](f.name)
+    def getPrimitiveObject[T : ClassManifest](f:Field[T]): Option[T] = getPrimitiveObject[T](f.name)
 
-    def getPrimitives[T : ClassManifest](key:String): Option[Seq[T]] = {
+    def getPrimitiveObjects[T : ClassManifest](key:String): Option[Seq[T]] = {
       getTypeSafeObject[Seq[T]](key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
     }
 
-    def getPrimitives[T : ClassManifest](f:Field[Seq[T]]): Option[Seq[T]] = getPrimitives[T](f.name)
+    def getPrimitiveObjects[T : ClassManifest](f:Field[Seq[T]]): Option[Seq[T]] = getPrimitiveObjects[T](f.name)
 
-    def getId: Option[MongoObjectId] = getPrimitive[ObjectId]("_id") map (MongoObjectId(_))
+    def getId: Option[MongoObjectId] = getPrimitiveObject[ObjectId]("_id") map (MongoObjectId(_))
 
     /**
      * This method only works if the duplicate keys have values of MongoObjects themselves. If the values themselves are not MongoObjects
@@ -73,30 +73,22 @@ trait MongoObjectTrait extends Tools {
       allDupes merge mo.filterNot(t => dupes.contains(t._1))
     }
 
-    def putPrimitive[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
+    def putPrimitiveObject[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
 
-    def putPrimitive[T](fv:FieldValue[T]): MongoObject = { putPrimitive(fv.name, fv.value) }
+    def putPrimitiveObject[T](fv:FieldValue[T]): MongoObject = { putPrimitiveObject(fv.name, fv.value) }
+
+    //TODO: Test
+    def putPrimitiveObjects[T](key:String, values: => Seq[T]): MongoObject = putAnyArray(convertToJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
+
+    //TODO: Test
+    def putPrimitiveObjects[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveObjects[T](fv.name, fv.value)
 
     def putMongo(key:String, mongo:MongoObject): MongoObject = putAnyArray(asJavaObject)(key, Seq(mongo.toDBObject))
-
-    def putMongo[T <: DomainObject <% MongoObject](fv:FieldValue[T]): MongoObject = { putMongo(fv.name, fv.value) }
 
     //todo: a DomainObject should already have a FieldValue[MongoObjectId]
     def putId(id:MongoObjectId): MongoObject = { map(_.dbo.put("_id", id.toObjectId))  }
 
     def merge(mo:MongoObject): MongoObject = { map(_.dbo.putAll(mo.toDBObject)) }
-
-    def putMongoArray(key:String, values:Seq[MongoObject]): MongoObject = putAnyArray(convertToJavaList)(key,
-      values.map(_.toDBObject))
-
-    def putMongoArray[T <: DomainObject <% MongoObject](fv:FieldValue[Seq[T]]): MongoObject = putMongoArray(fv.name,
-      fv.value.map(implicitly[MongoObject](_)))
-
-    //TODO: Test
-    def putPrimitiveArray[T](key:String, values: => Seq[T]): MongoObject = putAnyArray(convertToJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
-
-    //TODO: Test
-    def putPrimitiveArray[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveArray[T](fv.name, fv.value)
 
     private[MongoObject] def getTypeSafeObject[T](key:String, pf:PartialFunction[Any, Option[T]]): Option[T] = {
 
@@ -107,24 +99,6 @@ trait MongoObjectTrait extends Tools {
 
     private[akuru] def mongoConverter[T <: DomainObject : MongoToDomain](element: AnyRef): Option[T] =
       implicitly[MongoToDomain[T]].apply(element.asInstanceOf[DBObject])
-
-    private[akuru] def getPrimitiveConverter[T : AnyRefConverter](element:AnyRef): T = implicitly[AnyRefConverter[T]].convert(element)
-
-    private[akuru] def getAnyArrayType[T](container: => Seq[AnyRef])(f: AnyRef => T): Seq[T] = {
-      val buffer = new ListBuffer[T]
-      for(element <- container) {
-        buffer += f(element)
-      }
-
-      buffer.toSeq
-    }
-
-    private[akuru] def asSeqContainer(key: String): Seq[AnyRef] = {
-      import scala.collection.JavaConversions._
-      if (dbo.containsField(key)) dbo.get(key).asInstanceOf[BasicDBList].toSeq else Seq[AnyRef]()
-    }
-
-    private[akuru] def asSingleElementContainer(key: String): Seq[AnyRef] =  Seq(dbo.get(key))
 
     private[akuru] def putAnyArray(f: Seq[AnyRef] => AnyRef)(key: => String, values: => Seq[AnyRef]): MongoObject = {
       val converted = f(values)

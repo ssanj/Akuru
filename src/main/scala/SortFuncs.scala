@@ -6,7 +6,7 @@ import MongoTypes.MongoObject.mongo
 
 trait SortFuncs {
 
-  def sort[T](fv:Field[T], order:SortOrder): MongoSortObject = MongoSortObject(mongo.putPrimitive(fv.name, order.id))
+  def sort[T](fv:Field[T], order:SortOrder): MongoSortObject = MongoSortObject(mongo.putPrimitiveObject(fv.name, order.id))
 
   def noSort: MongoSortObject = MongoSortObject(mongo)
 
