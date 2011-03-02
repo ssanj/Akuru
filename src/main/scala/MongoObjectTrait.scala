@@ -25,15 +25,10 @@ trait MongoObjectTrait extends Tools {
     }
 
     def getMongo(key:String): Option[MongoObject] = {
-      if (dbo.keySet.contains(key)) {
-        dbo.get(key) match {
-          case o:DBObject => Some(new MongoObject(o))
-          case _ => None
-        }
-      } else None
+      getTypeSafeMongoObject(key, { case x:DBObject => Some(MongoObject(x)) } )
     }
 
-    def getBlah[T](key:String, pf:PartialFunction[DBObject, Option[T]]): Option[T] = {
+    private[MongoObject] def getTypeSafeMongoObject[T](key:String, pf:PartialFunction[DBObject, Option[T]]): Option[T] = {
       if (dbo.keySet.contains(key)) {
         dbo.get(key) match {
           case x:DBObject if (pf.isDefinedAt(x)) => pf.apply(x)
@@ -42,14 +37,27 @@ trait MongoObjectTrait extends Tools {
       } else None
     }
 
-    //def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = implicitly[MongoToDomain[T]].apply(getMongo(f.name))
-    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getBlah(f.name, {
+    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getTypeSafeMongoObject[T](f.name, {
       case o:DBObject => implicitly[MongoToDomain[T]].apply(MongoTypes.MongoObject(o)) })
 
-    def getMongoArray[T <: DomainObject : MongoToDomain : ClassManifest](key:String): Seq[T] = getBlah(key, {
+    def getMongoArray[T <: DomainObject : MongoToDomain : ClassManifest](key:String): Seq[T] = getTypeSafeMongoObject[Seq[T]](key, {
       case o:BasicDBList => Some(MongoObject.fromList[T](o)) }) getOrElse(Seq.empty[T])
 
     def getMongoArray[T <: DomainObject : MongoToDomain : ClassManifest, R](f:Field[R]): Seq[T] = getMongoArray[T](f.name)
+
+    def getTypeSafePrimitive[T : ClassManifest](key:String): Option[T] = {
+      if (dbo.containsField(key)) getElement[T](dbo.get(key)) else None
+    }
+
+    def getTypeSafePrimitive[T : ClassManifest](f:Field[T]): Option[T] = getTypeSafePrimitive[T](f.name)
+
+    def getTypeSafePrimitiveArray[T : ClassManifest](key:String): Option[Seq[T]] = {
+      getTypeSafeMongoObject[Seq[T]](key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
+    }
+
+    def getTypeSafePrimitiveArray[T : ClassManifest](f:Field[Seq[T]]): Option[Seq[T]] = getTypeSafePrimitiveArray[T](f.name)
+
+    def getId: Option[MongoObjectId] = getTypeSafePrimitive[ObjectId]("_id") map (MongoObjectId(_))
 
     /**
      * This method only works if the duplicate keys have values of MongoObjects themselves. If the values themselves are not MongoObjects
@@ -75,20 +83,6 @@ trait MongoObjectTrait extends Tools {
 
       allDupes merge mo.filterNot(t => dupes.contains(t._1))
     }
-
-    def getTypeSafePrimitive[T : ClassManifest](key:String): Option[T] = {
-      if (dbo.containsField(key)) getElement[T](dbo.get(key)) else None
-    }
-
-    def getTypeSafePrimitive[T : ClassManifest](f:Field[T]): Option[T] = getTypeSafePrimitive[T](f.name)
-
-    def getTypeSafePrimitiveArray[T : ClassManifest](key:String): Option[Seq[T]] = {
-      getBlah(key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
-    }
-
-    def getTypeSafePrimitiveArray[T : ClassManifest](f:Field[Seq[T]]): Option[Seq[T]] = getTypeSafePrimitiveArray[T](f.name)
-
-    def getId: Option[MongoObjectId] = getTypeSafePrimitive[ObjectId]("_id") map (MongoObjectId(_))
 
     def putPrimitive[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
 
