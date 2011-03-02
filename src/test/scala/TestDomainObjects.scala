@@ -20,8 +20,8 @@ trait TestDomainObjects {
 
     implicit def mongoToBlogConverter(mo:MongoObject): Option[Blog] =
        for {
-        title <- mo.getTypeSafePrimitive(titleField)
-        labels <- mo.getTypeSafePrimitiveArray(labelsField)
+        title <- mo.getPrimitive(titleField)
+        labels <- mo.getPrimitives(labelsField)
       } yield (Blog(titleField(title), labelsField(labels), idField(mo.getId)))
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = putDomainId(domain).putPrimitive(domain.title).putPrimitiveArray(domain.labels)
@@ -39,7 +39,7 @@ trait TestDomainObjects {
 
     implicit def mongoToLabelConverter(mo:MongoObject): Option[Label] =
       for {
-        value <- mo.getTypeSafePrimitive(valueField)
+        value <- mo.getPrimitive(valueField)
       } yield Label(valueField(value), idField(mo.getId))
 
     implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).putPrimitive(domain.value)
@@ -90,11 +90,11 @@ trait TestDomainObjects {
 
     implicit def mongoToBook(mo:MongoObject): Option[Book] =
     for {
-      name <- mo.getTypeSafePrimitive(nameField)
-      authors <- mo.getTypeSafePrimitiveArray(authorsField)
-      publisher <- mo.getTypeSafePrimitive(publisherField)
-      printVersion <- mo.getTypeSafePrimitive(printVersionField)
-      price <- mo.getTypeSafePrimitive(priceField)
+      name <- mo.getPrimitive(nameField)
+      authors <- mo.getPrimitives(authorsField)
+      publisher <- mo.getPrimitive(publisherField)
+      printVersion <- mo.getPrimitive(printVersionField)
+      price <- mo.getPrimitive(priceField)
     } yield
       Book(nameField(name), authorsField(authors), publisherField(publisher), printVersionField(printVersion), priceField(price), idField(mo.getId))
   }
@@ -119,9 +119,9 @@ trait TestDomainObjects {
 
     implicit def mongoToTask(mo:MongoObject): Option[Task] =
      for {
-      name <- mo.getTypeSafePrimitive(nameField)
-      priority <- mo.getTypeSafePrimitive(priorityField)
-      owner <-mo.getTypeSafePrimitive(ownerField)
+      name <- mo.getPrimitive(nameField)
+      priority <- mo.getPrimitive(priorityField)
+      owner <-mo.getPrimitive(ownerField)
      } yield Task(nameField(name), priorityField(priority), ownerField(owner), idField(mo.getId))
 
     implicit object TaskCollection extends CollectionName[Task] {

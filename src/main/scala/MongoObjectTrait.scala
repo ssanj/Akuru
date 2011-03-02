@@ -26,27 +26,27 @@ trait MongoObjectTrait extends Tools {
 
     def getMongoObject(key:String): Option[MongoObject] = getTypeSafeObject(key, { case x:DBObject => Some(MongoObject(x)) })
 
-    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getTypeSafeObject[T](f.name, {
+    def getDomainObject[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getTypeSafeObject[T](f.name, {
       case o:DBObject => implicitly[MongoToDomain[T]].apply(MongoTypes.MongoObject(o)) })
 
-    def getMongoArray[T <: DomainObject : MongoToDomain : ClassManifest](key:String): Seq[T] = getTypeSafeObject[Seq[T]](key, {
+    def getDomainObjects[T <: DomainObject : MongoToDomain : ClassManifest](key:String): Seq[T] = getTypeSafeObject[Seq[T]](key, {
       case o:BasicDBList => Some(MongoObject.fromList[T](o)) }) getOrElse(Seq.empty[T])
 
-    def getMongoArray[T <: DomainObject : MongoToDomain : ClassManifest, R](f:Field[R]): Seq[T] = getMongoArray[T](f.name)
+    def getDomainObjects[T <: DomainObject : MongoToDomain : ClassManifest, R](f:Field[R]): Seq[T] = getDomainObjects[T](f.name)
 
-    def getTypeSafePrimitive[T : ClassManifest](key:String): Option[T] = {
+    def getPrimitive[T : ClassManifest](key:String): Option[T] = {
       getTypeSafeObject[T](key, { case x:AnyRef => getElement[T](x) })
     }
 
-    def getTypeSafePrimitive[T : ClassManifest](f:Field[T]): Option[T] = getTypeSafePrimitive[T](f.name)
+    def getPrimitive[T : ClassManifest](f:Field[T]): Option[T] = getPrimitive[T](f.name)
 
-    def getTypeSafePrimitiveArray[T : ClassManifest](key:String): Option[Seq[T]] = {
+    def getPrimitives[T : ClassManifest](key:String): Option[Seq[T]] = {
       getTypeSafeObject[Seq[T]](key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
     }
 
-    def getTypeSafePrimitiveArray[T : ClassManifest](f:Field[Seq[T]]): Option[Seq[T]] = getTypeSafePrimitiveArray[T](f.name)
+    def getPrimitives[T : ClassManifest](f:Field[Seq[T]]): Option[Seq[T]] = getPrimitives[T](f.name)
 
-    def getId: Option[MongoObjectId] = getTypeSafePrimitive[ObjectId]("_id") map (MongoObjectId(_))
+    def getId: Option[MongoObjectId] = getPrimitive[ObjectId]("_id") map (MongoObjectId(_))
 
     /**
      * This method only works if the duplicate keys have values of MongoObjects themselves. If the values themselves are not MongoObjects
