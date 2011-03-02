@@ -84,11 +84,11 @@ trait MongoObjectTrait extends Tools {
 
     def getId: Option[MongoObjectId] = getTypeSafePrimitive[ObjectId]("_id") map (MongoObjectId(_))
 
-    def getTypeSafePrimitiveArray[T : ClassManifest](key:String): Seq[T] = {
-      getBlah(key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) }) getOrElse(Seq.empty[T])
+    def getTypeSafePrimitiveArray[T : ClassManifest](key:String): Option[Seq[T]] = {
+      getBlah(key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
     }
 
-    def getTypeSafePrimitiveArray[T : ClassManifest](f:Field[Seq[T]]): Seq[T] = getTypeSafePrimitiveArray[T](f.name)
+    def getTypeSafePrimitiveArray[T : ClassManifest](f:Field[Seq[T]]): Option[Seq[T]] = getTypeSafePrimitiveArray[T](f.name)
 
     def putPrimitive[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
 
