@@ -31,7 +31,7 @@ final class MongoObjectwithMergeDupesSpec extends CommonSpec {
     val mo2:MongoObject = mongo.putPrimitive("key5", "test").putMongo("$sort", mongo.putPrimitive("key2", "bleee")).putPrimitive("key6", "done")
     val mo3 = mo1.mergeDupes(mo2)
 
-    mo3.getMongo("$sort") should equal (Some(mongo.putPrimitive("key1", "blah").putPrimitive("key2", "bleee")))
+    mo3.getMongoObject("$sort") should equal (Some(mongo.putPrimitive("key1", "blah").putPrimitive("key2", "bleee")))
     mo3.getTypeSafePrimitive[String]("key3") should equal (Some("blue"))
     mo3.getTypeSafePrimitive[String]("key4") should equal (Some("boo"))
     mo3.getTypeSafePrimitive[String]("key5") should equal (Some("test"))

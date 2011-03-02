@@ -24,16 +24,7 @@ trait MongoObjectTrait extends Tools {
       dbo.keySet.toSet
     }
 
-    def getMongo(key:String): Option[MongoObject] = {
-      getTypeSafeObject(key, { case x:DBObject => Some(MongoObject(x)) } )
-    }
-
-    private[MongoObject] def getTypeSafeObject[T](key:String, pf:PartialFunction[Any, Option[T]]): Option[T] = {
-
-      def pfNone:PartialFunction[Any, Option[T]] = { case _:Any => None }
-
-      if (dbo.keySet.contains(key)) pf orElse (pfNone) apply (dbo.get(key)) else None
-    }
+    def getMongoObject(key:String): Option[MongoObject] = getTypeSafeObject(key, { case x:DBObject => Some(MongoObject(x)) })
 
     def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getTypeSafeObject[T](f.name, {
       case o:DBObject => implicitly[MongoToDomain[T]].apply(MongoTypes.MongoObject(o)) })
@@ -77,7 +68,7 @@ trait MongoObjectTrait extends Tools {
     def mergeDupes(mo:MongoObject): MongoObject = {
       val dupes = getKeySet filter (mo.getKeySet.contains(_))
       val allDupes = dupes.foldLeft(copyMongoObject)((container, key) =>
-        container.getMongo(key) fold (container, m1 => mo.getMongo(key) fold (container, m2 => container.putMongo(key, m1.merge(m2)))))
+        container.getMongoObject(key) fold (container, m1 => mo.getMongoObject(key) fold (container, m2 => container.putMongo(key, m1.merge(m2)))))
 
       allDupes merge mo.filterNot(t => dupes.contains(t._1))
     }
@@ -106,6 +97,13 @@ trait MongoObjectTrait extends Tools {
 
     //TODO: Test
     def putPrimitiveArray[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveArray[T](fv.name, fv.value)
+
+    private[MongoObject] def getTypeSafeObject[T](key:String, pf:PartialFunction[Any, Option[T]]): Option[T] = {
+
+      def pfNone:PartialFunction[Any, Option[T]] = { case _:Any => None }
+
+      if (dbo.keySet.contains(key)) pf orElse (pfNone) apply (dbo.get(key)) else None
+    }
 
     private[akuru] def mongoConverter[T <: DomainObject : MongoToDomain](element: AnyRef): Option[T] =
       implicitly[MongoToDomain[T]].apply(element.asInstanceOf[DBObject])
