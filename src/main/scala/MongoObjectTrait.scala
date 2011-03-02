@@ -25,34 +25,32 @@ trait MongoObjectTrait extends Tools {
     }
 
     def getMongo(key:String): Option[MongoObject] = {
-      getTypeSafeMongoObject(key, { case x:DBObject => Some(MongoObject(x)) } )
+      getTypeSafeObject(key, { case x:DBObject => Some(MongoObject(x)) } )
     }
 
-    private[MongoObject] def getTypeSafeMongoObject[T](key:String, pf:PartialFunction[DBObject, Option[T]]): Option[T] = {
-      if (dbo.keySet.contains(key)) {
-        dbo.get(key) match {
-          case x:DBObject if (pf.isDefinedAt(x)) => pf.apply(x)
-          case _ => None
-        }
-      } else None
+    private[MongoObject] def getTypeSafeObject[T](key:String, pf:PartialFunction[Any, Option[T]]): Option[T] = {
+
+      def pfNone:PartialFunction[Any, Option[T]] = { case _:Any => None }
+
+      if (dbo.keySet.contains(key)) pf orElse (pfNone) apply (dbo.get(key)) else None
     }
 
-    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getTypeSafeMongoObject[T](f.name, {
+    def getMongo[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getTypeSafeObject[T](f.name, {
       case o:DBObject => implicitly[MongoToDomain[T]].apply(MongoTypes.MongoObject(o)) })
 
-    def getMongoArray[T <: DomainObject : MongoToDomain : ClassManifest](key:String): Seq[T] = getTypeSafeMongoObject[Seq[T]](key, {
+    def getMongoArray[T <: DomainObject : MongoToDomain : ClassManifest](key:String): Seq[T] = getTypeSafeObject[Seq[T]](key, {
       case o:BasicDBList => Some(MongoObject.fromList[T](o)) }) getOrElse(Seq.empty[T])
 
     def getMongoArray[T <: DomainObject : MongoToDomain : ClassManifest, R](f:Field[R]): Seq[T] = getMongoArray[T](f.name)
 
     def getTypeSafePrimitive[T : ClassManifest](key:String): Option[T] = {
-      if (dbo.containsField(key)) getElement[T](dbo.get(key)) else None
+      getTypeSafeObject[T](key, { case x:AnyRef => getElement[T](x) })
     }
 
     def getTypeSafePrimitive[T : ClassManifest](f:Field[T]): Option[T] = getTypeSafePrimitive[T](f.name)
 
     def getTypeSafePrimitiveArray[T : ClassManifest](key:String): Option[Seq[T]] = {
-      getTypeSafeMongoObject[Seq[T]](key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
+      getTypeSafeObject[Seq[T]](key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
     }
 
     def getTypeSafePrimitiveArray[T : ClassManifest](f:Field[Seq[T]]): Option[Seq[T]] = getTypeSafePrimitiveArray[T](f.name)
