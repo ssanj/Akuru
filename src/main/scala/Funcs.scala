@@ -67,15 +67,17 @@ trait Funcs {
 
   def toMongoUpdateObject(mo: => MongoObject): MongoUpdateObject = MongoUpdateObject(mo)
 
-  def fromList[T <: DomainObject : MongoToDomain](list:BasicDBList): Seq[T] = {
-    import scala.collection.JavaConversions._
-    val seq:Seq[AnyRef] = list.toSeq
-    seq collect { case x:DBObject => implicitly[MongoToDomain[T]].apply(x) } flatten
+  def fromList[T <: DomainObject : MongoToDomain : ClassManifest](list:BasicDBList): Seq[T] = {
+    fromSomeList[T](list, _ collect { case x:DBObject => implicitly[MongoToDomain[T]].apply(x) })
   }
 
   def fromPrimitiveList[T : ClassManifest](list:BasicDBList): Seq[T] = {
+    fromSomeList[T](list, _ map (getElement[T]))
+  }
+
+  def fromSomeList[T : ClassManifest](list:BasicDBList, f:(Seq[AnyRef]) => Seq[Option[T]]): Seq[T] = {
     import scala.collection.JavaConversions._
     val seq:Seq[AnyRef] = list.toSeq
-    seq map (getElement[T](_)) flatten
+    f(seq) flatten
   }
 }
