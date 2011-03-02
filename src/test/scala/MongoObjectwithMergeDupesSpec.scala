@@ -15,8 +15,8 @@ final class MongoObjectwithMergeDupesSpec extends CommonSpec {
     val mo2:MongoObject = mongo.putPrimitiveArray[String](labelsField(Seq("test")))
     val mo3 = mo1.mergeDupes(mo2)
 
-    mo3.getPrimitive(titleField) should equal ("blah")
-    mo3.getPrimitiveArray(labelsField) should equal (Seq("test"))
+    mo3.getTypeSafePrimitive(titleField) should equal (Some("blah"))
+    mo3.getTypeSafePrimitiveArray(labelsField) should equal (Some(Seq("test")))
   }
 
   it should "merge dupes" in {
@@ -32,9 +32,9 @@ final class MongoObjectwithMergeDupesSpec extends CommonSpec {
     val mo3 = mo1.mergeDupes(mo2)
 
     mo3.getMongo("$sort") should equal (Some(mongo.putPrimitive("key1", "blah").putPrimitive("key2", "bleee")))
-    mo3.getPrimitive[String]("key3") should equal ("blue")
-    mo3.getPrimitive[String]("key4") should equal ("boo")
-    mo3.getPrimitive[String]("key5") should equal ("test")
-    mo3.getPrimitive[String]("key6") should equal ("done")
+    mo3.getTypeSafePrimitive[String]("key3") should equal (Some("blue"))
+    mo3.getTypeSafePrimitive[String]("key4") should equal (Some("boo"))
+    mo3.getTypeSafePrimitive[String]("key5") should equal (Some("test"))
+    mo3.getTypeSafePrimitive[String]("key6") should equal (Some("done"))
   }
 }
