@@ -22,13 +22,6 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
       runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).flatMap(t => implicitly[MongoToDomain[T]].apply(t)) }
     }
 
-//    def find[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Seq[T]] = {
-//      runSafelyWithEither {
-//        val mc:MongoCursor = dbc.find(mo)
-//        mc.asSeq[T]
-//      }
-//    }
-
     def find[T <: DomainObject : MongoToDomain](mo:MongoObject)(f: MongoCursor => MongoCursor): Either[String, Seq[T]] = {
       runSafelyWithEither { f(dbc.find(mo)).asSeq[T] }
     }
