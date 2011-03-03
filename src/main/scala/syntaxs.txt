@@ -103,4 +103,11 @@ find(Spend.CostType > 200.00D)
 (spends.cost $gt 200.00)
 
 
+save (blog1) and find (titleField("storms"))) noSort withResults(b => ...) onError()
+save (blog1) and find (titleField("storms"))) limitTo(5) withResults(b => ...) onError()
+findOne (titleField("Storms") withResults(b =>) onError ()
+findOne (Blog.title = "Storms" and Blog.labels = Seq("misc", "blah")) withResults(b =>) onError ()
+find (titleField("Blog updates")) thenUpdate { set(titleField("Blog Updatees")) and set(labelsField(Seq("bl%%g")).splat) } ~~>
 
+find (titleField("Blog updates")) thenUpdate (set(titleField("Phantom updates"))) withResults {wr => }
+(find (nameField("Clean Room")) dontSort createTask withResults( t => ) onError ()) execute verifySuccess

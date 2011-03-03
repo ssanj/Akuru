@@ -14,7 +14,6 @@ package akuru {
                             MongoWriteResultTrait with
                             MongoErrorTrait with
                             WrapWithTrait with
-                            MongoFunc with
                             MongoTools with
                             MongoRegEx with
                             DomainSupport with
