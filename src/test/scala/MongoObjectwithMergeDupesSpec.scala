@@ -7,8 +7,7 @@ package akuru
 final class MongoObjectwithMergeDupesSpec extends CommonSpec {
 
   import Blog._
-  import MongoTypes.MongoObject
-  import MongoTypes.MongoObject.mongo
+  import MongoObject.mongo
 
   "A MongoObject" should "merge documents with no dupes" in {
     val mo1:MongoObject = mongo.putPrimitiveObject(titleField("blah"))

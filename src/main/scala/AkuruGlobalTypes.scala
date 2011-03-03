@@ -23,4 +23,20 @@ trait AkuruGlobalTypes {
   type FieldValue[T] = akuru.MongoTypes.FieldValue[T]
   type Field[T] = akuru.MongoTypes.Field[T]
 
-}
+  type MongoObject = akuru.MongoTypes.MongoObject
+  val MongoObject = akuru.MongoTypes.MongoObject
+
+  type MongoObjectId = akuru.MongoTypes.MongoObjectId
+  val MongoObjectId = akuru.MongoTypes.MongoObjectId
+
+  type DomainObject = akuru.MongoTypes.DomainObject
+  val DomainObject = akuru.MongoTypes.DomainObject
+
+  type MID = akuru.MongoTypes.MID
+
+  type MongoToDomain[T <: DomainObject] = akuru.MongoTypes.MongoToDomain[T]
+
+  type DomainToMongo[T <: DomainObject] = akuru.MongoTypes.DomainToMongo[T]
+
+  type CollectionName[T <: DomainObject] = akuru.MongoTypes.CollectionName[T]
+ }

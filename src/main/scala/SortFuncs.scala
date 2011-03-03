@@ -1,7 +1,6 @@
 package akuru
 
 import MongoTypes.MongoSortObject
-import MongoTypes.MongoObject
 import MongoTypes.MongoObject.mongo
 
 trait SortFuncs {

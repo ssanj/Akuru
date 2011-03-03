@@ -5,10 +5,7 @@
 
 package akuru
 
-import MongoTypes.MongoObject
 import MongoTypes.MongoUpdateObject
-import MongoTypes.DomainObject
-import MongoTypes.MongoToDomain
 import MongoTypes.OperatorObject
 import MongoTypes.getElement
 

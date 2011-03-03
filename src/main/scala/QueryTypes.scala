@@ -4,10 +4,6 @@
  */
 package akuru
 
-import MongoTypes.MongoObject
-import MongoTypes.DomainToMongo
-import MongoTypes.DomainObject
-
 trait QueryTypes {
 
   sealed trait SortObject {

@@ -5,8 +5,6 @@
 
 package akuru
 
-import MongoTypes.MongoObjectId
-import MongoTypes.MongoObject
 import MongoTypes.MongoObject.empty
 
 trait DomainSupport { this:Tools =>

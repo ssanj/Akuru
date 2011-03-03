@@ -4,8 +4,7 @@
  */
 package akuru
 
-import MongoTypes.MongoObject
-import MongoTypes.MongoObject._
+import MongoObject._
 
 trait OperatorTypes {
 

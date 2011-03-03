@@ -5,14 +5,7 @@ import MongoTypes.RegExWithOptions
 import MongoTypes.FieldRegEx
 import MongoTypes.MongoSortObject
 import MongoTypes.OperatorObject
-import MongoTypes.MongoObject
-import MongoObject.mongo
-import MongoObject.fieldToMongo1
-import MongoObject.DBOToMongo
-import MongoObject.SequencedFVTOMongo
-import MongoObject.MongoJoiner
-import MongoObject.SortObjectJoiner
-
+import MongoObject._
 
 trait AkuruImplicits {
 
@@ -20,7 +13,7 @@ trait AkuruImplicits {
 
   implicit def fieldValueToMongo[T](fv: FieldValue[T]): MongoObject = fieldToMongo1[T](fv)
 
-  implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = MongoObject(dbo)
+  implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = new MongoObject(dbo)
 
   implicit def MongoObjectToDBObject(mo: MongoObject): DBObject = mo.toDBObject
 
