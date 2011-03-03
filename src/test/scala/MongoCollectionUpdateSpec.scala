@@ -5,8 +5,8 @@
 
 package akuru
 
-import _root_.akuru.MongoTypes._
-import _root_.akuru.MongoTypes.MongoObject._
+import akuru.MongoTypes._
+import akuru.MongoTypes.MongoObject._
 
 final class MongoCollectionUpdateSpec extends CommonSpec {
 

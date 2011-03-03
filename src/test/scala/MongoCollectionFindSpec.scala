@@ -5,9 +5,6 @@
 
 package akuru
 
-import MongoTypes._
-import MongoTypes.RegexConstants._
-
 final class MongoCollectionFindSpec extends CommonSpec {
 
   import Blog._
