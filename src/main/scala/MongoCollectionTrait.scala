@@ -19,7 +19,8 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
      writeResultToOption(() => dbc.save(value.toDBObject), handler)
 
     def findOne[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Option[T]] = {
-      runSafelyWithEither { nullToOption(dbc.findOne(mo.toDBObject)).flatMap(t => implicitly[MongoToDomain[T]].apply(t)) }
+      val res = dbc.findOne(mo.toDBObject)
+      runSafelyWithEither { nullToOption(res).flatMap(t => implicitly[MongoToDomain[T]].apply(t)) }
     }
 
     def find[T <: DomainObject : MongoToDomain](mo:MongoObject)(f: MongoCursor => MongoCursor): Either[String, Seq[T]] = {

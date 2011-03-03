@@ -30,15 +30,15 @@ trait Funcs {
 
   def mongo = new MongoObject
 
-  def query(tuples: Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
+  def query(tuples: Tuple2[String, AnyRef]*) = new MongoObject(Map[String, AnyRef](tuples:_*))
 
-  def mongoObject(tuples: Tuple2[String, AnyRef]*) = new MongoObject(tuples.toSeq)
+  def mongoObject(tuples: Tuple2[String, AnyRef]*) = query(tuples:_*)
 
   def combine(value:MongoObject*): MongoObject = if (value.isEmpty) mongo else value.foldLeft(value.head)((a, b) => a.merge(b))
 
   //TODO: remove this
   case class DBOToMongo(dbo: DBObject) {
-    def toMongo(): MongoObject = MongoObject(dbo)
+    def toMongo(): MongoObject = dbo
   }
 
   case class SequencedFVTOMongo[T](fv:FieldValue[Seq[T]]) {

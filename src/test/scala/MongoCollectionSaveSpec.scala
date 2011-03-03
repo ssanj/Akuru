@@ -6,9 +6,6 @@
 
 package akuru
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
-
 final class MongoCollectionSaveSpec extends CommonSpec {
 
   import Blog._

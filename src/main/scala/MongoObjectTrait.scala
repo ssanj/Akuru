@@ -4,15 +4,13 @@
  */
 package akuru
 
-import com.mongodb.{BasicDBObject, DBObject}
-
 trait MongoObjectTrait {
 
-  case class MongoObject(override val dbo:DBObject) extends MongoObjectBehaviour with Tools  {
+  case class MongoObject(override val dbo:Map[String, AnyRef]) extends MongoObjectBehaviour with Tools  {
 
-    def this() = this(new BasicDBObject)
+    def this() = this(Map.empty[String, AnyRef])
 
-    def this(tuples:Seq[Tuple2[String, Any]]) = this(new BasicDBObject(scala.collection.JavaConversions.asJavaMap(tuples.toMap)))
+    //def this(tuples:Seq[Tuple2[String, Any]]) = this(new BasicDBObject(scala.collection.JavaConversions.asJavaMap(tuples.toMap)))
   }
 
   object MongoObject extends

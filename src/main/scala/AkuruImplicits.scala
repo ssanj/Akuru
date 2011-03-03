@@ -13,7 +13,10 @@ trait AkuruImplicits {
 
   implicit def fieldValueToMongo[T](fv: FieldValue[T]): MongoObject = fieldToMongo1[T](fv)
 
-  implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = new MongoObject(dbo)
+  implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = {
+    import scala.collection.JavaConversions._
+    MongoObject(dbo.keySet.toSeq map (key => (key, dbo.get(key))) toMap)
+  }
 
   implicit def MongoObjectToDBObject(mo: MongoObject): DBObject = mo.toDBObject
 
