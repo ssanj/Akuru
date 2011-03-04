@@ -38,29 +38,39 @@ trait MongoObjectBehaviour { this:Tools =>
   def getId: Option[MongoObjectId] = getPrimitiveObject[ObjectId]("_id") map (MongoObjectId(_))
 
   /**
-   * TODO: Find a simpler way to write this.
    * This method only works if the duplicate keys have values of MongoObjects themselves. If the values themselves are not MongoObjects
    * the original key/values are returned unmerged.
    *
    * Eg.
    *
-   * {key1: {field1:value1, field2:value2}} mergeDupes {key1: {field3:value3, field4:value4}} will give:
+   * {key1: {field1:value1, field2:value2}} mergeMongoObjectValues {key1: {field3:value3, field4:value4}} will give:
    * {key1: {field1:value1, field2:value2, field3:value3, field4:value4}}.
    *
-   * Any values in duplicate keys within the values are trashed by the last value:
-   * {key1: {field1:value1, field2:value2}} mergeDupes {key1: {field1:value3, field2:value4}} will give:
+   * Any values in (duplicate keys within the values) are trashed by the last value:
+   * {key1: {field1:value1, field2:value2}} mergeMongoObjectValues {key1: {field1:value3, field2:value4}} will give:
    * {key1: {field1:value3, field2:value4}}
    *
-   * While with non-mongo values the original document unchanged.:
-   * {key1: value1} mergeDupes {key1: value2} will give:
+   * While with non-MongObject values the original document is unchanged:
+   * {key1: value1} mergeMongoObjectValues {key1: value2} will give:
    * {key1: value1}
+   *
+   * Within a document of mixed MongoObject and non-MongoObject values:
+   *
+   * 1. The duplicates keys with MongoObjects values are merged
+   * 2. The the values of unique keys are used as is (whether values are MongObjects or not)
+   * 3. Duplicate keys within (within the values) of the MongoObject value are trashed by the last value:
+   *
+   * {key1: {field1:value1, field2:value2, field3:value11}, key2: value10 } mergeMongoObjectValues {key1: {field3:value3, field4:value4}, key3:value16} will give:
+   * {key1: {field1:value1, field2:value2, field3:value3, field4:value4}, key2: value10, key3:value16}
    */
-  def mergeDupes(mo:MongoObject): MongoObject = {
-    val dupes = dbo.keySet.filter(mo.dbo.keySet.contains(_))
-    val allDupes = dupes.foldLeft(copyMongoObject)((container, key) =>
-      container.getMongoObject(key) fold (container, m1 => mo.getMongoObject(key) fold (container, m2 => container.putMongo(key, m1.merge(m2)))))
+  def mergeMongoObjectValues(incoming:MongoObject): MongoObject = {
+    val dupes = dbo.keySet & incoming.dbo.keySet
+    val merged = dupes.foldLeft(copyMongoObject)((container, key) =>
+      container.getMongoObject(key) fold (container,
+              m1 => incoming.getMongoObject(key) fold (container,
+                      m2 => container.putMongo(key, m1.merge(m2)))))
 
-    allDupes merge MongoObject(mo.dbo.filterNot(t => dupes.contains(t._1)))
+    merged merge MongoObject(incoming.dbo.filter(t => incoming.dbo.keySet &~ dupes contains (t._1)))
   }
 
   def putPrimitiveObject[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
@@ -84,7 +94,6 @@ trait MongoObjectBehaviour { this:Tools =>
 
     def pfNone:PartialFunction[Any, Option[T]] = { case _:Any => None }
 
-    //if (dbo.contains(key)) pf orElse (pfNone) apply (dbo.get(key)) else None
     dbo.get(key) fold (None, value => pf orElse (pfNone) apply (value))
   }
 
@@ -110,5 +119,5 @@ trait MongoObjectBehaviour { this:Tools =>
     new BasicDBObject(dbo)
   }
 
-  private[akuru] def copyMongoObject: MongoObject = new MongoObject
+  private[akuru] def copyMongoObject: MongoObject = new MongoObject(dbo)
 }
