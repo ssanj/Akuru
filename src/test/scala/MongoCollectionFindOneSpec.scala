@@ -5,7 +5,7 @@
 
 package akuru
 
-final class MongoCollectionFindOneSpec extends CommonSpec {
+final class MongoCollectionFindOneSpec extends CommonSpec with FindDSL {
 
   import Blog._
 
@@ -13,18 +13,18 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
     (onTestDB ~~>
             drop[Blog] ~~>
             save(Blog(titleField("blah1"))) ~~> save(Blog(titleField("blah2"))) ~~> save(Blog(titleField("blah3"))) ~~>
-            findOne[Blog](titleField ?* ("blah.*"/i)) { blog =>
+            ( find one (Blog) where (titleField ?* ("blah.*"/i)) withResults { blog =>
                 blog.title.value should include regex ("blah")
                 success
-            } { fail("Should have found hits") }
+            } onError { fail("Should have found hits") } )
     ) ~~>() verifySuccess
   }
 
   it  should "call a nomatches handler function if it does not have any matches" in {
     var handlerCalled = false
     (
-      onTestDB ~~> drop[Blog] ~~> findOne[Blog](titleField ?* ("blah"/)) { b => Some("Unexpected blog returned -> " + b) }
-                { handlerCalled = true } ~~>()
+      onTestDB ~~> drop[Blog] ~~> ( find one (Blog) where (titleField ?* ("blah"/)) withResults (b => Some("Unexpected blog returned -> " + b))
+              onError (handlerCalled = true) ) ~~>()
     ) verifySuccess()
 
     handlerCalled should be (true)
@@ -32,14 +32,15 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
 
   it should "handle exceptions thrown on finder execution" in {
     (
-      onTestDB ~~> findOne[Person](Person.nameField ?* ("*"/)){ _ => Some("Should not have return results") } { noOp } ~~>()
+      onTestDB ~~> ( find one (Person) where (Person.nameField ?* ("*"/)) withResults (_ => Some("Should not have return results"))
+              onError(noOp) ) ~~>()
     ) verifyError has (Person.expectedError)
   }
 
   it should "handle exceptions thrown on creating a query" in {
     (
-      onTestDB ~~> findOne[Blog](createExceptionalMongoObject) { _ => Some("Should not have return results") }
-                { throw new RuntimeException("Handler should not be called on error") } ~~>()
+      onTestDB ~~> ( find one (Blog) where (createExceptionalMongoObject) withResults ( _ => Some("Should not have return results"))
+              onError (throw new RuntimeException("Handler should not be called on error")) ) ~~>()
     ) verifyError has (mongoCreationException)
   }
 
@@ -48,8 +49,8 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
       onTestDB ~~>
               drop[Blog] ~~>
               save(Blog(titleField("blah1"))) ~~>
-              findOne[Blog](titleField ?* (".*"/)) { _ => throw new RuntimeException("Exception thrown handling match") }
-                        { throw new RuntimeException("Handler should not be called on error") } ~~>()
+              ( find one (Blog) where (titleField ?* (".*"/)) withResults (_ => throw new RuntimeException("Exception thrown handling match"))
+                      onError(throw new RuntimeException("Handler should not be called on error")) ) ~~>()
     ) verifyError has ("Exception thrown handling match")
   }
 
@@ -57,8 +58,8 @@ final class MongoCollectionFindOneSpec extends CommonSpec {
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              findOne[Blog](titleField ?* (".*"/)) { b => Some("Should not have return results -> " + b) }
-                        { throw new RuntimeException("Handler function threw an Exception") } ~~>()
+              ( find one (Blog) where (titleField ?* (".*"/)) withResults (b => Some("Should not have return results -> " + b))
+                      onError(throw new RuntimeException("Handler function threw an Exception")) ) ~~>()
     ) verifyError has ("Handler function threw an Exception")
   }
 }

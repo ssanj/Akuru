@@ -111,3 +111,7 @@ find (titleField("Blog updates")) thenUpdate { set(titleField("Blog Updatees")) 
 
 find (titleField("Blog updates")) thenUpdate (set(titleField("Phantom updates"))) withResults {wr => }
 (find (nameField("Clean Room")) dontSort createTask withResults( t => ) onError ()) execute verifySuccess
+
+findOne[Blog] where (titleField == "Blog Updates") withResults (b => ) onError ()
+find [Blog]s where (title == "") withResults (b =>) onError ()
+find [Blog]s where (titleField("Blog updates")) updateWith (set(titleField("Phantom updates"))) withResults {wr => } onError ()

@@ -14,7 +14,7 @@ trait TestDomainObjects {
   case class Blog(title:FieldValue[String],
                   labels:FieldValue[Seq[String]] = Blog.labelsField(Seq[String]()), override val id:FieldValue[MID] = defaultId) extends DomainObject
 
-  object Blog {
+  object Blog extends DomainTemplate[Blog] {
     val titleField = Field[String]("title")
     val labelsField = Field[Seq[String]]("labels")
 
@@ -36,7 +36,7 @@ trait TestDomainObjects {
 
   case class Label(value:FieldValue[String], override val id:FieldValue[MID] = defaultId) extends DomainObject
 
-  object Label {
+  object Label extends DomainTemplate[Label] {
 
     val valueField = Field[String]("value")
 
@@ -58,7 +58,7 @@ trait TestDomainObjects {
 
   case class Person(name:FieldValue[String], override val id:FieldValue[MID]= defaultId) extends DomainObject
 
-  object Person {
+  object Person extends DomainTemplate[Person] {
 
     val nameField = Field[String]("name")
 
@@ -81,7 +81,7 @@ trait TestDomainObjects {
                   price:FieldValue[Double],
                   override val id:FieldValue[MID] = defaultId) extends DomainObject
 
-  object Book {
+  object Book extends DomainTemplate[Book] {
     val nameField = Field[String]("name")
     val authorsField = Field[Seq[String]]("authors")
     val publisherField = Field[String]("pub")
@@ -112,7 +112,7 @@ trait TestDomainObjects {
                   val owner:FieldValue[String],
                   override val id:FieldValue[MID] = defaultId) extends DomainObject
 
-  object Task {
+  object Task extends DomainTemplate[Task] {
     val nameField = Field[String]("name")
     val priorityField = Field[Int]("priority")
     val ownerField = Field[String]("owner")

@@ -31,6 +31,7 @@ trait AkuruGlobalTypes {
 
   type DomainObject = akuru.MongoTypes.DomainObject
   val DomainObject = akuru.MongoTypes.DomainObject
+  type DomainTemplate[T <: DomainObject] = akuru.MongoTypes.DomainTemplate[T]
 
   type MID = akuru.MongoTypes.MID
 
@@ -39,4 +40,6 @@ trait AkuruGlobalTypes {
   type DomainToMongo[T <: DomainObject] = akuru.MongoTypes.DomainToMongo[T]
 
   type CollectionName[T <: DomainObject] = akuru.MongoTypes.CollectionName[T]
+
+  type UserFunction = akuru.MongoTypes.UserFunction
  }

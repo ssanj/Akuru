@@ -28,6 +28,8 @@ trait DomainSupport { this:Tools =>
     val id:FieldValue[MID]
   }
 
+  abstract class DomainTemplate[T <: DomainObject]
+
   object DomainObject {
     val idField = Field[MID]("_id")
 

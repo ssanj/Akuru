@@ -6,9 +6,8 @@
 package runners
 
 import _root_.akuru._
-import MongoTypes._
 
-object AkuruRunner extends TestDomainObjects {
+object AkuruRunner extends TestDomainObjects with FindDSL {
 
 
   def main(args: Array[String]) {
@@ -29,14 +28,14 @@ object AkuruRunner extends TestDomainObjects {
                     drop[Label] ~~>
                     blogs.map(b => save(b)) ~~>
                     (blogs.flatMap(b => b.labels.value.map(l => save(Label(valueField(l))))).toList) ~~>
-                    findOne{ titleField("Hello World Lift") } { printBlog } { noOp } ~~>
+                    ( find one Blog where (titleField("Hello World Lift")) withResults (printBlog) onError(noOp) ) ~~>
                     find { (labelsField ?* ("ubuntu|work"/i) and titleField ?* ("less"/i)) } { all } { printBlogs } ~~>
                     update[Blog]{ titleField("lessons learned") } { set(titleField("Lessons Learned")) } ~~>
-                    findOne { labelsField ?* ("work"/i) } { printBlog } { noOp } ~~>
+                    ( find one Blog where (labelsField ?* ("work"/i)) withResults (printBlog) onError (noOp) ) ~~>
                     update[Blog]{ titleField("Lessons Learned") } { b2 } ~~>
-                    findOne{ labelsField ?* ("work"/i) } { printBlog } { noOp } ~~>
+                    ( find one Blog where (labelsField ?* ("work"/i)) withResults (printBlog) onError (noOp) ) ~~>
                     upsert[Blog]{ titleField("Semigroup") } { b3 } ~~>
-                    findOne{ labelsField ?* ("functional"/) } { printBlog } { noOp }
+                    ( find one (Blog) where (labelsField ?* ("functional"/)) withResults (printBlog) onError(noOp) )
                  } ~~>() getOrElse("success >>")
     println(result)
   }
