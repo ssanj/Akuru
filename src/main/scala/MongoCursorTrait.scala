@@ -22,6 +22,8 @@ trait MongoCursorTrait {
     def limit(hits: => Int): MongoCursor = dbc.limit(hits)
 
     def orderBy(sorting: => SortObjectJoiner): MongoCursor = dbc.sort(sorting.done)
+
+    def all: MongoCursor = this
   }
 
   object MongoCursor {

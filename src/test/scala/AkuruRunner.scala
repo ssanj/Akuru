@@ -7,7 +7,7 @@ package runners
 
 import _root_.akuru._
 
-object AkuruRunner extends TestDomainObjects with FindDSL {
+object AkuruRunner extends TestDomainObjects with FindOneDSL {
 
 
   def main(args: Array[String]) {
