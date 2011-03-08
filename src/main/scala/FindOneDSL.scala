@@ -31,7 +31,7 @@ trait FindOneDSL extends MongoFunctions with Tools {
   final class ConstrainedBy[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject) {
     def constraintOf(bc: Constraint[T]): MultipleResults[T] = new MultipleResults[T](bc, query)
 
-    def withResults(success: Seq[T] => Option[String]): ErrorsFindMany[T] = new MultipleResults[T](All(), query).withResults(success)
+    def withResults(success: Seq[T] => Option[String]): UserFunction = new MultipleResults[T](All(), query).withResults(success)
   }
 
   sealed abstract class Constraint[T <: DomainObject : CollectionName : MongoToDomain] {
@@ -51,7 +51,7 @@ trait FindOneDSL extends MongoFunctions with Tools {
   }
 
   final class MultipleResults[T <: DomainObject : CollectionName : MongoToDomain](constraint: Constraint[T], query: => MongoObject) {
-    def withResults(success: Seq[T] => Option[String]): ErrorsFindMany[T] = new ErrorsFindMany[T](query, constraint, success)
+    def withResults(success: Seq[T] => Option[String]): UserFunction = find[T](query)(constraint.apply())(success)
   }
 
   final class Results[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject) {
@@ -60,10 +60,5 @@ trait FindOneDSL extends MongoFunctions with Tools {
 
   final class ErrorsFindOne[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject, success: T => Option[String]) {
     def onError(error: => Unit): UserFunction = findOne[T](query)(success)(error)
-  }
-
-  final class ErrorsFindMany[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject, constraint: Constraint[T],
-    success: Seq[T] => Option[String]) {
-    def onError(error: => Unit): UserFunction = find[T](query)(constraint.apply())(success)
   }
 }
