@@ -5,7 +5,7 @@
 
 package akuru
 
-final class MongoCollectionFindSpec extends CommonSpec with FindOneDSL {
+final class MongoCollectionFindSpec extends CommonSpec with FindDSL {
 
   import Blog._
 
@@ -28,7 +28,7 @@ final class MongoCollectionFindSpec extends CommonSpec with FindOneDSL {
   it should "return zero results if there are no matches" in {
     (onTestDB ~~>
               drop[Blog] ~~>
-              ( find many (Blog) where (titleField ?* ("*"/)) withResults {blogs =>
+              ( find many Blog where (titleField ?* ("*"/)) withResults {blogs =>
                 blogs.size should equal (0)
                 success
               } )
@@ -68,11 +68,11 @@ final class MongoCollectionFindSpec extends CommonSpec with FindOneDSL {
   it should "sort results" in {
     (onTestDB ~~>
             drop[Blog] ~~>
-            save(Blog(titleField("Pears"), labelsField(Seq("fruit")))) ~~>
-            save(Blog(titleField("Orange"), labelsField(Seq("fruit")))) ~~>
-            save(Blog(titleField("Apple"), labelsField(Seq("fruit")))) ~~>
-            save(Blog(titleField("WaterMellon"), labelsField(Seq("fruit")))) ~~>
-            ( find many Blog where (titleField ?* (".*"/)) constrainedBy (Limit(2) and Order(titleField, ASC)) withResults {b =>
+            save(Blog(titleField("Pears"), labelsField(Seq("fruit", "pears")))) ~~>
+            save(Blog(titleField("Orange"), labelsField(Seq("citrus", "fruit", "navel", "jaffa")))) ~~>
+            save(Blog(titleField("Apple"), labelsField(Seq("apples", "fruit", "green", "red")))) ~~>
+            save(Blog(titleField("WaterMellon"), labelsField(Seq("mellon", "fruit", "striped")))) ~~>
+            ( find many Blog where (labelsField ?* ("fruit"/)) constrainedBy (Limit(2) and Order(titleField, ASC)) withResults {b =>
               b.size should equal (2)
               b(0).title.value should equal ("Apple")
               b(1).title.value should equal ("Orange")

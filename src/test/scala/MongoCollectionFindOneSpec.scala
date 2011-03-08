@@ -5,7 +5,7 @@
 
 package akuru
 
-final class MongoCollectionFindOneSpec extends CommonSpec with FindOneDSL {
+final class MongoCollectionFindOneSpec extends CommonSpec with FindDSL {
 
   import Blog._
 
