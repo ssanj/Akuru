@@ -29,24 +29,30 @@ trait FindOneDSL extends MongoFunctions with Tools {
   }
 
   final class ConstrainedBy[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject) {
-    def constraintOf(bc: Constraint[T]): MultipleResults[T] = new MultipleResults[T](bc, query)
+    def constrainedBy(bc: Constraint[T]): MultipleResults[T] = new MultipleResults[T](bc, query)
 
     def withResults(success: Seq[T] => Option[String]): UserFunction = new MultipleResults[T](All(), query).withResults(success)
   }
 
-  sealed abstract class Constraint[T <: DomainObject : CollectionName : MongoToDomain] {
+  sealed abstract class Constraint[T <: DomainObject] {
     def apply(): MongoCursor => MongoCursor
+    def and(constraint: Constraint[T]): Constraint[T] = new StackedConstraint[T](this, constraint)
   }
 
-  case class Limit[T <: DomainObject : CollectionName : MongoToDomain](n:Int) extends Constraint[T] {
+  final class StackedConstraint[T <: DomainObject](constraint1: Constraint[T], constraint2: Constraint[T])
+          extends Constraint[T] {
+    def apply(): MongoCursor => MongoCursor = mc => constraint2.apply()(constraint1.apply()(mc))
+  }
+
+  case class Limit[T <: DomainObject](n:Int) extends Constraint[T] {
     def apply(): MongoCursor => MongoCursor = mc => mc.limit(n)
   }
 
-  case class Order[T <: DomainObject : CollectionName : MongoToDomain](fv:Field[T], order:SortOrder) extends Constraint[T] {
+  case class Order[T <: DomainObject, U](fv:Field[U], order:SortOrder) extends Constraint[T] {
     def apply(): MongoCursor => MongoCursor = mc => mc.orderBy(sort(fv, order))
   }
 
-  case class All[T <: DomainObject : CollectionName : MongoToDomain]() extends Constraint[T] {
+  case class All[T <: DomainObject]() extends Constraint[T] {
     def apply(): MongoCursor => MongoCursor = mc => mc.all
   }
 

@@ -64,5 +64,21 @@ final class MongoCollectionFindSpec extends CommonSpec with FindOneDSL {
               ( find many Blog where (titleField ?* (".*query.*"/i)) withResults { blogs => blogs.size should equal (1); success } ) ~~>()
     ) verifySuccess
   }
+
+  it should "sort results" in {
+    (onTestDB ~~>
+            drop[Blog] ~~>
+            save(Blog(titleField("Pears"), labelsField(Seq("fruit")))) ~~>
+            save(Blog(titleField("Orange"), labelsField(Seq("fruit")))) ~~>
+            save(Blog(titleField("Apple"), labelsField(Seq("fruit")))) ~~>
+            save(Blog(titleField("WaterMellon"), labelsField(Seq("fruit")))) ~~>
+            ( find many Blog where (titleField ?* (".*"/)) constrainedBy (Limit(2) and Order(titleField, ASC)) withResults {b =>
+              b.size should equal (2)
+              b(0).title.value should equal ("Apple")
+              b(1).title.value should equal ("Orange")
+              success
+            } )
+    ) ~~>()  verifySuccess
+  }
 }
 
