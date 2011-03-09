@@ -30,9 +30,9 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     (blogs.flatMap(b => b.labels.value.map(l => save(Label(valueField(l))))).toList) ~~>
                     ( find one Blog where (titleField("Hello World Lift")) withResults (printBlog) onError(noOp) ) ~~>
                     ( find many Blog where (labelsField ?* ("ubuntu|work"/i) and titleField ?* ("less"/i)) withResults (printBlogs) ) ~~>
-                    update[Blog]{ titleField("lessons learned") } { set(titleField("Lessons Learned")) } ~~>
+                    ( update one Blog where (titleField("lessons learned")) withValues (set(titleField("Lessons Learned"))) returnErrors ) ~~>
                     ( find one Blog where (labelsField ?* ("work"/i)) withResults (printBlog) onError (noOp) ) ~~>
-                    update[Blog]{ titleField("Lessons Learned") } { b2 } ~~>
+                    ( update one Blog where (titleField("Lessons Learned")) withValues (b2) returnErrors ) ~~>
                     ( find one Blog where (labelsField ?* ("work"/i)) withResults (printBlog) onError (noOp) ) ~~>
                     upsert[Blog]{ titleField("Semigroup") } { b3 } ~~>
                     ( find one (Blog) where (labelsField ?* ("functional"/)) withResults (printBlog) onError(noOp) )
