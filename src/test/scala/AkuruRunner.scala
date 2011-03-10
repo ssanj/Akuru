@@ -28,14 +28,14 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     drop[Label] ~~>
                     blogs.map(b => save(b)) ~~>
                     (blogs.flatMap(b => b.labels.value.map(l => save(Label(valueField === l)))).toList) ~~>
-                    ( find one Blog where (titleField === "Hello World Lift") withResults (printBlog) onError(noOp) ) ~~>
-                    ( find many Blog where (labelsField ?* ("ubuntu|work"/i) and titleField ?* ("less"/i)) withResults (printBlogs) ) ~~>
-                    ( update one Blog where (titleField === "lessons learned") withValues (set(titleField === "Lessons Learned")) returnErrors ) ~~>
-                    ( find one Blog where (labelsField ?* ("work"/i)) withResults (printBlog) onError (noOp) ) ~~>
-                    ( update one Blog where (titleField === "Lessons Learned") withValues (b2) returnErrors ) ~~>
-                    ( find one Blog where (labelsField ?* ("work"/i)) withResults (printBlog) onError (noOp) ) ~~>
+                    ( find one Blog where titleField === "Hello World Lift" withResults printBlog onError noOp ) ~~>
+                    ( find many Blog where (labelsField ?* ("ubuntu|work"/i) and titleField ?* ("less"/i)) withResults printBlogs ) ~~>
+                    ( update one Blog where titleField === "lessons learned" withValues set(titleField === "Lessons Learned") returnErrors ) ~~>
+                    ( find one Blog where labelsField ?* ("work"/i) withResults printBlog onError noOp ) ~~>
+                    ( update one Blog where titleField === "Lessons Learned" withValues b2 returnErrors ) ~~>
+                    ( find one Blog where labelsField ?* ("work"/i) withResults printBlog onError noOp ) ~~>
                     upsert[Blog]{ titleField === "Semigroup" } { b3 } ~~>
-                    ( find one (Blog) where (labelsField ?* ("functional"/)) withResults (printBlog) onError(noOp) )
+                    ( find one Blog where labelsField ?* ("functional"/) withResults printBlog onError noOp )
                  } ~~>() getOrElse("success >>")
     println(result)
   }

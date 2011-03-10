@@ -57,7 +57,7 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
               b.authors.value should equal (Seq("Martin Odersky", "Lex Spoon", "Bill Venners"))
               b.publisher.value should  equal ("artima")
               b.printVersion.value should equal (3)
-              b.price.value  should equal (99.99D)
+              b.price.value should equal (99.99D)
               success
             } onError (ex("Could not find Book")) )
     ) ~~>() verifySuccess
