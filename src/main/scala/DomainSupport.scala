@@ -22,6 +22,7 @@ trait DomainSupport { this:Tools =>
 
   case class Field[T](name:String) {
     def apply(value:T): FieldValue[T] = FieldValue[T](this, value)
+    def === (value:T) : FieldValue[T] = apply(value)
   }
 
   trait DomainObject {

@@ -15,10 +15,10 @@ final class MongoCollectionUpdateMultipleSpec extends AkuruDSL with CommonSpec w
 
   it should "update multiple matched results" in {
     ( initBlog ~~>
-      save(Blog(titleField("Functor"), labelsField(Seq("fp", "patterns")))) ~~>
-      save(Blog(titleField("Applicative"), labelsField(Seq("fp", "patterns")))) ~~>
-      save(Blog(titleField("Semigroup"), labelsField(Seq("fp", "patterns")))) ~~>
-      save(Blog(titleField("Lessons Learned"), labelsField(Seq("work", "ideas")))) ~~>
+      save(Blog(titleField === "Functor", labelsField === Seq("fp", "patterns"))) ~~>
+      save(Blog(titleField === "Applicative", labelsField === Seq("fp", "patterns"))) ~~>
+      save(Blog(titleField === "Semigroup", labelsField === Seq("fp", "patterns"))) ~~>
+      save(Blog(titleField === "Lessons Learned", labelsField === Seq("work", "ideas"))) ~~>
       ( find many Blog where (labelsField ?* ("fp"/)) withResults {b => b.size should equal (3); success} ) ~~>
       ( update many Blog where (labelsField ?* ("fp"/)) withValues (set(labelsField(Seq("functional programming", "patterns")).splat()))
               returnErrors ) ~~>
