@@ -5,29 +5,18 @@
 
 package akuru
 
-import akuru.MongoTypes._
 import akuru.MongoTypes.MongoObject._
 
-final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec  {
+final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec with MongoCollectionCommonUpdateSpec {
 
   import Blog._
   import Book._
 
-  "A MongoCollection with Updates" should "not update DomainObjects that do not match" in {
-    ( initBlog ~~>
-            ( update one Blog where (titleField("Blog updates")) withValues (set(titleField("Phantom updates")))
-                    expectResults {wr =>
-                      runSafelyWithOptionReturnError {
-                        wr.updatedExisting should equal (false)
-                        wr.getN should equal (Some(0))
-                        wr.ok should equal (true)
-                    }}
-            )
-    ) ~~>() verifySuccess
+  override def cardinality: UpdateQuery[Blog] = ( update one Blog )
+  override def specName:String = "A MongoCollection with Single Updates"
+  override def expectedResults = 1
 
-  }
-
-  it should "update an matching DomainObjects" in {
+  it should "update a single matching DomainObjects" in {
     ( initBlog ~~>
             save(Blog(titleField("Blog updates"), labelsField(Seq("blog, update")))) ~~>
             ( find one Blog where (titleField("Blog updates")) withResults  (b => ignoreSuccess)
