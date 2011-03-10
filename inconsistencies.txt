@@ -1,0 +1,2 @@
+1. find one has an onError clause while find many does not
+2. update many does not exist

@@ -6,21 +6,21 @@
 
 package akuru
 
-final class MongoCollectionSaveSpec extends CommonSpec {
+final class MongoCollectionSaveSpec extends AkuruDSL with CommonSpec {
 
   import Blog._
 
   "A MongoCollection" should "save a new MongoObject" in {
-     ({ onTestDB ~~>
+     ( onTestDB ~~>
           drop[Blog] ~~>
-          findOne[Blog](titleField("blah")) { _ => fail("Shouldn't have found Blog") } { noOp } ~~>
+          ( find one Blog where (titleField("blah")) withResults (_ => fail("Shouldn't have found Blog")) onError (noOp) ) ~~>
           save(Blog(titleField("blah"), labelsField(Seq("test", "random")))) ~~>
-          findOne[Blog](titleField("blah")) { t =>
+          ( find one Blog where (titleField("blah")) withResults { t =>
               t.title.value should equal ("blah")
               t.labels.value should equal (Seq("test", "random"))
               success
-          } { fail("Didn't find Blog") }
-      } ~~>()) verifySuccess
+          } onError (fail("Didn't find Blog"))
+      ) ~~>()) verifySuccess
   }
 
   it should ("handle errors on object creation") in {

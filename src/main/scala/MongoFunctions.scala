@@ -49,11 +49,11 @@ trait MongoFunctions { this:Tools  =>
   def find[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(c: MongoCursor => MongoCursor)(g: Seq[T] => Option[String]):
     UserFunction = col => col(collectionName[T]).find[T](f)(c).fold(l => Some(l), r => g(r))
 
-  def update[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject): UserFunction =
-    col => col(collectionName[T]).update3(query = q, update = u.value, handler = defaultHandler)
-
   def safeUpdate[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject)(g: MongoWriteResult => Option[String]): UserFunction =
     col => col(collectionName[T]).update3(query = q, update = u.value, handler = g)
+
+  def safeUpdateMany[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject)(g: MongoWriteResult => Option[String]): UserFunction =
+    col => col(collectionName[T]).update3(query = q, update = u.value, handler = g, multi = true)
 
   def upsert[T <: DomainObject : CollectionName : DomainToMongo](q: => MongoObject)(u: => T): UserFunction =
     col => col(collectionName[T]).update3(q, u, true, handler = defaultHandler)

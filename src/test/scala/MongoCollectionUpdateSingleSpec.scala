@@ -8,7 +8,7 @@ package akuru
 import akuru.MongoTypes._
 import akuru.MongoTypes.MongoObject._
 
-final class MongoCollectionUpdateSpec extends AkuruDSL with CommonSpec  {
+final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec  {
 
   import Blog._
   import Book._

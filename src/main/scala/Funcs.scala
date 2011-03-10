@@ -42,6 +42,7 @@ trait Funcs {
   }
 
   case class SequencedFVTOMongo[T](fv:FieldValue[Seq[T]]) {
+    println("called!" + fv)
     def splat(): MongoObject = mongo.putPrimitiveObjects[T](fv)
   }
 

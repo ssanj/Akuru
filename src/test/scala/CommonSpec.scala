@@ -12,4 +12,13 @@ trait CommonSpec extends FlatSpec with ShouldMatchers
         with TestDomainObjects
         with MongoFunctions
         with MongoSpecSupport
-        with Tools
+        with Tools {
+
+  def initBlog: FutureConnection =  onTestDB ~~> drop[Blog]
+
+  def initBook: FutureConnection =  onTestDB ~~> drop[Book]
+
+  def initTask: FutureConnection =  onTestDB ~~> drop[Task]
+
+  def initPerson: FutureConnection =  onTestDB ~~> drop[Person]
+}

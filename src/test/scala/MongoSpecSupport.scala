@@ -33,4 +33,6 @@ trait MongoSpecSupport { this:Assertions with ShouldMatchers with MongoFunctions
   implicit def opToVerifyResult(op:Option[String]): VerifyResult = VerifyResult(op)
 
   def onTestDB = onDatabase("akuru_test")
+
+  def ex(message:String): Nothing = { throw new RuntimeException(message) }
 }

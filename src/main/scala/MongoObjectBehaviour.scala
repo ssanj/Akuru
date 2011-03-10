@@ -101,7 +101,8 @@ trait MongoObjectBehaviour { this:Tools =>
     implicitly[MongoToDomain[T]].apply(element.asInstanceOf[DBObject])
 
   private[akuru] def putAnyArray(f: Seq[AnyRef] => AnyRef)(key: => String, values: => Seq[AnyRef]): MongoObject = {
-    MongoObject(dbo + (key -> f(values)))
+    val mo = MongoObject(dbo + (key -> f(values)))
+    mo
   }
 
   private[akuru] def convertToJavaList(values: Seq[AnyRef]): AnyRef = {
