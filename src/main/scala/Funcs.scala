@@ -19,6 +19,8 @@ trait Funcs {
 
   def $funcPrimitive(action: String, col: String, value: AnyRef): MongoObject = mongo.putMongo(action, mongo.putPrimitiveObject(col, value))
 
+  def arrayFieldToMongo1[T](fv: FieldValue[Seq[T]]): MongoObject = mongo.putPrimitiveObjects[T](fv)
+
   def fieldToMongo1[T](fv: FieldValue[T]): MongoObject = mongo.putPrimitiveObject[T](fv)
 
   def fieldToMongo2[R, T](fv1: FieldValue[R], fv2: FieldValue[T]): MongoObject = mongo.putPrimitiveObject(fv1).merge(mongo.putPrimitiveObject(fv2))
@@ -54,6 +56,8 @@ trait Funcs {
 
     def done: MongoObject = mo
   }
+
+  def anyArrayFunction1[T]: String => FieldValue[Seq[T]] => MongoObject = fname => fv => $funcMongo(fname, arrayFieldToMongo1[T](fv))
 
   def anyFunction1[T]: String => FieldValue[T] => MongoObject = fname => fv => $funcMongo(fname, fieldToMongo1[T](fv))
 

@@ -105,6 +105,18 @@ trait MongoObjectBehaviour { this:Tools =>
     mo
   }
 
+  def putAnything[T : ClassManifest](fv:FieldValue[T]) : MongoObject = {
+    getElement[T](fv.value.asInstanceOf[AnyRef]) match {
+      case Some(element) => element match {
+        case seq:Seq[_] => merge(putPrimitiveObjects[T](new FieldValue[Seq[T]](new Field[Seq[T]](fv.name), fv.value.asInstanceOf[Seq[T]])))
+        case mo:MongoObject => merge(putMongo(fv.name, mo))
+        case id:MongoObjectId =>   merge(putId(id))
+        case _:Any => MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))
+      }
+      case None => copyMongoObject
+    }
+  }
+
   private[akuru] def convertToJavaList(values: Seq[AnyRef]): AnyRef = {
     import scala.collection.JavaConversions.asJavaList
     val list:java.util.List[AnyRef] = values.toList

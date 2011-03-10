@@ -118,7 +118,8 @@ trait TestDomainObjects {
     val ownerField = Field[String]("owner")
 
     implicit def taskToMongoObject(task:Task): MongoObject =
-      putDomainId(task).putPrimitiveObject(task.name).putPrimitiveObject(task.priority).putPrimitiveObject(task.owner)
+      //putDomainId(task).putPrimitiveObject(task.name).putPrimitiveObject(task.priority).putPrimitiveObject(task.owner)
+    putDomainId(task).putAnything(task.name).putAnything(task.priority).putAnything(task.owner)
 
     implicit def mongoToTask(mo:MongoObject): Option[Task] =
      for {

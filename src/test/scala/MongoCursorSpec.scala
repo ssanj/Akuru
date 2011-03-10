@@ -15,16 +15,16 @@ final class MongoCursorSpec extends CommonSpec {
     ) ~~>() verifySuccess
   }
 
-  it should "sort by the fields supplied" in {
-    (setup ~~>
-      find(priorityField > 1) (_.orderBy(sort(ownerField, ASC) and sort(priorityField, DSC)).limit(2)) {tasks:Seq[Task] =>
-        tasks.size should equal (2)
-        tasks(0).name.value should equal ("Polish Ring")
-        tasks(1).name.value should equal ("Eat second-breakfast")
-        success
-      }
-    ) ~~>() verifySuccess
-  }
+//  it should "sort by the fields supplied" in {
+//    (setup ~~>
+//      find(priorityField > 1) (_.orderBy(sort(ownerField, ASC) and sort(priorityField, DSC)).limit(2)) {tasks:Seq[Task] =>
+//        tasks.size should equal (2)
+//        tasks(0).name.value should equal ("Polish Ring")
+//        tasks(1).name.value should equal ("Eat second-breakfast")
+//        success
+//      }
+//    ) ~~>() verifySuccess
+//  }
 
   private def setup: FutureConnection = {
     onTestDB ~~> drop[Task] ~~>
