@@ -22,7 +22,7 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
             ( find one Blog where (titleField === "Blog updates") withResults  (b => ignoreSuccess)
                     onError (ex("Could not find Blog")) ) ~~>
             ( update one Blog where (titleField === "Blog updates") withValues
-                    (set(titleField === "Blog Updatees") and set(labelsField === Seq("bl%%g", "sm%%g"))) returnErrors ) ~~>
+                    (set(titleField === "Blog Updatees") & set(labelsField === Seq("bl%%g", "sm%%g"))) returnErrors ) ~~>
             ( find one Blog where (titleField === "Blog updates") withResults (b => ex("found old Blog")) onError (noOp) )  ~~>
             ( find one Blog where (titleField === "Blog Updatees") withResults { b:Blog =>
               b.title.value should equal ("Blog Updatees")
@@ -49,7 +49,7 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
                 success
             } onError (ex("Could not find Book")) ) ~~>
             ( update one Book where (publisherField === "artima" and printVersionField === 2 and priceField === 54.95D)
-                      withValues (set(nameField === "PISC" and printVersionField === 3 and priceField === 99.99D)) returnErrors ) ~~>
+                      withValues (set(nameField === "PISC" & printVersionField === 3 & priceField === 99.99D)) returnErrors ) ~~>
             ( find one Blog where (nameField === "Programming in Scala") withResults (b => ex("Found old Book"))
                     onError (noOp) ) ~~>
             ( find one Book where (nameField === "PISC" and printVersionField === 3) withResults {b =>

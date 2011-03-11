@@ -26,10 +26,10 @@ trait OperatorTypes {
 
     def >=(t1:T): MongoObject = gte(t1)
 
-    def between(t1:T, t2:T): MongoObject = mongo.putMongo(f.name, mongo.putPrimitiveObject("$gte", t1).merge(mongo.putPrimitiveObject("$lte", t2)))
+    def between(t1:T, t2:T): MongoObject = mongo.putMongo(f.name, mongo.merge("$gte" -> t1).merge(mongo.merge("$lte" -> t2)))
 
     def |<>|(t1:T, t2:T): MongoObject = between(t1, t2)
 
-    private def operate[T <% Number](f:Field[T], value: => T, func:String): MongoObject =  $funcPrimitive(f.name, func, value)
+    private def operate[T <% Number](f:Field[T], value: => T, func: => String): MongoObject = $funcPrimitive(f.name, func, value)
   }
 }

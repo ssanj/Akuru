@@ -96,7 +96,7 @@ trait MongoObjectBehaviour { this:Tools =>
 
   def merge[T](fv:FieldValue[T]): MongoObject = MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))
 
-  def merge(t:(String, AnyRef)): MongoObject = MongoObject(dbo + (t._1 -> t._2))
+  def merge(t:(String, Any)): MongoObject = MongoObject(dbo + (t._1 -> t._2.asInstanceOf[AnyRef]))
 
   private def getTypeSafeObject[T](key:String, pf:PartialFunction[Any, Option[T]]): Option[T] = {
 

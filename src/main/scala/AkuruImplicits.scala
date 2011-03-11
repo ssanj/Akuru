@@ -5,6 +5,7 @@ import MongoTypes.RegExWithOptions
 import MongoTypes.FieldRegEx
 import MongoTypes.MongoSortObject
 import MongoTypes.OperatorObject
+import MongoTypes.MongoUpdateObject
 import MongoObject._
 
 trait AkuruImplicits {
@@ -12,6 +13,8 @@ trait AkuruImplicits {
   import com.mongodb.DBObject
 
   implicit def fieldValueToMongo[T : ClassManifest](fv: FieldValue[T]): MongoObject = fieldToMongo1[T](fv)
+
+  implicit def fieldValueToUpdateObject[T : ClassManifest](fv: FieldValue[T]): MongoUpdateObject = MongoUpdateObject(fieldToMongo1[T](fv))
 
   implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = {
     import scala.collection.JavaConversions._

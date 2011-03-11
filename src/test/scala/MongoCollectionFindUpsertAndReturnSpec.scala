@@ -29,7 +29,7 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec {
             save(createHPTask1) ~~>
             save(createHPTask2) ~~>
             findAndUpsertAndReturn[Task](nameField("Clean Room")) { sort(priorityField, DSC) and sort(ownerField, ASC) } {
-              set(nameField("Clean Den")) and set(priorityField(6)) } {t =>
+              set(nameField("Clean Den") & priorityField(6)) } {t =>
               t.name.value should equal ("Clean Den")
               t.priority.value should equal (6)
               t.owner.value should equal ("Litterbug")
