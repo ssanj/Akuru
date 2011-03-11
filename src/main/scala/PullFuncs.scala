@@ -29,5 +29,5 @@ trait PullFuncs { this:Funcs =>
 
   def pull(col:String, value:AnyRef): MongoUpdateObject =  toMongoUpdateObject($funcPrimitive("$pull", col, value))
 
-  def pull[T]: FieldValue[T] => MongoUpdateObject = fv => toMongoUpdateObject(anyFunction1[T](functionName)(fv))
+  def pull[T : ClassManifest](fv:FieldValue[T]): MongoUpdateObject = toMongoUpdateObject(anyFunction1[T](functionName, fv))
 }

@@ -15,9 +15,6 @@ trait PushFuncs  { this:Funcs =>
 
   import PushFuncs._
 
-  //TODO: we need to update this for arrays/Lists only
-//  def push(col:String, value:MongoObject): MongoUpdateObject =  toMongoUpdateObject($funcMongo(functionName, col, value))
-
-  def push[T]: (Field[Seq[T]], => T) => MongoUpdateObject = (f, value) =>
-    toMongoUpdateObject(anyFunction1[T](functionName)(new FieldValue[T](new Field[T](f.name), value)))
+  def push[T : ClassManifest](f:Field[Seq[T]], value: => T): MongoUpdateObject =
+    toMongoUpdateObject(anyFunction1[T](functionName, new FieldValue[T](new Field[T](f.name), value)))
 }

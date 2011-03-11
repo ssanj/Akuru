@@ -26,7 +26,7 @@ trait TestDomainObjects {
     }
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = {
-      putDomainId(domain).putPrimitiveObject(domain.title).putPrimitiveObjects(domain.labels)
+      putDomainId(domain).putAnything(domain.title).putAnything(domain.labels)
     }
 
     implicit object BlogCollection extends CollectionName[Blog] {
@@ -45,7 +45,7 @@ trait TestDomainObjects {
         value <- mo.getPrimitiveObject(valueField)
       } yield Label(valueField(value), idField(mo.getId))
 
-    implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).putPrimitiveObject(domain.value)
+    implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).putAnything(domain.value)
 
     implicit object LabelCollection extends CollectionName[Label] {
       override val name = "label"
@@ -89,7 +89,7 @@ trait TestDomainObjects {
     val priceField = Field[Double]("price")
 
     implicit def bookToMongo(b:Book): MongoObject = putDomainId(b).
-            putPrimitiveObject(b.name).putPrimitiveObjects(b.authors).putPrimitiveObject(b.publisher).putPrimitiveObject(b.printVersion).putPrimitiveObject(b.price)
+            putAnything(b.name).putAnything(b.authors).putAnything(b.publisher).putAnything(b.printVersion).putAnything(b.price)
 
     implicit def mongoToBook(mo:MongoObject): Option[Book] =
     for {
@@ -100,12 +100,11 @@ trait TestDomainObjects {
       price <- mo.getPrimitiveObject(priceField)
     } yield
       Book(nameField(name), authorsField(authors), publisherField(publisher), printVersionField(printVersion), priceField(price), idField(mo.getId))
-  }
 
-  implicit object BookCollectionName extends CollectionName[Book] {
-    override val name = "book"
+    implicit object BookCollectionName extends CollectionName[Book] {
+      override val name = "book"
+    }
   }
-
 
   case class Task(val name:FieldValue[String],
                   val priority:FieldValue[Int],

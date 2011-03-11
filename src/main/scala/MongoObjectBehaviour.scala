@@ -77,11 +77,15 @@ trait MongoObjectBehaviour { this:Tools =>
 
   def putPrimitiveObject[T](fv:FieldValue[T]): MongoObject = { putPrimitiveObject(fv.name, fv.value) }
 
-  //TODO: Test
-  def putPrimitiveObjects[T](key:String, values: => Seq[T]): MongoObject = putAnyArray(convertToJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
+//  //TODO: Test
+//  def putPrimitiveObjects[T](key:String, values: => Seq[T]): MongoObject = putAnyArray(convertToJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
+//
+//  //TODO: Test
+//  def putPrimitiveObjects[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveObjects[T](fv.name, fv.value)
 
-  //TODO: Test
-  def putPrimitiveObjects[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveObjects[T](fv.name, fv.value)
+  def putPrimitiveObjects2[T](fv:FieldValue[Seq[T]]): MongoObject = {
+     merge(fv.name -> convertToJavaList(fv.value map (_.asInstanceOf[AnyRef])))
+  }
 
   def putMongo(key:String, mongo:MongoObject): MongoObject = putAnyArray(asJavaObject)(key, Seq(mongo.toDBObject))
 
@@ -89,6 +93,10 @@ trait MongoObjectBehaviour { this:Tools =>
   def putId(id:MongoObjectId): MongoObject = MongoObject(dbo + ("_id" -> id.toObjectId))
 
   def merge(mo:MongoObject): MongoObject = MongoObject(dbo ++ (mo.dbo))
+
+  def merge[T](fv:FieldValue[T]): MongoObject = MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))
+
+  def merge(t:(String, AnyRef)): MongoObject = MongoObject(dbo + (t._1 -> t._2))
 
   private def getTypeSafeObject[T](key:String, pf:PartialFunction[Any, Option[T]]): Option[T] = {
 
@@ -108,7 +116,7 @@ trait MongoObjectBehaviour { this:Tools =>
   def putAnything[T : ClassManifest](fv:FieldValue[T]) : MongoObject = {
     getElement[T](fv.value.asInstanceOf[AnyRef]) match {
       case Some(element) => element match {
-        case seq:Seq[_] => merge(putPrimitiveObjects[T](new FieldValue[Seq[T]](new Field[Seq[T]](fv.name), fv.value.asInstanceOf[Seq[T]])))
+        case seq:Seq[_] => merge(putPrimitiveObjects2[T](new FieldValue[Seq[T]](new Field[Seq[T]](fv.name), fv.value.asInstanceOf[Seq[T]])))
         case mo:MongoObject => merge(putMongo(fv.name, mo))
         case id:MongoObjectId =>   merge(putId(id))
         case _:Any => MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))

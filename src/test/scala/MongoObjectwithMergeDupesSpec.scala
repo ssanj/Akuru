@@ -11,7 +11,7 @@ final class MongoObjectwithMergeDupesSpec extends CommonSpec {
 
   "A MongoObject" should "merge documents with no dupes" in {
     val mo1:MongoObject = mongo.putPrimitiveObject(titleField("blah"))
-    val mo2:MongoObject = mongo.putPrimitiveObjects[String](labelsField(Seq("test")))
+    val mo2:MongoObject = mongo.putAnything(labelsField(Seq("test")))
     val mo3 = mo1.mergeMongoObjectValues(mo2)
 
     mo3.getPrimitiveObject(titleField) should equal (Some("blah"))

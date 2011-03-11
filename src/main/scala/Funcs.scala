@@ -6,7 +6,6 @@
 package akuru
 
 import MongoTypes.MongoUpdateObject
-import MongoTypes.OperatorObject
 import MongoTypes.getElement
 
 trait Funcs {
@@ -19,14 +18,7 @@ trait Funcs {
 
   def $funcPrimitive(action: String, col: String, value: AnyRef): MongoObject = mongo.putMongo(action, mongo.putPrimitiveObject(col, value))
 
-  def arrayFieldToMongo1[T](fv: FieldValue[Seq[T]]): MongoObject = mongo.putPrimitiveObjects[T](fv)
-
-  def fieldToMongo1[T](fv: FieldValue[T]): MongoObject = mongo.putPrimitiveObject[T](fv)
-
-  def fieldToMongo2[R, T](fv1: FieldValue[R], fv2: FieldValue[T]): MongoObject = mongo.putPrimitiveObject(fv1).merge(mongo.putPrimitiveObject(fv2))
-
-  def fieldToMongo3[R, S, T](fv1: FieldValue[R], fv2: FieldValue[S], fv3: FieldValue[T]): MongoObject =
-    mongo.putPrimitiveObject(fv1).merge(mongo.putPrimitiveObject(fv2)).merge(mongo.putPrimitiveObject(fv3))
+  def fieldToMongo1[T : ClassManifest](fv: FieldValue[T]): MongoObject = mongo.putAnything[T](fv)
 
   def empty = new MongoObject
 
@@ -38,16 +30,6 @@ trait Funcs {
 
   def combine(value:MongoObject*): MongoObject = if (value.isEmpty) mongo else value.foldLeft(value.head)((a, b) => a.merge(b))
 
-  //TODO: remove this
-  case class DBOToMongo(dbo: DBObject) {
-    def toMongo(): MongoObject = dbo
-  }
-
-  case class SequencedFVTOMongo[T](fv:FieldValue[Seq[T]]) {
-    println("called!" + fv)
-    def splat(): MongoObject = mongo.putPrimitiveObjects[T](fv)
-  }
-
   case class MongoJoiner(mo:MongoObject) {
 
     def and(another:MongoObject): MongoJoiner = MongoJoiner(mo.merge(another))
@@ -57,15 +39,7 @@ trait Funcs {
     def done: MongoObject = mo
   }
 
-  def anyArrayFunction1[T]: String => FieldValue[Seq[T]] => MongoObject = fname => fv => $funcMongo(fname, arrayFieldToMongo1[T](fv))
-
-  def anyFunction1[T]: String => FieldValue[T] => MongoObject = fname => fv => $funcMongo(fname, fieldToMongo1[T](fv))
-
-  def anyFunction2[R, T]: String => (FieldValue[R], FieldValue[T]) => MongoObject = fname => (fv1, fv2) =>
-    $funcMongo(fname, fieldToMongo2[R,T](fv1, fv2))
-
-  def anyFunction3[R, S, T]: String => (FieldValue[R], FieldValue[S], FieldValue[T]) => MongoObject =
-    fname => (fv1, fv2, fv3) => $funcMongo(fname, fieldToMongo3[R,S,T](fv1, fv2, fv3))
+  def anyFunction1[T : ClassManifest](fname:String, fv:FieldValue[T]): MongoObject = $funcMongo(fname, fieldToMongo1[T](fv))
 
   def toMongoUpdateObject(mo: => MongoObject): MongoUpdateObject = MongoUpdateObject(mo)
 

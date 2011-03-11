@@ -16,17 +16,17 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
   override def specName:String = "A MongoCollection with Single Updates"
   override def expectedResults = 1
 
-  it should "update a single matching DomainObjects" in {
+  it should "update a single matching DomainObject" in {
     ( initBlog ~~>
             save(Blog(titleField === "Blog updates", labelsField === Seq("blog, update"))) ~~>
             ( find one Blog where (titleField === "Blog updates") withResults  (b => ignoreSuccess)
                     onError (ex("Could not find Blog")) ) ~~>
             ( update one Blog where (titleField === "Blog updates") withValues
-                    (set(titleField === "Blog Updatees") and set((labelsField === Seq("bl%%g")).splat)) returnErrors ) ~~>
+                    (set(titleField === "Blog Updatees") and set(labelsField === Seq("bl%%g", "sm%%g"))) returnErrors ) ~~>
             ( find one Blog where (titleField === "Blog updates") withResults (b => ex("found old Blog")) onError (noOp) )  ~~>
             ( find one Blog where (titleField === "Blog Updatees") withResults { b:Blog =>
               b.title.value should equal ("Blog Updatees")
-              b.labels.value should equal (Seq("bl%%g"))
+              b.labels.value should equal (Seq("bl%%g", "sm%%g"))
               success
             } onError (ex("Could not find updated Blog")) )
      ) ~~>() verifySuccess

@@ -11,7 +11,7 @@ trait AkuruImplicits {
 
   import com.mongodb.DBObject
 
-  implicit def fieldValueToMongo[T](fv: FieldValue[T]): MongoObject = fieldToMongo1[T](fv)
+  implicit def fieldValueToMongo[T : ClassManifest](fv: FieldValue[T]): MongoObject = fieldToMongo1[T](fv)
 
   implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = {
     import scala.collection.JavaConversions._
@@ -19,15 +19,6 @@ trait AkuruImplicits {
   }
 
   implicit def MongoObjectToDBObject(mo: MongoObject): DBObject = mo.toDBObject
-
-  implicit def tuple2PrimitiveToMongoObject(tuple2: Tuple2[String, AnyRef]): MongoObject = mongo.putPrimitiveObject(tuple2._1, tuple2._2)
-
-  implicit def tuple2MongoToMongoObject(tuple2: Tuple2[String, MongoObject]): MongoObject = mongo.putMongo(tuple2._1, tuple2._2)
-
-  //TODO: remove this
-  implicit def dboToDBOToMongo(dbo: DBObject): DBOToMongo = DBOToMongo(dbo)
-
-  implicit def sequencedFVTOMongo[T](fv:FieldValue[Seq[T]]): SequencedFVTOMongo[T] = SequencedFVTOMongo[T](fv)
 
   implicit def mongoToMongoJoiner(mo:MongoObject): MongoJoiner = MongoJoiner(mo)
 

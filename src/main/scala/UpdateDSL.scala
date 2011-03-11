@@ -17,22 +17,20 @@ trait UpdateDSL { this:MongoFunctions with Tools =>
 
   class HowMany {
 
-    def one[T <: DomainObject : CollectionName](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](false)
+    def one[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](false)
 
-    def many[T <: DomainObject : CollectionName](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](true)
+    def many[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](true)
   }
 
-  class UpdateQuery[T <: DomainObject : CollectionName](multiple:Boolean) {
+  class UpdateQuery[T <: DomainObject : CollectionName : ClassManifest](multiple:Boolean) {
     def where(query: => MongoObject): UpdatedObject[T] = new UpdatedObject[T](multiple, query)
   }
 
-  class UpdatedObject[T <: DomainObject : CollectionName](multiple:Boolean, q: => MongoObject) {
+  class UpdatedObject[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, q: => MongoObject) {
     def withValues(u: => UpdateObject): ExpectWriteResult[T] = new ExpectWriteResult[T](multiple, q, u)
   }
 
-  //def update[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject): UserFunction =
-  //def safeUpdate[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject)(g: MongoWriteResult => Option[String]): UserFunction =
-  class ExpectWriteResult[T <: DomainObject : CollectionName](multiple: Boolean, q: => MongoObject, u: => UpdateObject) {
+  class ExpectWriteResult[T <: DomainObject : CollectionName : ClassManifest](multiple: Boolean, q: => MongoObject, u: => UpdateObject) {
 
     def expectResults(f: MongoWriteResult => Option[String]): UserFunction = if (multiple) safeUpdateMany[T](q)(u)(f) else safeUpdate[T](q)(u)(f)
 
