@@ -2,7 +2,7 @@
 2. update many does not exist (done)
 3. Better array support. Something of the sort: [F[_] <: Traversable[_], T <: DomainObject](value:F[T])
 4. renamed update operations to include $: $set, $put, $push etc
-5. Get rid of Splat for arrays. Arrays should work as per everything else
+5. Get rid of Splat for arrays. Arrays should work as per everything else (done)
 6. Handle nulls in getElement
 7. Created NestedFields for nested objects
 8. allow equality between 2 Fields and 2 FieldValues
@@ -11,6 +11,7 @@
 11. Add Command Objects to run any JSon command
 12. Are Query objects needed?
 13. Clean up update operator syntax. (set (field === value) and set (field2 === value2)) is ugly.
+ (done - we can now do set(field1 === value1 & field2 === value2)
 14. update one/many have an unnecessary returnErrors clause. Remove.
 15. Allow saving of multiple DomainObjects at once. save (list) ~~>
 16. MongoWriteResult should only return Boolean. true if valid false if not. The users function through be sage (runWithEither[Option[String], Boolean]

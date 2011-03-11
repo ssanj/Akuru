@@ -1,0 +1,40 @@
+{} = supplied by the user
+() = optional
+[] = one of
+all other text is part of the DSL
+
+regex
+------
+
+(string / options)
+
+(".*"/)
+
+used in query field via the ?* operator.
+
+DomainObject.field1 ?* ("title*"/[i|u|o/])
+
+operator
+-------------
+
+operators [lt | lte | gt | gte | between | < | <= | > | >= | |<>|]
+
+DomainObject.field1 > (5)
+DomainObject.field1 between (6, 8)
+
+query (FieldValues, Regex and Operators can be used as part of a query)
+-----
+
+DomainObject.field1(value1) and DomainObject.field2(value2)
+DomainObject.field1 === value1 and DomainObject.field2 === value2
+DomainObject.field1 ?* ("regex"/[i/u/o/]) and DomainObject.field2 === value and DomainObject.field3 ?* ("regex"/)
+
+find
+----
+find cardinality[one|many] {DomainObject} where {query} withResults {handler} (onError {error handler})
+
+find one X where (field1 === value1 and field2 === value2) withResults  (b => doSomething) onError (handleError)
+find many X where (field1 === value1 and field2 === value2) withResults {b => doSomething}
+
+for a cardinality of one, the handler function is (DomainObject => Option[String])
+for a cardinality of many, the handler function is (Seq[DomainObject] => Option[String])
