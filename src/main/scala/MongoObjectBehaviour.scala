@@ -73,15 +73,9 @@ trait MongoObjectBehaviour { this:Tools =>
     merged merge MongoObject(incoming.dbo.filter(t => incoming.dbo.keySet &~ dupes contains (t._1)))
   }
 
-  def putPrimitiveObject[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
+ def putPrimitiveObject[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
 
   def putPrimitiveObject[T](fv:FieldValue[T]): MongoObject = { putPrimitiveObject(fv.name, fv.value) }
-
-//  //TODO: Test
-//  def putPrimitiveObjects[T](key:String, values: => Seq[T]): MongoObject = putAnyArray(convertToJavaList)(key, values.map(_.asInstanceOf[AnyRef]))
-//
-//  //TODO: Test
-//  def putPrimitiveObjects[T](fv:FieldValue[Seq[T]]): MongoObject = putPrimitiveObjects[T](fv.name, fv.value)
 
   def putPrimitiveObjects2[T](fv:FieldValue[Seq[T]]): MongoObject = {
      merge(fv.name -> convertToJavaList(fv.value map (_.asInstanceOf[AnyRef])))

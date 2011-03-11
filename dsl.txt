@@ -6,13 +6,16 @@ all other text is part of the DSL
 regex
 ------
 
-(string / options)
+(string / [i|x|dot/litera|m|u|d|none| ])
 
 (".*"/)
+(".*"/i)
+
+/ or none implies case-sensitive searches.
 
 used in query field via the ?* operator.
 
-DomainObject.field1 ?* ("title*"/[i|u|o/])
+DomainObject.field1 ?* ("title*"/)
 
 operator
 -------------

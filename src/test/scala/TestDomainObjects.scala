@@ -11,8 +11,8 @@ import DomainObject._
 
 trait TestDomainObjects {
 
-  case class Blog(title:FieldValue[String],
-                  labels:FieldValue[Seq[String]] = Blog.labelsField(Seq[String]()), override val id:FieldValue[MID] = defaultId) extends DomainObject
+  case class Blog(title:Blog.titleField.Value,
+                  labels:Blog.labelsField.Value = Blog.labelsField === Seq.empty[String], override val id:FieldValue[MID] = defaultId) extends DomainObject
 
   object Blog extends DomainTemplate[Blog] {
     val titleField = Field[String]("title")
@@ -22,7 +22,7 @@ trait TestDomainObjects {
        for {
         title <- mo.getPrimitiveObject(titleField)
         labels <- mo.getPrimitiveObjects(labelsField)
-      } yield (Blog(titleField(title), labelsField(labels), idField(mo.getId)))
+      } yield (Blog(titleField === title, labelsField === labels, idField === mo.getId))
     }
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = {
@@ -34,7 +34,7 @@ trait TestDomainObjects {
     }
   }
 
-  case class Label(value:FieldValue[String], override val id:FieldValue[MID] = defaultId) extends DomainObject
+  case class Label(value:Label.valueField.Value, override val id:FieldValue[MID] = defaultId) extends DomainObject
 
   object Label extends DomainTemplate[Label] {
 
@@ -43,7 +43,7 @@ trait TestDomainObjects {
     implicit def mongoToLabelConverter(mo:MongoObject): Option[Label] =
       for {
         value <- mo.getPrimitiveObject(valueField)
-      } yield Label(valueField(value), idField(mo.getId))
+      } yield Label(valueField === value, idField === mo.getId)
 
     implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).putAnything(domain.value)
 
@@ -56,7 +56,7 @@ trait TestDomainObjects {
 
   def createExceptionalMongoObject: MongoObject = throw new RuntimeException(mongoCreationException)
 
-  case class Person(name:FieldValue[String], override val id:FieldValue[MID]= defaultId) extends DomainObject
+  case class Person(name:Person.nameField.Value, override val id:FieldValue[MID]= defaultId) extends DomainObject
 
   object Person extends DomainTemplate[Person] {
 
@@ -74,11 +74,11 @@ trait TestDomainObjects {
     }
   }
 
-  case class Book(name:FieldValue[String],
-                  authors:FieldValue[Seq[String]] = Book.authorsField(Seq("misc")),
-                  publisher:FieldValue[String],
-                  printVersion:FieldValue[Int] = Book.printVersionField(1),
-                  price:FieldValue[Double],
+  case class Book(name:Book.nameField.Value,
+                  authors:Book.authorsField.Value = Book.authorsField === Seq("misc"),
+                  publisher:Book.publisherField.Value,
+                  printVersion:Book.printVersionField.Value = Book.printVersionField === 1,
+                  price:Book.priceField.Value,
                   override val id:FieldValue[MID] = defaultId) extends DomainObject
 
   object Book extends DomainTemplate[Book] {
@@ -99,16 +99,17 @@ trait TestDomainObjects {
       printVersion <- mo.getPrimitiveObject(printVersionField)
       price <- mo.getPrimitiveObject(priceField)
     } yield
-      Book(nameField(name), authorsField(authors), publisherField(publisher), printVersionField(printVersion), priceField(price), idField(mo.getId))
+      Book(nameField === name, authorsField === authors, publisherField === publisher, printVersionField === printVersion, priceField === price,
+        idField === mo.getId)
 
     implicit object BookCollectionName extends CollectionName[Book] {
       override val name = "book"
     }
   }
 
-  case class Task(val name:FieldValue[String],
-                  val priority:FieldValue[Int],
-                  val owner:FieldValue[String],
+  case class Task(val name:Task.nameField.Value,
+                  val priority:Task.priorityField.Value,
+                  val owner:Task.ownerField.Value,
                   override val id:FieldValue[MID] = defaultId) extends DomainObject
 
   object Task extends DomainTemplate[Task] {
@@ -117,15 +118,14 @@ trait TestDomainObjects {
     val ownerField = Field[String]("owner")
 
     implicit def taskToMongoObject(task:Task): MongoObject =
-      //putDomainId(task).putPrimitiveObject(task.name).putPrimitiveObject(task.priority).putPrimitiveObject(task.owner)
-    putDomainId(task).putAnything(task.name).putAnything(task.priority).putAnything(task.owner)
+      putDomainId(task).putAnything(task.name).putAnything(task.priority).putAnything(task.owner)
 
     implicit def mongoToTask(mo:MongoObject): Option[Task] =
      for {
       name <- mo.getPrimitiveObject(nameField)
       priority <- mo.getPrimitiveObject(priorityField)
       owner <-mo.getPrimitiveObject(ownerField)
-     } yield Task(nameField(name), priorityField(priority), ownerField(owner), idField(mo.getId))
+     } yield Task(nameField === name, priorityField === priority, ownerField === owner, idField === mo.getId)
 
     implicit object TaskCollection extends CollectionName[Task] {
       override val name = "task"

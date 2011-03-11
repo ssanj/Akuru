@@ -21,8 +21,9 @@ trait DomainSupport { this:Tools =>
   }
 
   case class Field[T](name:String) {
-    def apply(value:T): FieldValue[T] = FieldValue[T](this, value)
-    def === (value:T) : FieldValue[T] = apply(value)
+    type Value = FieldValue[T]
+    def apply(value:T): Value = FieldValue[T](this, value)
+    def === (value:T) : Value = apply(value)
   }
 
   trait DomainObject {
@@ -33,6 +34,7 @@ trait DomainSupport { this:Tools =>
 
   object DomainObject {
     val idField = Field[MID]("_id")
+    def idField2(mo:MongoObject) = idField.apply(mo.getId)
 
     val defaultId:FieldValue[MID] = idField.apply(None)
   }
