@@ -24,6 +24,12 @@ trait DomainSupport { this:Tools =>
     type Value = FieldValue[T]
     def apply(value:T): Value = FieldValue[T](this, value)
     def === (value:T) : Value = apply(value)
+
+    def create(value:T): DieldValue = DieldValue(this, value)
+
+    case class DieldValue(field:Field[T], value:T) {
+      val name = field.name
+    }
   }
 
   trait DomainObject {

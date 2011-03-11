@@ -11,18 +11,30 @@ import DomainObject._
 
 trait TestDomainObjects {
 
+  case class Phone(brand:Phone.brand.DieldValue)
+
+  object Phone {
+    val brand = Field[String]("brand")
+    val model = Field[String]("model")
+  }
+
+  def doSomething: Phone = Phone(Phone.brand.create("Apple"))
+
+  def blah[T](f:Field[T]#DieldValue) {}
+
   case class Blog(title:Blog.titleField.Value,
-                  labels:Blog.labelsField.Value = Blog.labelsField === Seq.empty[String], override val id:FieldValue[MID] = defaultId) extends DomainObject
+                  labels:Blog.labelsField.Value= Blog.labelsField === Seq.empty[String], override val id:FieldValue[MID] = defaultId) extends DomainObject
 
   object Blog extends DomainTemplate[Blog] {
     val titleField = Field[String]("title")
+    val miscField = Field[String]("misc")
     val labelsField = Field[Seq[String]]("labels")
 
     implicit def mongoToBlogConverter(mo:MongoObject): Option[Blog] = {
        for {
         title <- mo.getPrimitiveObject(titleField)
         labels <- mo.getPrimitiveObjects(labelsField)
-      } yield (Blog(titleField === title, labelsField === labels, idField === mo.getId))
+      } yield (Blog(miscField === title, labelsField === labels, idField === mo.getId))
     }
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = {
