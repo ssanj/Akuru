@@ -15,34 +15,27 @@ trait DomainSupport { this:Tools =>
 
   type DomainToMongo[T <: DomainObject] = T => MongoObject
 
-
-  case class FieldValue[T](field:Field[T], value:T) {
-    val name = field.name
-  }
-
   case class Field[T](name:String) {
-    type Value = FieldValue[T]
-    def apply(value:T): Value = FieldValue[T](this, value)
+
+    def apply(value:T): Value = Value(value)
+
     def === (value:T) : Value = apply(value)
 
-    def create(value:T): DieldValue = DieldValue(this, value)
-
-    case class DieldValue(field:Field[T], value:T) {
+    final case class Value(value:T) {
       val name = field.name
+      lazy val field = Field.this  //we need this lazy as it should be accessed only after Field instantiation.
     }
   }
 
   trait DomainObject {
-    val id:FieldValue[MID]
+    val id:DomainObject.idField.Value
   }
 
   abstract class DomainTemplate[T <: DomainObject]
 
   object DomainObject {
     val idField = Field[MID]("_id")
-    def idField2(mo:MongoObject) = idField.apply(mo.getId)
-
-    val defaultId:FieldValue[MID] = idField.apply(None)
+    val defaultId = idField === None
   }
 
   trait CollectionName[T <: DomainObject] {

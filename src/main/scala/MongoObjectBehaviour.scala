@@ -110,7 +110,7 @@ trait MongoObjectBehaviour { this:Tools =>
   def putAnything[T : ClassManifest](fv:FieldValue[T]) : MongoObject = {
     getElement[T](fv.value.asInstanceOf[AnyRef]) match {
       case Some(element) => element match {
-        case seq:Seq[_] => merge(putPrimitiveObjects2[T](new FieldValue[Seq[T]](new Field[Seq[T]](fv.name), fv.value.asInstanceOf[Seq[T]])))
+        case seq:Seq[_] => merge(putPrimitiveObjects2[T](new Field[Seq[T]](fv.name) === seq.asInstanceOf[Seq[T]]))
         case mo:MongoObject => merge(putMongo(fv.name, mo))
         case id:MongoObjectId =>   merge(putId(id))
         case _:Any => MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))

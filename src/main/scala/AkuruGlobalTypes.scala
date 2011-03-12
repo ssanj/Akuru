@@ -20,7 +20,7 @@ trait AkuruGlobalTypes {
   val d = akuru.MongoTypes.RegexConstants.d
   val none = akuru.MongoTypes.RegexConstants.none
 
-  type FieldValue[T] = akuru.MongoTypes.FieldValue[T]
+  type FieldValue[T] = Field[T]#Value
   type Field[T] = akuru.MongoTypes.Field[T]
 
   type MongoObject = akuru.MongoTypes.MongoObject

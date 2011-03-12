@@ -11,30 +11,19 @@ import DomainObject._
 
 trait TestDomainObjects {
 
-  case class Phone(brand:Phone.brand.DieldValue)
-
-  object Phone {
-    val brand = Field[String]("brand")
-    val model = Field[String]("model")
-  }
-
-  def doSomething: Phone = Phone(Phone.brand.create("Apple"))
-
-  def blah[T](f:Field[T]#DieldValue) {}
-
   case class Blog(title:Blog.titleField.Value,
-                  labels:Blog.labelsField.Value= Blog.labelsField === Seq.empty[String], override val id:FieldValue[MID] = defaultId) extends DomainObject
+                  labels:Blog.labelsField.Value = Blog.labelsField === Seq.empty[String],
+                  id:DomainObject.idField.Value = defaultId) extends DomainObject
 
   object Blog extends DomainTemplate[Blog] {
     val titleField = Field[String]("title")
-    val miscField = Field[String]("misc")
     val labelsField = Field[Seq[String]]("labels")
 
     implicit def mongoToBlogConverter(mo:MongoObject): Option[Blog] = {
        for {
         title <- mo.getPrimitiveObject(titleField)
         labels <- mo.getPrimitiveObjects(labelsField)
-      } yield (Blog(miscField === title, labelsField === labels, idField === mo.getId))
+      } yield (Blog(titleField === title, labelsField === labels, idField === mo.getId))
     }
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = {
@@ -46,7 +35,7 @@ trait TestDomainObjects {
     }
   }
 
-  case class Label(value:Label.valueField.Value, override val id:FieldValue[MID] = defaultId) extends DomainObject
+  case class Label(value:Label.valueField.Value, id:DomainObject.idField.Value = defaultId) extends DomainObject
 
   object Label extends DomainTemplate[Label] {
 
@@ -68,7 +57,7 @@ trait TestDomainObjects {
 
   def createExceptionalMongoObject: MongoObject = throw new RuntimeException(mongoCreationException)
 
-  case class Person(name:Person.nameField.Value, override val id:FieldValue[MID]= defaultId) extends DomainObject
+  case class Person(name:Person.nameField.Value, id:DomainObject.idField.Value = defaultId) extends DomainObject
 
   object Person extends DomainTemplate[Person] {
 
@@ -76,12 +65,11 @@ trait TestDomainObjects {
 
     implicit def personToMongo(p:Person): MongoObject = empty
 
-    implicit def mongoToPerson(mo:MongoObject): Option[Person] = Some(Person(name = nameField("testing"), defaultId))
+    implicit def mongoToPerson(mo:MongoObject): Option[Person] = Some(Person(name = nameField === "testing"))
 
     lazy val expectedError = "no person collection here!"
 
     implicit object PersonCollectionName extends CollectionName[Person] {
-
       lazy val name = throw new RuntimeException(expectedError)
     }
   }
@@ -91,7 +79,7 @@ trait TestDomainObjects {
                   publisher:Book.publisherField.Value,
                   printVersion:Book.printVersionField.Value = Book.printVersionField === 1,
                   price:Book.priceField.Value,
-                  override val id:FieldValue[MID] = defaultId) extends DomainObject
+                  override val id:DomainObject.idField.Value = defaultId) extends DomainObject
 
   object Book extends DomainTemplate[Book] {
     val nameField = Field[String]("name")
@@ -122,7 +110,7 @@ trait TestDomainObjects {
   case class Task(val name:Task.nameField.Value,
                   val priority:Task.priorityField.Value,
                   val owner:Task.ownerField.Value,
-                  override val id:FieldValue[MID] = defaultId) extends DomainObject
+                  override val id:DomainObject.idField.Value = defaultId) extends DomainObject
 
   object Task extends DomainTemplate[Task] {
     val nameField = Field[String]("name")
