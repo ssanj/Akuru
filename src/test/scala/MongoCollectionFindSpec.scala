@@ -12,9 +12,9 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL {
   "A MongoCollection with find" should "find all saved objects matching a query" in {
     (onTestDB ~~>
               drop[Blog] ~~>
-              save(Blog(titleField("sample1"), labelsField(Seq("sample")))) ~~>
-              save(Blog(titleField("sample2"), labelsField(Seq("sample")))) ~~>
-              save(Blog(titleField("sample3"), labelsField(Seq("sample")))) ~~>
+              save(Blog(titleField === "sample1", labelsField === Seq("sample"))) ~~>
+              save(Blog(titleField === "sample2", labelsField === Seq("sample"))) ~~>
+              save(Blog(titleField === "sample3", labelsField === Seq("sample"))) ~~>
               ( find many Blog where (titleField ?* ("sample*"/)) withResults { blogs =>
                 blogs.size should equal (3)
                 blogs.exists(_.title.value == "sample1") should be (true)
@@ -57,7 +57,7 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL {
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              save(Blog(titleField("Querying with RegEx"), labelsField(Seq("query", "regex")))) ~~>
+              save(Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) ~~>
               ( find many Blog where (titleField ?* ("querying with RegEx"/)) withResults { blogs => blogs.size should equal (0); success } ) ~~>
               ( find many Blog where (titleField ?* ("Querying with RegEx"/i)) withResults { blogs => blogs.size should equal (1); success } ) ~~>
               ( find many Blog where (titleField ?* (".* with RegEx"/)) withResults { blogs => blogs.size should equal (1); success } ) ~~>
@@ -68,10 +68,10 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL {
   it should "sort results" in {
     (onTestDB ~~>
             drop[Blog] ~~>
-            save(Blog(titleField("Pears"), labelsField(Seq("fruit", "pears")))) ~~>
-            save(Blog(titleField("Orange"), labelsField(Seq("citrus", "fruit", "navel", "jaffa")))) ~~>
-            save(Blog(titleField("Apple"), labelsField(Seq("apples", "fruit", "green", "red")))) ~~>
-            save(Blog(titleField("WaterMellon"), labelsField(Seq("mellon", "fruit", "striped")))) ~~>
+            save(Blog(titleField === "Pears", labelsField === Seq("fruit", "pears"))) ~~>
+            save(Blog(titleField === "Orange", labelsField === Seq("citrus", "fruit", "navel", "jaffa"))) ~~>
+            save(Blog(titleField === "Apple", labelsField === Seq("apples", "fruit", "green", "red"))) ~~>
+            save(Blog(titleField === "WaterMellon", labelsField === Seq("mellon", "fruit", "striped"))) ~~>
             ( find many Blog where (labelsField ?* ("fruit"/)) constrainedBy (Limit(2) and Order(titleField, ASC)) withResults {b =>
               b.size should equal (2)
               b(0).title.value should equal ("Apple")

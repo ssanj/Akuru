@@ -15,3 +15,4 @@
 14. update one/many have an unnecessary returnErrors clause. Remove.
 15. Allow saving of multiple DomainObjects at once. save (list) ~~>
 16. MongoWriteResult should only return Boolean. true if valid false if not. The users function through be sage (runWithEither[Option[String], Boolean]
+17. Make Order subdsl better. Current Order(field1, ASC|DSC) -> OrderBy field1 | ASC
