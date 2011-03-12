@@ -16,3 +16,6 @@
 15. Allow saving of multiple DomainObjects at once. save (list) ~~>
 16. MongoWriteResult should only return Boolean. true if valid false if not. The users function through be sage (runWithEither[Option[String], Boolean]
 17. Make Order subdsl better. Current Order(field1, ASC|DSC) -> OrderBy field1 | ASC
+18. Find a way to not have to type in idField for each DomainObject
+19. Clean up unnecessary methods on MongoObjectBehaviour
+20. create example from Casbah
