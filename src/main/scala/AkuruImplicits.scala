@@ -14,6 +14,11 @@ trait AkuruImplicits {
 
   implicit def fieldValueToMongo[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoObject = fieldToMongo1[O, T](fv)
 
+  implicit def fieldValueContinuerToMongo[O <: DomainObject](fvc: FieldValueContinuer[O]): MongoObject = fvc.done
+
+  implicit def fieldValueToFieldValueJoiner[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): FieldValueJoiner[O, T] =
+    FieldValueJoiner[O, T](fv)
+
   implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = {
     import scala.collection.JavaConversions._
     MongoObject(dbo.keySet.toSeq map (key => (key, dbo.get(key))) toMap)
