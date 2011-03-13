@@ -8,21 +8,21 @@ import MongoObject._
 
 trait OperatorTypes {
 
-  case class OperatorObject[T <% Number](f:Field[T]) {
+  case class OperatorObject[O <: DomainObject, T <% Number](f:Field[O, T]) {
 
-    def lt(t1:T): MongoObject = operate[T](f, t1, "$lt")
+    def lt(t1:T): MongoObject = operate[O, T](f, t1, "$lt")
 
     def <(t1:T): MongoObject = lt(t1)
 
-    def lte(t1:T): MongoObject = operate[T](f, t1, "$lte")
+    def lte(t1:T): MongoObject = operate[O, T](f, t1, "$lte")
 
     def <=(t1:T): MongoObject = lte(t1)
 
-    def gt(t1:T): MongoObject = operate[T](f, t1, "$gt")
+    def gt(t1:T): MongoObject = operate[O, T](f, t1, "$gt")
 
     def >(t1:T): MongoObject = gt(t1)
 
-    def gte(t1:T): MongoObject = operate[T](f, t1, "$gte")
+    def gte(t1:T): MongoObject = operate[O, T](f, t1, "$gte")
 
     def >=(t1:T): MongoObject = gte(t1)
 
@@ -30,6 +30,7 @@ trait OperatorTypes {
 
     def |<>|(t1:T, t2:T): MongoObject = between(t1, t2)
 
-    private def operate[T <% Number](f:Field[T], value: => T, func: => String): MongoObject = $funcPrimitive(f.name, func, value)
+    private def operate[O <: DomainObject, T <% Number](f:Field[O, T], value: => T, func: => String): MongoObject =
+      $funcPrimitive(f.name, func, value)
   }
 }

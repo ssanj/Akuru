@@ -47,7 +47,7 @@ trait MongoRegEx {
     }
   }
 
-  case class FieldRegEx[T](field:Field[T]) {
+  case class FieldRegEx[O <: DomainObject, T](field:Field[O, T]) {
     def ?*(reg:RegEx): MongoObject = reg.toMongo(field.name)
   }
 }

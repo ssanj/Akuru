@@ -7,17 +7,16 @@ package akuru
 
 import MongoTypes._
 import MongoTypes.MongoObject.empty
-import DomainObject._
 
 trait TestDomainObjects {
 
   case class Blog(title:Blog.titleField.Value,
                   labels:Blog.labelsField.Value = Blog.labelsField === Seq.empty[String],
-                  id:DomainObject.idField.Value = defaultId) extends DomainObject
+                  id:Blog.idField.Value = Blog.defaultId) extends DomainObject
 
   object Blog extends DomainTemplate[Blog] {
-    val titleField = Field[String]("title")
-    val labelsField = Field[Seq[String]]("labels")
+    val titleField = field[String]("title")
+    val labelsField = field[Seq[String]]("labels")
 
     implicit def mongoToBlogConverter(mo:MongoObject): Option[Blog] = {
        for {
@@ -27,7 +26,7 @@ trait TestDomainObjects {
     }
 
     implicit def blogToMongoConverter(domain:Blog): MongoObject = {
-      putDomainId(domain).putAnything(domain.title).putAnything(domain.labels)
+      putId(domain.id.value).putAnything(domain.title).putAnything(domain.labels)
     }
 
     implicit object BlogCollection extends CollectionName[Blog] {
@@ -35,18 +34,18 @@ trait TestDomainObjects {
     }
   }
 
-  case class Label(value:Label.valueField.Value, id:DomainObject.idField.Value = defaultId) extends DomainObject
+  case class Label(value:Label.valueField.Value, id:Label.idField.Value = Label.defaultId) extends DomainObject
 
   object Label extends DomainTemplate[Label] {
 
-    val valueField = Field[String]("value")
+    val valueField = field[String]("value")
 
     implicit def mongoToLabelConverter(mo:MongoObject): Option[Label] =
       for {
         value <- mo.getPrimitiveObject(valueField)
       } yield Label(valueField === value, idField === mo.getId)
 
-    implicit def labelToMongoConverter(domain:Label): MongoObject = putDomainId(domain).putAnything(domain.value)
+    implicit def labelToMongoConverter(domain:Label): MongoObject = putId(domain.id.value).putAnything(domain.value)
 
     implicit object LabelCollection extends CollectionName[Label] {
       override val name = "label"
@@ -57,11 +56,11 @@ trait TestDomainObjects {
 
   def createExceptionalMongoObject: MongoObject = throw new RuntimeException(mongoCreationException)
 
-  case class Person(name:Person.nameField.Value, id:DomainObject.idField.Value = defaultId) extends DomainObject
+  case class Person(name:Person.nameField.Value, id:Person.idField.Value = Person.defaultId) extends DomainObject
 
   object Person extends DomainTemplate[Person] {
 
-    val nameField = Field[String]("name")
+    val nameField = field[String]("name")
 
     implicit def personToMongo(p:Person): MongoObject = empty
 
@@ -79,16 +78,16 @@ trait TestDomainObjects {
                   publisher:Book.publisherField.Value,
                   printVersion:Book.printVersionField.Value = Book.printVersionField === 1,
                   price:Book.priceField.Value,
-                  override val id:DomainObject.idField.Value = defaultId) extends DomainObject
+                  id:Book.idField.Value = Book.defaultId) extends DomainObject
 
   object Book extends DomainTemplate[Book] {
-    val nameField = Field[String]("name")
-    val authorsField = Field[Seq[String]]("authors")
-    val publisherField = Field[String]("pub")
-    val printVersionField = Field[Int]("version")
-    val priceField = Field[Double]("price")
+    val nameField = field[String]("name")
+    val authorsField = field[Seq[String]]("authors")
+    val publisherField = field[String]("pub")
+    val printVersionField = field[Int]("version")
+    val priceField = field[Double]("price")
 
-    implicit def bookToMongo(b:Book): MongoObject = putDomainId(b).
+    implicit def bookToMongo(b:Book): MongoObject = putId(b.id.value).
             putAnything(b.name).putAnything(b.authors).putAnything(b.publisher).putAnything(b.printVersion).putAnything(b.price)
 
     implicit def mongoToBook(mo:MongoObject): Option[Book] =
@@ -107,18 +106,18 @@ trait TestDomainObjects {
     }
   }
 
-  case class Task(val name:Task.nameField.Value,
-                  val priority:Task.priorityField.Value,
-                  val owner:Task.ownerField.Value,
-                  override val id:DomainObject.idField.Value = defaultId) extends DomainObject
+  case class Task(name:Task.nameField.Value,
+                  priority:Task.priorityField.Value,
+                  owner:Task.ownerField.Value,
+                  id:Task.idField.Value = Task.defaultId) extends DomainObject
 
   object Task extends DomainTemplate[Task] {
-    val nameField = Field[String]("name")
-    val priorityField = Field[Int]("priority")
-    val ownerField = Field[String]("owner")
+    val nameField = field[String]("name")
+    val priorityField = field[Int]("priority")
+    val ownerField = field[String]("owner")
 
     implicit def taskToMongoObject(task:Task): MongoObject =
-      putDomainId(task).putAnything(task.name).putAnything(task.priority).putAnything(task.owner)
+      putId(task.id.value).putAnything(task.name).putAnything(task.priority).putAnything(task.owner)
 
     implicit def mongoToTask(mo:MongoObject): Option[Task] =
      for {

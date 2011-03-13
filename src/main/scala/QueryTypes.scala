@@ -33,7 +33,8 @@ trait QueryTypes {
     def &(other:MongoUpdateObject): MongoUpdateObject = MongoUpdateObject(mo.mergeMongoObjectValues(other.value))
 
     import MongoTypes.MongoObject.mongo
-    def &[T : ClassManifest](other:FieldValue[T]): MongoUpdateObject = MongoUpdateObject(mo.mergeMongoObjectValues(mongo.putAnything[T](other)))
+    def &[O <: DomainObject, T : ClassManifest](other:FieldValue[O, T]): MongoUpdateObject =
+      MongoUpdateObject(mo.mergeMongoObjectValues(mongo.putAnything[O, T](other)))
   }
 
   object UpdateObject {

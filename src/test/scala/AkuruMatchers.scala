@@ -8,9 +8,9 @@ import org.scalatest.matchers.HavePropertyMatcher
 
 trait AkuruMatchers {
   def name(expectedValue: String) =
-      new HavePropertyMatcher[Field[_], String] {
+      new HavePropertyMatcher[Field[_, _], String] {
         import org.scalatest.matchers.HavePropertyMatchResult
-        def apply(field: Field[_]) =
+        def apply(field: Field[_, _]) =
           HavePropertyMatchResult(
             field.name == expectedValue,
             "name",

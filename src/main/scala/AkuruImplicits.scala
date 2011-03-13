@@ -12,7 +12,7 @@ trait AkuruImplicits {
 
   import com.mongodb.DBObject
 
-  implicit def fieldValueToMongo[T : ClassManifest](fv: FieldValue[T]): MongoObject = fieldToMongo1[T](fv)
+  implicit def fieldValueToMongo[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoObject = fieldToMongo1[O, T](fv)
 
   implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = {
     import scala.collection.JavaConversions._
@@ -23,13 +23,14 @@ trait AkuruImplicits {
 
   implicit def mongoToMongoJoiner(mo:MongoObject): MongoJoiner = MongoJoiner(mo)
 
-  implicit def fvToMongoJoiner[T : ClassManifest](fv:FieldValue[T]): MongoJoiner = MongoJoiner(mongo.putAnything[T](fv))
+  implicit def fvToMongoJoiner[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]): MongoJoiner = MongoJoiner(mongo.putAnything[O, T](fv))
 
-  implicit def fieldValueToUpdateObject[T : ClassManifest](fv: FieldValue[T]): MongoUpdateObject = MongoUpdateObject(fieldToMongo1[T](fv))
+  implicit def fieldValueToUpdateObject[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject =
+    MongoUpdateObject(fieldToMongo1[O, T](fv))
 
   implicit def mongoJoinerToMongo(mj:MongoJoiner): MongoObject = mj.done
 
-  implicit def fieldToOperation[T <% Number](f:Field[T]): OperatorObject[T] = OperatorObject[T](f)
+  implicit def fieldToOperation[O <: DomainObject, T <% Number](f:Field[O, T]): OperatorObject[O, T] = OperatorObject[O, T](f)
 
   implicit def mongoSortToSortObjectJoiner(mso:MongoSortObject): SortObjectJoiner = SortObjectJoiner(mso)
 
@@ -37,5 +38,5 @@ trait AkuruImplicits {
 
   implicit def stringToRegX(reg: String): RegExWithOptions = RegExWithOptions(reg)
 
-  implicit def fieldToFieldRegEx[T](f:Field[T]): FieldRegEx[T] = FieldRegEx[T](f)
+  implicit def fieldToFieldRegEx[O <: DomainObject, T](f:Field[O, T]): FieldRegEx[O, T] = FieldRegEx[O, T](f)
 }

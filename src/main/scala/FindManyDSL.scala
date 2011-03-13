@@ -34,7 +34,7 @@ trait FindManyDSL { this:MongoFunctions with Tools =>
     def apply(): MongoCursor => MongoCursor = mc => mc.limit(n)
   }
 
-  case class Order[T <: DomainObject, U](fv:Field[U], order:SortOrder) extends Constraint[T] {
+  case class Order[T <: DomainObject, U](fv:Field[T, U], order:SortOrder) extends Constraint[T] {
     def apply(): MongoCursor => MongoCursor = mc => mc.orderBy(sort(fv, order))
   }
 

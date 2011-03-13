@@ -15,7 +15,7 @@ trait DomainSupport { this:Tools =>
 
   type DomainToMongo[T <: DomainObject] = T => MongoObject
 
-  case class Field[T](name:String) {
+  case class Field[O <: DomainObject, T](name:String) {
 
     def apply(value:T): Value = Value(value)
 
@@ -27,20 +27,22 @@ trait DomainSupport { this:Tools =>
     }
   }
 
-  trait DomainObject {
-    val id:DomainObject.idField.Value
+  class Owner[O <: DomainObject] {
+    def createField[T](name:String): Field[O, T] = Field[O, T](name)
   }
 
-  abstract class DomainTemplate[T <: DomainObject]
+  trait DomainObject
 
-  object DomainObject {
-    val idField = Field[MID]("_id")
-    val defaultId = idField === None
+  abstract class DomainTemplate[O <: DomainObject] {
+    private val idKey = "_id"
+    def field[T](name:String): Field[O, T] = new Owner[O].createField[T](name)
+    val idField: Field[O, MID] = new Owner[O].createField[MID](idKey)
+    val defaultId: idField.Value = idField === None
   }
 
   trait CollectionName[T <: DomainObject] {
     val name:String
   }
 
-  def putDomainId(domain:DomainObject): MongoObject =  foldOption(domain.id.value)(empty)(id => empty.putId(id))
+  def putId(id:MID): MongoObject =  foldOption(id)(empty)(id => empty.putId(id))
 }

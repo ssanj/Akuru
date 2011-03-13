@@ -20,8 +20,8 @@ trait AkuruGlobalTypes {
   val d = akuru.MongoTypes.RegexConstants.d
   val none = akuru.MongoTypes.RegexConstants.none
 
-  type FieldValue[T] = Field[T]#Value
-  type Field[T] = akuru.MongoTypes.Field[T]
+  type FieldValue[O <: DomainObject, T] = Field[O, T]#Value
+  type Field[O <: DomainObject, T] = akuru.MongoTypes.Field[O, T]
 
   type MongoObject = akuru.MongoTypes.MongoObject
   val MongoObject = akuru.MongoTypes.MongoObject
@@ -30,7 +30,6 @@ trait AkuruGlobalTypes {
   val MongoObjectId = akuru.MongoTypes.MongoObjectId
 
   type DomainObject = akuru.MongoTypes.DomainObject
-  val DomainObject = akuru.MongoTypes.DomainObject
   type DomainTemplate[T <: DomainObject] = akuru.MongoTypes.DomainTemplate[T]
 
   type MID = akuru.MongoTypes.MID

@@ -15,25 +15,26 @@ trait MongoObjectBehaviour { this:Tools =>
 
   def getMongoObject(key:String): Option[MongoObject] = getTypeSafeObject(key, { case x:DBObject => Some(x) })
 
-  def getDomainObject[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getTypeSafeObject[T](f.name, {
-    case o:DBObject => implicitly[MongoToDomain[T]].apply(o) })
-
-  def getDomainObjects[T <: DomainObject : MongoToDomain : ClassManifest](key:String): Seq[T] = getTypeSafeObject[Seq[T]](key, {
-    case o:BasicDBList => Some(MongoObject.fromList[T](o)) }) getOrElse(Seq.empty[T])
-
-  def getDomainObjects[T <: DomainObject : MongoToDomain : ClassManifest, R](f:Field[R]): Seq[T] = getDomainObjects[T](f.name)
+  //TODO: Do we need these funcs?
+//  def getDomainObject[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getTypeSafeObject[T](f.name, {
+//    case o:DBObject => implicitly[MongoToDomain[T]].apply(o) })
+//
+//  def getDomainObjects[T <: DomainObject : MongoToDomain : ClassManifest](key:String): Seq[T] = getTypeSafeObject[Seq[T]](key, {
+//    case o:BasicDBList => Some(MongoObject.fromList[T](o)) }) getOrElse(Seq.empty[T])
+//
+//  def getDomainObjects[T <: DomainObject : MongoToDomain : ClassManifest, R](f:Field[R]): Seq[T] = getDomainObjects[T](f.name)
 
   def getPrimitiveObject[T : ClassManifest](key:String): Option[T] = {
     getTypeSafeObject[T](key, { case x:AnyRef => getElement[T](x) })
   }
 
-  def getPrimitiveObject[T : ClassManifest](f:Field[T]): Option[T] = getPrimitiveObject[T](f.name)
+  def getPrimitiveObject[O <: DomainObject, T : ClassManifest](f:Field[O, T]): Option[T] = getPrimitiveObject[T](f.name)
 
   def getPrimitiveObjects[T : ClassManifest](key:String): Option[Seq[T]] = {
     getTypeSafeObject[Seq[T]](key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
   }
 
-  def getPrimitiveObjects[T : ClassManifest](f:Field[Seq[T]]): Option[Seq[T]] = getPrimitiveObjects[T](f.name)
+  def getPrimitiveObjects[O <: DomainObject, T : ClassManifest](f:Field[O, Seq[T]]): Option[Seq[T]] = getPrimitiveObjects[T](f.name)
 
   def getId: Option[MongoObjectId] = getPrimitiveObject[ObjectId]("_id") map (MongoObjectId(_))
 
@@ -75,9 +76,9 @@ trait MongoObjectBehaviour { this:Tools =>
 
  def putPrimitiveObject[T](key:String, value:T): MongoObject = { putAnyArray(asJavaObject)(key, Seq(value.asInstanceOf[AnyRef])) }
 
-  def putPrimitiveObject[T](fv:FieldValue[T]): MongoObject = { putPrimitiveObject(fv.name, fv.value) }
+  def putPrimitiveObject[O <: DomainObject, T](fv:FieldValue[O, T]): MongoObject = { putPrimitiveObject(fv.name, fv.value) }
 
-  def putPrimitiveObjects2[T](fv:FieldValue[Seq[T]]): MongoObject = {
+  def putPrimitiveObjects2[O <: DomainObject, T](fv:FieldValue[O, Seq[T]]): MongoObject = {
      merge(fv.name -> convertToJavaList(fv.value map (_.asInstanceOf[AnyRef])))
   }
 
@@ -88,7 +89,7 @@ trait MongoObjectBehaviour { this:Tools =>
 
   def merge(mo:MongoObject): MongoObject = MongoObject(dbo ++ (mo.dbo))
 
-  def merge[T](fv:FieldValue[T]): MongoObject = MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))
+  def merge[O <: DomainObject, T](fv:FieldValue[O, T]): MongoObject = MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))
 
   def merge(t:(String, Any)): MongoObject = MongoObject(dbo + (t._1 -> t._2.asInstanceOf[AnyRef]))
 
@@ -107,10 +108,10 @@ trait MongoObjectBehaviour { this:Tools =>
     mo
   }
 
-  def putAnything[T : ClassManifest](fv:FieldValue[T]) : MongoObject = {
+  def putAnything[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]) : MongoObject = {
     getElement[T](fv.value.asInstanceOf[AnyRef]) match {
       case Some(element) => element match {
-        case seq:Seq[_] => merge(putPrimitiveObjects2[T](new Field[Seq[T]](fv.name) === seq.asInstanceOf[Seq[T]]))
+        case seq:Seq[_] => merge(putPrimitiveObjects2[O, T](new Field[O, Seq[T]](fv.name) === seq.asInstanceOf[Seq[T]]))
         case mo:MongoObject => merge(putMongo(fv.name, mo))
         case id:MongoObjectId =>   merge(putId(id))
         case _:Any => MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))

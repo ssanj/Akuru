@@ -15,7 +15,7 @@ trait PushFuncs  { this:Funcs =>
 
   import PushFuncs._
 
-  def push[T : ClassManifest](f:Field[Seq[T]], value: => T): MongoUpdateObject =
+  def push[O <: DomainObject, T : ClassManifest](f:Field[O, Seq[T]], value: => T): MongoUpdateObject =
     //toMongoUpdateObject(anyFunction1[T](functionName, new FieldValue[T](new Field[T](f.name), value)))
-    toMongoUpdateObject(anyFunction1[T](functionName, new Field[T](f.name) === value))
+    toMongoUpdateObject(anyFunction1[O, T](functionName, new Field[O, T](f.name) === value))
 }

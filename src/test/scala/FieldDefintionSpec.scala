@@ -10,12 +10,14 @@ import org.scalatest.matchers.ShouldMatchers
 
 final class FieldDefintionSpec extends FlatSpec with ShouldMatchers with AkuruMatchers {
 
+  class Blah extends DomainObject
+
   "A Field" should "match another Field with the same name" in {
-    FD[String]("title") should have (name("title"))
+    FD[Blah, String]("title") should have (name("title"))
   }
 
   it should "not match another Field with a different name" in {
-    FD[String]("title") should not have (name("blah"))
+    FD[Blah, String]("title") should not have (name("blah"))
   }
 }
 

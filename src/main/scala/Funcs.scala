@@ -18,7 +18,7 @@ trait Funcs {
 
   def $funcPrimitive(action: String, col: String, value: AnyRef): MongoObject = mongo.putMongo(action, mongo.putPrimitiveObject(col, value))
 
-  def fieldToMongo1[T : ClassManifest](fv: FieldValue[T]): MongoObject = mongo.putAnything[T](fv)
+  def fieldToMongo1[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoObject = mongo.putAnything[O, T](fv)
 
   def empty = new MongoObject
 
@@ -34,12 +34,12 @@ trait Funcs {
 
     def and(another:MongoObject): MongoJoiner = MongoJoiner(mo.merge(another))
 
-    def and[T](another:FieldValue[T]): MongoJoiner = MongoJoiner(mo.merge(another))
+    def and[O <: DomainObject, T](another:FieldValue[O, T]): MongoJoiner = MongoJoiner(mo.merge(another))
 
     def done: MongoObject = mo
   }
 
-  def anyFunction1[T : ClassManifest](fname:String, fv:FieldValue[T]): MongoObject = $funcMongo(fname, fieldToMongo1[T](fv))
+  def anyFunction1[O <: DomainObject, T : ClassManifest](fname:String, fv:FieldValue[O, T]): MongoObject = $funcMongo(fname, fieldToMongo1[O, T](fv))
 
   def toMongoUpdateObject(mo: => MongoObject): MongoUpdateObject = MongoUpdateObject(mo)
 

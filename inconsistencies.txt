@@ -19,3 +19,4 @@
 18. Find a way to not have to type in idField for each DomainObject
 19. Clean up unnecessary methods on MongoObjectBehaviour
 20. create example from Casbah
+21. make field search type safe on the owner object.
