@@ -37,15 +37,31 @@ trait Funcs {
     def done: MongoObject = mo
   }
 
-  case class FieldValueJoiner[O <: DomainObject, T : ClassManifest](fv1:FieldValue[O, T]) {
-    def and2[S : ClassManifest](fv2:FieldValue[O, S]): FieldValueContinuer[O] =
-      FieldValueContinuer[O](mongo.putAnything[O, T](fv1).putAnything[O, S](fv2))
+  sealed abstract class JoinerValue[O <: DomainObject] {
+    def done: MongoObject
   }
 
-  case class FieldValueContinuer[O <: DomainObject](mo:MongoObject) {
-    def and2[T : ClassManifest](fv:FieldValue[O, T]): FieldValueContinuer[O] = FieldValueContinuer[O](mo.putAnything[O, T](fv))
+  case class FieldValueJoinerValue[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]) extends JoinerValue[O] {
+    def done: MongoObject = mongo.putAnything[O, T](fv)
+  }
+
+  case class MongoJoinerValue[O <: DomainObject](mo:MongoObject) extends JoinerValue[O] {
     def done: MongoObject = mo
   }
+
+  case class FieldValueJoiner[O <: DomainObject](join:JoinerValue[O]) {
+//    def and2[S : ClassManifest](fv2:FieldValue[O, S]): FieldValueContinuer[O] =
+//      FieldValueContinuer[O](mongo.putAnything[O, T](fv1).putAnything[O, S](fv2))
+    def and2[S : ClassManifest](fv2:FieldValue[O, S]): FieldValueJoiner[O] =
+      FieldValueJoiner[O](MongoJoinerValue[O](join.done.putAnything[O, S](fv2)))
+
+    def done: MongoObject = join.done
+  }
+
+//  case class FieldValueContinuer[O <: DomainObject](mo:MongoObject) {
+//    def and2[T : ClassManifest](fv:FieldValue[O, T]): FieldValueContinuer[O] = FieldValueContinuer[O](mo.putAnything[O, T](fv))
+//    def done: MongoObject = mo
+//  }
 
   def anyFunction1[O <: DomainObject, T : ClassManifest](fname:String, fv:FieldValue[O, T]): MongoObject = $funcMongo(fname, fieldToMongo1[O, T](fv))
 

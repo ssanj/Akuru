@@ -20,3 +20,4 @@
 19. Clean up unnecessary methods on MongoObjectBehaviour
 20. create example from Casbah
 21. make field search type safe on the owner object.
+22. Rename and2 in FieldValueJoiner/Continuer
