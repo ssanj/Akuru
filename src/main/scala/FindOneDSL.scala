@@ -11,7 +11,7 @@ trait FindOneDSL { this:MongoFunctions with Tools =>
 
     def where[R : ClassManifest](fv:Field[T, R]#Value): Results[T] = new Results[T](fv)
 
-    import MongoTypes.MongoObject.FieldValueJoiner
+    import MongoTypes.FieldValueJoiner
     def where(fvj:FieldValueJoiner[T]): Results[T] = new Results[T](fvj.done)
   }
 

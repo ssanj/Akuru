@@ -6,6 +6,8 @@ package akuru
 
 trait QueryTypes {
 
+  import MongoObject.mongo
+
   sealed trait SortObject {
     val value:MongoObject
   }
@@ -40,5 +42,31 @@ trait QueryTypes {
   object UpdateObject {
     implicit def domainToUpdateObject[T <: DomainObject : DomainToMongo](value:T): UpdateObject = DomainUpdateObject[T](value)
     //we don't add an implicit def for mongo -> updateObject here as we want to limit it to specific mongo objects.
+  }
+
+  sealed abstract class JoinerValue[O <: DomainObject] {
+    def done: MongoObject
+  }
+
+  case class FieldValueJoinerValue[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]) extends JoinerValue[O] {
+    def done: MongoObject = mongo.putAnything[O, T](fv)
+  }
+
+  case class MongoJoinerValue[O <: DomainObject](mo:MongoObject) extends JoinerValue[O] {
+    def done: MongoObject = mo
+  }
+
+  case class FieldValueJoiner[O <: DomainObject](join:JoinerValue[O]) {
+    def and2[S : ClassManifest](fv2:FieldValue[O, S]): FieldValueJoiner[O] =
+      FieldValueJoiner[O](MongoJoinerValue[O](join.done.putAnything[O, S](fv2)))
+
+    def done: MongoObject = join.done
+  }
+
+  case class MongoJoiner(mo:MongoObject) {
+
+    def and(another:MongoObject): MongoJoiner = MongoJoiner(mo.merge(another))
+
+    def done: MongoObject = mo
   }
 }

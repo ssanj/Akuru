@@ -21,3 +21,6 @@
 20. create example from Casbah
 21. make field search type safe on the owner object.
 22. Rename and2 in FieldValueJoiner/Continuer
+23. simplify FieldValueJoiner to one class. (done)
+24. Migrate find many and update to use FieldValueJoiners.
+25. Make Regex typesafe.

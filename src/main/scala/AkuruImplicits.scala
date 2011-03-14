@@ -6,7 +6,12 @@ import MongoTypes.FieldRegEx
 import MongoTypes.MongoSortObject
 import MongoTypes.OperatorObject
 import MongoTypes.MongoUpdateObject
-import MongoObject._
+import MongoTypes.FieldValueJoiner
+import MongoTypes.FieldValueJoinerValue
+import MongoTypes.MongoJoiner
+import MongoObject.SortObjectJoiner
+import MongoObject.fieldToMongo1
+import MongoObject.mongo
 
 trait AkuruImplicits {
 
