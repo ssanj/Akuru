@@ -6,7 +6,7 @@ all other text is part of the DSL
 regex
 ------
 
-(string / [i|x|dot/litera|m|u|d|none| ])
+(string / [i|x|dot|litera|m|u|d|none| ])
 
 (".*"/)
 (".*"/i)
@@ -15,7 +15,7 @@ regex
 
 used in query field via the ?* operator.
 
-DomainObject.field1 ?* ("title*"/)
+DomainObject.field1 === ("title*"/)
 
 operator
 -------------

@@ -32,12 +32,12 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                             withResults printBlog onError noOp ) ~~>
                     ( find many Blog where (labelsField === {"ubuntu|work"/i} and2 titleField === ("less"/i)) withResults printBlogs ) ~~>
                     ( update one Blog where titleField === "lessons learned" withValues set(titleField === "Lessons Learned") returnErrors ) ~~>
-                    ( find one Blog where labelsField === ("work"/i) withResults printBlog onError noOp ) ~~>
+                    ( find one Blog where labelsField === {"work"/i} withResults printBlog onError noOp ) ~~>
                     ( update one Blog where titleField === "Lessons Learned" withValues b2 returnErrors ) ~~>
-                    ( find one Blog where labelsField === ("work"/i) withResults printBlog onError noOp ) ~~>
+                    ( find one Blog where labelsField === {"work"/i} withResults printBlog onError noOp ) ~~>
                     upsert[Blog]{ titleField === "Semigroup" } { b3 } ~~>
-                    ( find one Blog where labelsField === ("functional"/) withResults printBlog onError noOp ) ~~>
-                    ( find many Blog where labelsField === (".*"/) constrainedBy (Limit(1) and Order(titleField, ASC)) withResults printBlogs )
+                    ( find one Blog where labelsField === {"functional"/} withResults printBlog onError noOp ) ~~>
+                    ( find many Blog where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField, ASC)) withResults printBlogs )
                  } ~~>() getOrElse("success >>")
     println(result)
   }
