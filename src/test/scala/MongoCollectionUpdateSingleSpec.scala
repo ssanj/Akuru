@@ -50,9 +50,9 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
             } onError (ex("Could not find Book")) ) ~~>
             ( update one Book where (publisherField === "artima" and printVersionField === 2 and priceField === 54.95D)
                       withValues (set(nameField === "PISC" & printVersionField === 3 & priceField === 99.99D)) returnErrors ) ~~>
-            ( find one Blog where (nameField === "Programming in Scala") withResults (b => ex("Found old Book"))
+            ( find one Blog where (titleField === "Programming in Scala") withResults (b => ex("Found old Book"))
                     onError (noOp) ) ~~>
-            ( find one Book where (nameField === "PISC" and printVersionField === 3) withResults {b =>
+            ( find one Book where (nameField === "PISC" and2 printVersionField === 3) withResults {b =>
               b.name.value should equal ("PISC")
               b.authors.value should equal (Seq("Martin Odersky", "Lex Spoon", "Bill Venners"))
               b.publisher.value should  equal ("artima")

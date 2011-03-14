@@ -48,15 +48,15 @@ trait QueryTypes {
     def done: MongoObject
   }
 
-  case class FieldValueJoinerValue[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]) extends JoinerValue[O] {
+  case class FieldValueJoinerValue[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]) extends JoinerValue[O] {
     def done: MongoObject = mongo.putAnything[O, T](fv)
   }
 
-  case class MongoJoinerValue[O <: DomainObject](mo:MongoObject) extends JoinerValue[O] {
+  case class MongoJoinerValue[O <: DomainObject](mo: MongoObject) extends JoinerValue[O] {
     def done: MongoObject = mo
   }
 
-  case class FieldValueJoiner[O <: DomainObject](join:JoinerValue[O]) {
+  case class FieldValueJoiner[O <: DomainObject](join: JoinerValue[O]) {
     def and2[S : ClassManifest](fv2:FieldValue[O, S]): FieldValueJoiner[O] =
       FieldValueJoiner[O](MongoJoinerValue[O](join.done.putAnything[O, S](fv2)))
 

@@ -7,12 +7,8 @@ package akuru
 trait FindOneDSL { this:MongoFunctions with Tools =>
 
   final class QueryForSingleResult[T <: DomainObject : CollectionName : MongoToDomain] {
-    def where(query: => MongoObject): Results[T] = new Results[T](query)
-
-    def where[R : ClassManifest](fv:Field[T, R]#Value): Results[T] = new Results[T](fv)
-
     import MongoTypes.FieldValueJoiner
-    def where(fvj:FieldValueJoiner[T]): Results[T] = new Results[T](fvj.done)
+    def where(fvj: => FieldValueJoiner[T]): Results[T] = new Results[T](fvj.done)
   }
 
   final class Results[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject) {
