@@ -23,7 +23,10 @@ trait UpdateDSL { this:MongoFunctions with Tools =>
   }
 
   class UpdateQuery[T <: DomainObject : CollectionName : ClassManifest](multiple:Boolean) {
-    def where(query: => MongoObject): UpdatedObject[T] = new UpdatedObject[T](multiple, query)
+    import MongoTypes.FieldValueJoiner
+    def where(fvj: => FieldValueJoiner[T]): UpdatedObject[T] = new UpdatedObject[T](multiple, fvj.done)
+//
+//    def where(query: => MongoObject): UpdatedObject[T] = new UpdatedObject[T](multiple, query)
   }
 
   class UpdatedObject[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, q: => MongoObject) {

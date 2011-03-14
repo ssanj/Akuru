@@ -20,7 +20,7 @@ final class MongoCollectionUpdateMultipleSpec extends AkuruDSL with CommonSpec w
       save(Blog(titleField === "Semigroup", labelsField === Seq("fp", "patterns"))) ~~>
       save(Blog(titleField === "Lessons Learned", labelsField === Seq("work", "ideas"))) ~~>
       ( find many Blog where labelsField === ("fp"/) withResults {b => b.size should equal (3); success} ) ~~>
-      ( update many Blog where (labelsField ?* ("fp"/)) withValues (set(labelsField === Seq("functional programming", "patterns")))
+      ( update many Blog where labelsField === ("fp"/) withValues (set(labelsField === Seq("functional programming", "patterns")))
               returnErrors ) ~~>
       ( find many Blog where labelsField === ("fp"/) withResults {b => b.size should equal (0); success} ) ~~>
       ( find many Blog where labelsField === ("functional programming"/) withResults {b => b.size should equal (3); success} )

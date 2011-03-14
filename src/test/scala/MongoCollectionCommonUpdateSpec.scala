@@ -30,7 +30,7 @@ trait MongoCollectionCommonUpdateSpec { this:AkuruDSL with CommonSpec =>
     ( initBlog ~~>
         save(Blog(titleField === "Functor1", labelsField === Seq("fp"))) ~~>
         save(Blog(titleField === "Functor2", labelsField === Seq("fp"))) ~~>
-        ( cardinality where (titleField ?* ("Functor.*"/)) withValues (push(labelsField, "tech"))
+        ( cardinality where titleField === ("Functor.*"/) withValues (push(labelsField, "tech"))
                 expectResults (wr => if (wr.getN == Some(expectedResults)) None else
                   Some("Expected  Some(" + expectedResults + ") updates but got: " + wr.getN)) ) ~~>
         ( find many Blog where labelsField === ("tech"/) withResults {b => b.size should equal (expectedResults); success} )
@@ -40,7 +40,7 @@ trait MongoCollectionCommonUpdateSpec { this:AkuruDSL with CommonSpec =>
   it should "handle Exceptions on expectResults on matched updates" in {
     ( initBlog ~~>
         save(Blog(titleField === "Functor", labelsField === Seq("fp"))) ~~>
-        ( cardinality where (titleField ?* ("Functor"/)) withValues (set(titleField === "^^functor^^"))
+        ( cardinality where titleField === ("Functor"/) withValues (set(titleField === "^^functor^^"))
                 expectResults (wr => ex("flattened functor")) )
     ) ~~>() verifyError(_ should startWith ("flattened functor"))
   }

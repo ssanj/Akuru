@@ -23,5 +23,5 @@
 22. Rename and2 in FieldValueJoiner/Continuer
 23. simplify FieldValueJoiner to one class. (done)
 24. Migrate find many and update to use FieldValueJoiners.
-25. Make Regex typesafe. (done for find one, find many)
+25. Make Regex typesafe. (done for find one, find many, update) (todo: upserts, findManyBlah)
 26. Remove ?* syntax for regex.
