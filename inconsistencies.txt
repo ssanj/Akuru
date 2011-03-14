@@ -25,3 +25,4 @@
 24. Migrate find many and update to use FieldValueJoiners.
 25. Make Regex typesafe. (done for find one, find many, update) (todo: upserts, findManyBlah)
 26. Remove ?* syntax for regex.
+27. Make set() type-safe MongoUpdateObject needs a type of O <: DomainObject.
