@@ -60,6 +60,8 @@ trait QueryTypes {
     def and2[S : ClassManifest](fv2:FieldValue[O, S]): FieldValueJoiner[O] =
       FieldValueJoiner[O](MongoJoinerValue[O](join.done.putAnything[O, S](fv2)))
 
+    def and2(another:FieldValueJoiner[O]): FieldValueJoiner[O] = FieldValueJoiner[O](MongoJoinerValue[O](join.done.merge(another.done)))
+
     def done: MongoObject = join.done
   }
 

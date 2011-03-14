@@ -39,14 +39,10 @@ final class MongoCollectionFindOneSpec extends CommonSpec with FindDSL {
 
   it should "handle exceptions thrown on creating a query" in {
     (
-      onTestDB ~~> ( find one Blog where (exceptionalFieldValue) withResults ( _ => Some("Should not have return results"))
+      onTestDB ~~> ( find one Blog where (exceptionalFieldValueJoiner) withResults ( _ => Some("Should not have return results"))
               onError (ex("Handler should not be called on error")) ) ~~>()
     ) verifyError has (mongoCreationException)
   }
-
-  import MongoTypes.FieldValueJoiner
-  import MongoTypes.MongoJoinerValue
-  private def exceptionalFieldValue[O <: DomainObject]: FieldValueJoiner[O] = FieldValueJoiner[O](MongoJoinerValue[O](createExceptionalMongoObject))
 
   it should "handle exceptions thrown by match handler function" in {
     (
