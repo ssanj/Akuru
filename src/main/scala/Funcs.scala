@@ -32,7 +32,7 @@ trait Funcs {
 
   def anyFunction1[O <: DomainObject, T : ClassManifest](fname:String, fv:FieldValue[O, T]): MongoObject = $funcMongo(fname, fieldToMongo1[O, T](fv))
 
-  def toMongoUpdateObject(mo: => MongoObject): MongoUpdateObject = MongoUpdateObject(mo)
+  def toMongoUpdateObject[O <: DomainObject](mo: => MongoObject): MongoUpdateObject[O] = MongoUpdateObject[O](mo)
 
   def fromList[T <: DomainObject : MongoToDomain : ClassManifest](list:BasicDBList): Seq[T] = {
     fromSomeList[T](list, _ collect { case x:DBObject => implicitly[MongoToDomain[T]].apply(x) })

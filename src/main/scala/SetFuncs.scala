@@ -19,7 +19,7 @@ trait SetFuncs { this:Funcs =>
 
   import SetFuncs._
 
-  def set(update: MongoUpdateObject): MongoUpdateObject =  toMongoUpdateObject($funcMongo(functionName, update.value))
+  def set[O <: DomainObject](update: MongoUpdateObject[O]): MongoUpdateObject[O] =  toMongoUpdateObject[O]($funcMongo(functionName, update.value))
 
-  def set[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject = toMongoUpdateObject(anyFunction1[O, T](functionName, fv))
+  def set[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject[O] = toMongoUpdateObject[O](anyFunction1[O, T](functionName, fv))
 }

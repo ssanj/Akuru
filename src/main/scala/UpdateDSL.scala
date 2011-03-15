@@ -28,10 +28,10 @@ trait UpdateDSL { this:MongoFunctions with Tools =>
   }
 
   class UpdatedObject[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, q: => MongoObject) {
-    def withValues(u: => UpdateObject): ExpectWriteResult[T] = new ExpectWriteResult[T](multiple, q, u)
+    def withValues(u: => UpdateObject[T]): ExpectWriteResult[T] = new ExpectWriteResult[T](multiple, q, u)
   }
 
-  class ExpectWriteResult[T <: DomainObject : CollectionName : ClassManifest](multiple: Boolean, q: => MongoObject, u: => UpdateObject) {
+  class ExpectWriteResult[T <: DomainObject : CollectionName : ClassManifest](multiple: Boolean, q: => MongoObject, u: => UpdateObject[T]) {
 
     def expectResults(f: MongoWriteResult => Option[String]): UserFunction = if (multiple) safeUpdateMany[T](q)(u)(f) else safeUpdate[T](q)(u)(f)
 

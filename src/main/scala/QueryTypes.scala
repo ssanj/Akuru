@@ -21,26 +21,26 @@ trait QueryTypes {
     override val value:MongoObject = mo
   }
 
-  sealed trait UpdateObject {
+  sealed trait UpdateObject[O <: DomainObject] {
     val value:MongoObject
   }
 
-  case class DomainUpdateObject[T <: DomainObject : DomainToMongo](domain:T) extends UpdateObject {
+  case class DomainUpdateObject[T <: DomainObject : DomainToMongo](domain:T) extends UpdateObject[T] {
     override val value:MongoObject = implicitly[DomainToMongo[T]].apply(domain)
   }
 
-  case class MongoUpdateObject(mo:MongoObject) extends UpdateObject {
+  case class MongoUpdateObject[O <: DomainObject](mo:MongoObject) extends UpdateObject[O] {
     override val value:MongoObject = mo
 
-    def &(other:MongoUpdateObject): MongoUpdateObject = MongoUpdateObject(mo.mergeMongoObjectValues(other.value))
+    def &(other:MongoUpdateObject[O]): MongoUpdateObject[O] = MongoUpdateObject[O](mo.mergeMongoObjectValues(other.value))
 
     import MongoTypes.MongoObject.mongo
-    def &[O <: DomainObject, T : ClassManifest](other:FieldValue[O, T]): MongoUpdateObject =
-      MongoUpdateObject(mo.mergeMongoObjectValues(mongo.putAnything[O, T](other)))
+    def &[T : ClassManifest](other:FieldValue[O, T]): MongoUpdateObject[O] =
+      MongoUpdateObject[O](mo.mergeMongoObjectValues(mongo.putAnything[O, T](other)))
   }
 
   object UpdateObject {
-    implicit def domainToUpdateObject[T <: DomainObject : DomainToMongo](value:T): UpdateObject = DomainUpdateObject[T](value)
+    implicit def domainToUpdateObject[T <: DomainObject : DomainToMongo](value:T): UpdateObject[T] = DomainUpdateObject[T](value)
     //we don't add an implicit def for mongo -> updateObject here as we want to limit it to specific mongo objects.
   }
 

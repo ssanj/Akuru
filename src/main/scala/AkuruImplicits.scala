@@ -33,8 +33,8 @@ trait AkuruImplicits {
 
   implicit def fvToMongoJoiner[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]): MongoJoiner = MongoJoiner(mongo.putAnything[O, T](fv))
 
-  implicit def fieldValueToUpdateObject[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject =
-    MongoUpdateObject(fieldToMongo1[O, T](fv))
+  implicit def fieldValueToUpdateObject[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject[O] =
+    MongoUpdateObject[O](fieldToMongo1[O, T](fv))
 
   implicit def mongoJoinerToMongo(mj:MongoJoiner): MongoObject = mj.done
 

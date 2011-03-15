@@ -25,9 +25,9 @@ trait PullFuncs { this:Funcs =>
 
   import PullFuncs._
 
-  def pull(col:String, value:MongoObject): MongoUpdateObject =  toMongoUpdateObject($funcMongo("$pull", col, value))
+  def pull[O <: DomainObject](col:String, value:MongoObject): MongoUpdateObject[O] =  toMongoUpdateObject[O]($funcMongo("$pull", col, value))
 
-  def pull(col:String, value:AnyRef): MongoUpdateObject =  toMongoUpdateObject($funcPrimitive("$pull", col, value))
+  def pull[O <: DomainObject](col:String, value:AnyRef): MongoUpdateObject[O] =  toMongoUpdateObject[O]($funcPrimitive("$pull", col, value))
 
-  def pull[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]): MongoUpdateObject = toMongoUpdateObject(anyFunction1[O, T](functionName, fv))
+  def pull[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]): MongoUpdateObject[O] = toMongoUpdateObject[O](anyFunction1[O, T](functionName, fv))
 }
