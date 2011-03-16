@@ -29,3 +29,4 @@
 28. Make Order method type-safe. (done)
 29. Do we need find one and many? Can't we used find (many returned by default) (done)
 30. Unifiy update|updsert|findModifyReturn|findModifyDelete|findModifyUpsert
+31. Need to use find without (). Eg find (Blog) should be find Blog.

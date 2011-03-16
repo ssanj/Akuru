@@ -133,3 +133,12 @@ delete one (Blog) where (titleField === "lessons learned") sortedBy(titleField|A
 
 update one Blog where titleField === "Lessons Learned" withValues b2 returnErrors
 upsert one Blog  where titleField === "Lessons Learned" withValues b2 insert
+
+find thenUpdate Blog where (query) sort() update() withUpdated() onError
+find thenUpdate Blog where (query) sort() update() onError
+
+find thenUpsert Blog where  (query) sort() update() withUpdated() onError
+find thenUpsert Blog where  (query) sort() update() onError
+
+find thenRemove Blog where  (query) sort() withRemoved() onError
+find thenRemove Blog where  (query) sort()  onError
