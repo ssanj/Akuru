@@ -33,7 +33,7 @@ trait UpdateDSL { this:MongoFunctions with Tools =>
 
   class ExpectWriteResult[T <: DomainObject : CollectionName : ClassManifest](multiple: Boolean, q: => MongoObject, u: => UpdateObject[T]) {
 
-    def expectResults(f: MongoWriteResult => Option[String]): UserFunction = if (multiple) safeUpdateMany[T](q)(u)(f) else safeUpdate[T](q)(u)(f)
+    def expectResults(f: MongoWriteResult => Option[String]): UserFunction = msafeUpdate[T](q)(u)(f)(multiple)
 
     def returnErrors: UserFunction = expectResults(defaultHandler)
   }

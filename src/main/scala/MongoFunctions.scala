@@ -23,12 +23,13 @@ trait MongoFunctions { this:Tools  =>
 
   def save[T <: DomainObject : DomainToMongo : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save[T](f, defaultHandler)
 
-  def findOne[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(g: T => Option[String])(h: => Unit):UserFunction =
-    col => col(collectionName[T]).findOne[T](f).fold(l => Some(l), r => foldOption(r){h;None:Option[String]}(g))
-
   def mfind[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(c: MongoCursor => MongoCursor)(g: Seq[T] => Option[String])
                                                               (h: => Option[String]):
     UserFunction = col => col(collectionName[T]).find[T](f)(c).fold(l => Some(l), r => if (r.isEmpty) h else g(r))
+
+  def msafeUpdate[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject[T])(g: MongoWriteResult => Option[String])
+                                                     (multiple: => Boolean): UserFunction =
+    col => col(collectionName[T]).update3(query = q, update = u.value, handler = g, multi = multiple)
 
   def findAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner
           )(update: => UpdateObject[T])(f: T => Option[String])(h: => Option[String]): UserFunction =
@@ -49,12 +50,6 @@ trait MongoFunctions { this:Tools  =>
   def all(mc:MongoCursor): MongoCursor = identity(mc)
 
   def ignoreSuccess: Option[String] = None:Option[String]
-
-  def safeUpdate[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject[T])(g: MongoWriteResult => Option[String]): UserFunction =
-    col => col(collectionName[T]).update3(query = q, update = u.value, handler = g)
-
-  def safeUpdateMany[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject[T])(g: MongoWriteResult => Option[String]): UserFunction =
-    col => col(collectionName[T]).update3(query = q, update = u.value, handler = g, multi = true)
 
   def upsert[T <: DomainObject : CollectionName : DomainToMongo](q: => MongoObject)(u: => T): UserFunction =
     col => col(collectionName[T]).update3(q, u, true, handler = defaultHandler)

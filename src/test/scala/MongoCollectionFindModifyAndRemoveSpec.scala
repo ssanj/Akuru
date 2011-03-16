@@ -23,7 +23,6 @@ final class MongoCollectionFindModifyAndRemoveSpec extends CommonSpec {
   }
 
   it should "find and remove an existing object" in {
-    var handlerCalled = false
     (onTestDB ~~>
             drop[Blog] ~~>
             save(Blog(titleField("Storms"), labelsField(Seq("qld", "weather")))) ~~>
@@ -32,9 +31,7 @@ final class MongoCollectionFindModifyAndRemoveSpec extends CommonSpec {
               b.labels.value should equal (Seq("qld", "weather"))
               success
             } ( throw new RuntimeException("Handler called on success.")) ~~>
-            findOne(titleField("Storms")) {b:Blog => Some("Returned deleted Blog") } { handlerCalled = true }
-      ~~>()) verifySuccess
-
-    handlerCalled should equal (true)
+            mfind(titleField("Storms")) (all) {b:Seq[Blog] => Some("Returned deleted Blog") } { error("did not delete Blog") }
+      ) ~~>() verifyError(_ should equal ("did not delete Blog"))
   }
 }
