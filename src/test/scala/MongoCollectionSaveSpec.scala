@@ -13,13 +13,14 @@ final class MongoCollectionSaveSpec extends AkuruDSL with CommonSpec {
   "A MongoCollection" should "save a new MongoObject" in {
      ( onTestDB ~~>
           drop[Blog] ~~>
-          ( find one Blog where (titleField("blah")) withResults (_ => fail("Shouldn't have found Blog")) onError (noOp) ) ~~>
+          ( find (Blog) where (titleField("blah")) withResults (_ => fail("Shouldn't have found Blog")) withoutResults success ) ~~>
           save(Blog(titleField("blah"), labelsField(Seq("test", "random")))) ~~>
-          ( find one Blog where (titleField("blah")) withResults { t =>
-              t.title.value should equal ("blah")
-              t.labels.value should equal (Seq("test", "random"))
+          ( find (Blog) where (titleField("blah")) withResults { blogs =>
+              blogs.size should equal (1)
+              blogs(0).title.value should equal ("blah")
+              blogs(0).labels.value should equal (Seq("test", "random"))
               success
-          } onError (fail("Didn't find Blog"))
+          } withoutResults error("Didn't find a Blog")
       ) ~~>()) verifySuccess
   }
 

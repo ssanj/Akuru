@@ -19,16 +19,18 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
   it should "update a single matching DomainObject" in {
     ( initBlog ~~>
             save(Blog(titleField === "Blog updates", labelsField === Seq("blog, update"))) ~~>
-            ( find one Blog where (titleField === "Blog updates") withResults  (b => ignoreSuccess)
-                    onError (ex("Could not find Blog")) ) ~~>
+            ( find (Blog) where (titleField === "Blog updates") withResults  (b => ignoreSuccess)
+                    withoutResults error("Could not find Blog") ) ~~>
             ( update one Blog where (titleField === "Blog updates") withValues
                     (set(titleField === "Blog Updatees" & labelsField === Seq("bl%%g", "sm%%g"))) returnErrors ) ~~>
-            ( find one Blog where (titleField === "Blog updates") withResults (b => ex("found old Blog")) onError (noOp) )  ~~>
-            ( find one Blog where (titleField === "Blog Updatees") withResults { b:Blog =>
+            ( find (Blog) where (titleField === "Blog updates") withResults (b => ex("found old Blog")) withoutResults success )  ~~>
+            ( find (Blog) where (titleField === "Blog Updatees") withResults { blogs =>
+              blogs.size should equal (1)
+              val b = blogs(0)
               b.title.value should equal ("Blog Updatees")
               b.labels.value should equal (Seq("bl%%g", "sm%%g"))
               success
-            } onError (ex("Could not find updated Blog")) )
+            } withoutResults error("Could not find updated Blog") )
      ) ~~>() verifySuccess
   }
 
@@ -40,26 +42,30 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
                       printVersionField === 2,
                       priceField === 54.95D)
             ) ~~>
-            ( find one Book where (nameField === "Programming in Scala") withResults { b =>
+            ( find (Book) where (nameField === "Programming in Scala") withResults { books =>
+                books.size should equal (1)
+                val b = books(0)
                 b.name.value should equal ("Programming in Scala")
                 b.authors.value should equal (Seq("Martin Odersky", "Lex Spoon", "Bill Venners"))
                 b.publisher.value should  equal ("artima")
                 b.printVersion.value should equal (2)
                 b.price.value  should equal (54.95D)
                 success
-            } onError (ex("Could not find Book")) ) ~~>
+            } withoutResults error("Could not find Book") ) ~~>
             ( update one Book where (publisherField === "artima" and2 printVersionField === 2 and2 priceField === 54.95D)
                       withValues (set(nameField === "PISC" & printVersionField === 3 & priceField === 99.99D)) returnErrors ) ~~>
-            ( find one Blog where (titleField === "Programming in Scala") withResults (b => ex("Found old Book"))
-                    onError (noOp) ) ~~>
-            ( find one Book where (nameField === "PISC" and2 printVersionField === 3) withResults {b =>
+            ( find (Blog) where (titleField === "Programming in Scala") withResults (b => error("Found old Book"))
+                    withoutResults success ) ~~>
+            ( find (Book) where (nameField === "PISC" and2 printVersionField === 3) withResults {books =>
+              books.size should equal (1)
+              val b = books(0)
               b.name.value should equal ("PISC")
               b.authors.value should equal (Seq("Martin Odersky", "Lex Spoon", "Bill Venners"))
               b.publisher.value should  equal ("artima")
               b.printVersion.value should equal (3)
               b.price.value should equal (99.99D)
               success
-            } onError (ex("Could not find Book")) )
+            } withoutResults error("Could not find Book") )
     ) ~~>() verifySuccess
   }
 }

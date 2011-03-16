@@ -4,15 +4,8 @@
  */
 package akuru
 
-trait FindDSL extends FindOneDSL with FindManyDSL { this:MongoFunctions with Tools =>
+trait FindDSL extends FindManyDSL { this:MongoFunctions with Tools =>
 
-  def find: HowMany = new HowMany
-
-  final class HowMany {
-
-    def one[T <: DomainObject : CollectionName : MongoToDomain](template: => DomainTemplate[T]): QueryForSingleResult[T] = new QueryForSingleResult[T]
-
-    def many[T <: DomainObject : CollectionName : MongoToDomain](template: => DomainTemplate[T]): QueryForMultipleResults[T]  =
+  def find[T <: DomainObject : CollectionName : MongoToDomain](template: => DomainTemplate[T]): QueryForMultipleResults[T]  =
       new QueryForMultipleResults[T]
-  }
 }

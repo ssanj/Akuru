@@ -38,13 +38,13 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
                 b.name.value should equal (updated.name.value)
                 success
               } { Some("Book was not updated!!") } ~~>
-              find[Book](nameField("Programming in Scala")) { all }  { books =>
+              mfind[Book](nameField("Programming in Scala")) { all }  { books =>
                 books.size should equal (1)
                 books.foreach { b:Book =>
                   b.name.value should equal ("Programming in Scala")
                   b.printVersion.value should equal (unUpdatedVersion)
                 }
-                success}
+                success} { error("Expected 1 but got 0 hits") }
    ) ~~>() verifySuccess
   }
 

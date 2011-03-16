@@ -28,6 +28,8 @@ trait MongoSpecSupport { this:Assertions with ShouldMatchers with MongoFunctions
 
   def success: Option[String] = None
 
+  def error(message:String): Option[String] = Some(message)
+
   def has(str:String): String => Unit =  result => result should include regex (str)
 
   implicit def opToVerifyResult(op:Option[String]): VerifyResult = VerifyResult(op)

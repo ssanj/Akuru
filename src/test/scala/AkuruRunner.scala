@@ -28,16 +28,16 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     drop[Label] ~~>
                     blogs.map(b => save(b)) ~~>
                     (blogs.flatMap(b => b.labels.value.map(l => save(Label(valueField === l)))).toList) ~~>
-                    ( find one Blog where (Blog.titleField === "Hello World Lift" and2 Blog.labelsField === Seq("lift", "scala", "sbt"))
-                            withResults printBlog onError noOp ) ~~>
-                    ( find many Blog where (labelsField === {"ubuntu|work"/i} and2 titleField === ("less"/i)) withResults printBlogs ) ~~>
+                    ( find (Blog) where (Blog.titleField === "Hello World Lift" and2 Blog.labelsField === Seq("lift", "scala", "sbt"))
+                            withResults printBlogs withoutResults noOp ) ~~>
+                    ( find (Blog) where (labelsField === {"ubuntu|work"/i} and2 titleField === ("less"/i)) withResults printBlogs withoutResults noOp ) ~~>
                     ( update one Blog where titleField === "lessons learned" withValues set(titleField === "Lessons Learned") returnErrors ) ~~>
-                    ( find one Blog where labelsField === {"work"/i} withResults printBlog onError noOp ) ~~>
+                    ( find (Blog) where labelsField === {"work"/i} withResults printBlogs withoutResults  noOp ) ~~>
                     ( update one Blog where titleField === "Lessons Learned" withValues b2 returnErrors ) ~~>
-                    ( find one Blog where labelsField === {"work"/i} withResults printBlog onError noOp ) ~~>
+                    ( find (Blog) where labelsField === {"work"/i} withResults printBlogs withoutResults  noOp ) ~~>
                     upsert[Blog]{ titleField === "Semigroup" } { b3 } ~~>
-                    ( find one Blog where labelsField === {"functional"/} withResults printBlog onError noOp ) ~~>
-                    ( find many Blog where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField, ASC)) withResults printBlogs )
+                    ( find (Blog) where labelsField === {"functional"/} withResults printBlogs withoutResults  noOp ) ~~>
+                    ( find (Blog) where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField, ASC)) withResults printBlogs withoutResults noOp)
                  } ~~>() getOrElse("success >>")
     println(result)
   }

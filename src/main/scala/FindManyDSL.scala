@@ -18,7 +18,7 @@ trait FindManyDSL { this:MongoFunctions with Tools =>
   final class ConstrainedBy[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject) {
     def constrainedBy(bc: Constraint[T]): MultipleResults[T] = new MultipleResults[T](bc, query)
 
-    def withResults(success: Seq[T] => Option[String]): UserFunction = new MultipleResults[T](All(), query).withResults(success)
+    def withResults(success: Seq[T] => Option[String]): WithoutResults[T] = new WithoutResults[T](All(), query, success)
   }
 
   sealed abstract class Constraint[T <: DomainObject] {
@@ -44,7 +44,12 @@ trait FindManyDSL { this:MongoFunctions with Tools =>
   }
 
   final class MultipleResults[T <: DomainObject : CollectionName : MongoToDomain](constraint: Constraint[T], query: => MongoObject) {
-    def withResults(success: Seq[T] => Option[String]): UserFunction = find[T](query)(constraint.apply())(success)
+    def withResults(success: Seq[T] => Option[String]): WithoutResults[T] = new WithoutResults[T](constraint, query, success)
+  }
+
+  final class WithoutResults[T <: DomainObject : CollectionName : MongoToDomain](constraint: Constraint[T], query: => MongoObject,
+                                                                                 success: => (Seq[T]) => Option[String]) {
+    def withoutResults(noHits: => Option[String]): UserFunction = mfind[T](query)(constraint.apply())(success)(noHits)
   }
 
 }
