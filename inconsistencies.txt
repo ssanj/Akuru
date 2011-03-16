@@ -9,20 +9,22 @@
 9. Get rid of imports from MongoTypes.MongoObject._
 10. Convert regex to Scala RegEx.
 11. Add Command Objects to run any JSon command
-12. Are Query objects needed?
+12. Are Query objects needed? Yes. Rename FieldValueJoiner to Query
 13. Clean up update operator syntax. (set (field === value) and set (field2 === value2)) is ugly.
  (done - we can now do set(field1 === value1 & field2 === value2)
 14. update one/many have an unnecessary returnErrors clause. Remove.
 15. Allow saving of multiple DomainObjects at once. save (list) ~~>
-16. MongoWriteResult should only return Boolean. true if valid false if not. The users function through be sage (runWithEither[Option[String], Boolean]
+16. MongoWriteResult should only return Boolean. true if valid false if not. The users function should be safe (runWithEither[Option[String], Boolean]
 17. Make Order subdsl better. Current Order(field1, ASC|DSC) -> OrderBy field1 | ASC
 18. Find a way to not have to type in idField for each DomainObject
 19. Clean up unnecessary methods on MongoObjectBehaviour
 20. create example from Casbah
-21. make field search type safe on the owner object.
-22. Rename and2 in FieldValueJoiner/Continuer
+21. make field search type safe on the owner object. (done)
+22. Rename and2 in FieldValueJoiner
 23. simplify FieldValueJoiner to one class. (done)
-24. Migrate find many and update to use FieldValueJoiners.
+24. Migrate find one, many and update to use FieldValueJoiners. (done)
 25. Make Regex typesafe. (done for find one, find many, update) (todo: upserts, findManyBlah)
-26. Remove ?* syntax for regex.
-27. Make set() type-safe MongoUpdateObject needs a type of O <: DomainObject.
+26. Remove ?* syntax for regex. (done)
+27. Make set() type-safe MongoUpdateObject needs a type of O <: DomainObject. (done)
+28. Make Order method type-safe. (done)
+29. Do we need find one and many? Can't we used find (many returned by default)
