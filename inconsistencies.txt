@@ -27,4 +27,4 @@
 26. Remove ?* syntax for regex. (done)
 27. Make set() type-safe MongoUpdateObject needs a type of O <: DomainObject. (done)
 28. Make Order method type-safe. (done)
-29. Do we need find one and many? Can't we used find (many returned by default)
+29. Do we need find one and many? Can't we used find (many returned by default) (done)
