@@ -28,8 +28,8 @@ trait MongoFunctions { this:Tools  =>
     UserFunction = col => col(collectionName[T]).find[T](f)(c).fold(l => Some(l), r => if (r.isEmpty) h else g(r))
 
   def msafeUpdate[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject[T])(g: MongoWriteResult => Option[String])
-                                                     (multiple: => Boolean): UserFunction =
-    col => col(collectionName[T]).update3(query = q, update = u.value, handler = g, multi = multiple)
+                                                     (multiple: => Boolean)(up: => Boolean): UserFunction =
+    col => col(collectionName[T]).update3(query = q, update = u.value, handler = g, multi = multiple, upsert = up)
 
   def findAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner
           )(update: => UpdateObject[T])(f: T => Option[String])(h: => Option[String]): UserFunction =

@@ -129,3 +129,7 @@ upsert (Blog) where (titleField === "lessons learned") sortedBy(titleField|ASC) 
 update many (Blog) where (titleField === "lessons learned") sortedBy(titleField|ASC) withValues (set(titleField === "Lessons Learned"))
     withResults() onError()
 delete one (Blog) where (titleField === "lessons learned") sortedBy(titleField|ASC) withResults() onError()
+
+
+update one Blog where titleField === "Lessons Learned" withValues b2 returnErrors
+upsert one Blog  where titleField === "Lessons Learned" withValues b2 insert

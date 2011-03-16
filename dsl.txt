@@ -44,3 +44,19 @@ The errorHandler function is => Option[String]. If you want processing to stop a
 
 Any Exceptions thrown in either function will cause the processing of subsequent statements to stop. The Exception message will be returned as a
 Some(errorMessage) after execution.
+
+update
+------
+
+update {one|many} {DomainObject} where {query} withValues {UpdatedDomainObject} {returnErrors|handler}
+
+//X is replaced by Y.
+update one X where field1 === value1 withValues (Y) returnErrors
+
+//use set to update only some fields
+update one X where field1 === value1 withValues (set(field1 === value2 & field2 === value 2)) returnErrors
+
+update one X where field1 === value1 withValues (Y) expectResults {wr => wr.getN == Some(1)}
+
+The format of the handler functions is MongoWriteResult => Option[String]. Return None if all is good or return a Some(errorMessage) if you
+wish to stop execution.

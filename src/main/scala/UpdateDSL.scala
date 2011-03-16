@@ -6,6 +6,7 @@ package akuru
 
 import MongoTypes.UpdateObject
 import MongoTypes.MongoWriteResult
+import MongoTypes.FieldValueJoiner
 
 /**
  * update one Blog where (titleField("lessons learned")) withValues (set(titleField("Lessons Learned"))) expectResults(_) ~~>
@@ -15,25 +16,34 @@ trait UpdateDSL { this:MongoFunctions with Tools =>
 
   def update: HowMany = new HowMany
 
+  def upsert: InsertOne = new InsertOne
+
+  class InsertOne {
+    def one[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](multiple = false,
+      upsert = true)
+  }
+
   class HowMany {
 
-    def one[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](false)
+    def one[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](multiple = false,
+      upsert = false)
 
-    def many[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](true)
+    def many[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](multiple = true,
+      upsert = false)
   }
 
-  class UpdateQuery[T <: DomainObject : CollectionName : ClassManifest](multiple:Boolean) {
-    import MongoTypes.FieldValueJoiner
-    def where(fvj: => FieldValueJoiner[T]): UpdatedObject[T] = new UpdatedObject[T](multiple, fvj.done)
+  class UpdateQuery[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, upsert: => Boolean) {
+    def where(fvj: => FieldValueJoiner[T]): UpdatedObject[T] = new UpdatedObject[T](multiple, upsert, fvj)
   }
 
-  class UpdatedObject[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, q: => MongoObject) {
-    def withValues(u: => UpdateObject[T]): ExpectWriteResult[T] = new ExpectWriteResult[T](multiple, q, u)
+  class UpdatedObject[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, upsert: => Boolean, q: => FieldValueJoiner[T]) {
+    def withValues(u: => UpdateObject[T]): ExpectWriteResult[T] = new ExpectWriteResult[T](multiple, upsert, q, u)
   }
 
-  class ExpectWriteResult[T <: DomainObject : CollectionName : ClassManifest](multiple: Boolean, q: => MongoObject, u: => UpdateObject[T]) {
+  class ExpectWriteResult[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, upsert: => Boolean, q: => FieldValueJoiner[T],
+                                                                              u: => UpdateObject[T]) {
 
-    def expectResults(f: MongoWriteResult => Option[String]): UserFunction = msafeUpdate[T](q)(u)(f)(multiple)
+    def expectResults(f: MongoWriteResult => Option[String]): UserFunction = msafeUpdate[T](q.done)(u)(f)(multiple)(upsert)
 
     def returnErrors: UserFunction = expectResults(defaultHandler)
   }
