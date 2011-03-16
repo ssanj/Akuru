@@ -34,11 +34,11 @@ DomainObject.field1 ?* ("regex"/[i/u/o/]) and DomainObject.field2 === value and 
 
 find
 ----
-find cardinality[one|many] {DomainObject} where {query} (constrainedBy{Limit|Order(ASC|DSC)}*) withResults {handler} (onError {error handler})
+find {DomainObject} where {query} (constrainedBy{Limit|Order(ASC|DSC)}*) withResults {handler} withoutResults {errorHandler}
 
-find one X where (field1 === value1 and field2 === value2) withResults  (b => doSomething) onError (handleError)
-find many X where (field1 === value1 and field2 === value2) withResults {b => doSomething}
-find many x where (field1 === value1) constrainedBy (Limit(N) and Order(field1, ASC)) withResults {b => doSomething)
+find (X) where (field1 === value1 and field2 === value2) withResults (b => doSomething) withoutResults (handleError)
+find (X) where (field1 === value1 and field2 === value2) withResults {b => doSomething}  withoutResults (handleError)
+find (X) where (field1 === value1) constrainedBy (Limit(N) and Order(field1, ASC)) withResults {b => doSomething)  withoutResults (handleError)
 
-for a cardinality of one, the handler function is (DomainObject => Option[String])
-for a cardinality of many, the handler function is (Seq[DomainObject] => Option[String])
+The handler function is (Seq[DomainObject] => Option[String])
+The errorHandler function is => Option[String]
