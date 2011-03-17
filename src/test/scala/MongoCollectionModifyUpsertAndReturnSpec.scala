@@ -5,12 +5,11 @@
 
 package akuru
 
-final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec with AkuruDSL {
+final class MongoCollectionModifyUpsertAndReturnSpec extends CommonSpec with AkuruDSL {
 
   import Task._
   import MongoTypes.MongoObject._
   "A MongoCollection with Modify and Upsert" should "create a non-existant object" in {
-    var handlerCalled = false
     ( initTask ~~>
             ( modify a Task where nameField === "Clean Room" upsertWith createTask withUpserted { t =>
                 t.name.value should equal ("Clean Room")
