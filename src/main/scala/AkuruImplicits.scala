@@ -30,7 +30,7 @@ trait AkuruImplicits {
 
   implicit def fieldToOperation[O <: DomainObject, T <% Number](f:Field[O, T]): NumericOperations[O, T] = NumericOperations[O, T](f)
 
-  implicit def defaultRegExOption: RegexConstants.Value = RegexConstants.none
+  implicit val defaultRegExOption: RegexConstants.Value = RegexConstants.none
 
   implicit def stringToRegX(reg: String): RegExWithOptions = RegExWithOptions(reg)
 
