@@ -28,7 +28,7 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     drop[Label] ~~>
                     blogs.map(b => save(b)) ~~>
                     (blogs.flatMap(b => b.labels.value.map(l => save(Label(valueField === l)))).toList) ~~>
-                    ( find (Blog) where (Blog.titleField === "Hello World Lift" and Blog.labelsField === Seq("lift", "scala", "sbt"))
+                    ( find (Blog) where (titleField === "Hello World Lift" and labelsField === Seq("lift", "scala", "sbt"))
                             withResults printBlogs withoutResults noOp ) ~~>
                     ( find (Blog) where (labelsField === {"ubuntu|work"/i} and titleField === ("less"/i)) withResults printBlogs withoutResults noOp ) ~~>
                     ( update one Blog where titleField === "lessons learned" withValues set(titleField === "Lessons Learned") returnErrors ) ~~>

@@ -10,7 +10,7 @@ import MongoTypes.MongoQueryJoiner
 
 trait OperatorTypes {
 
-  case class OperatorObject[O <: DomainObject, T <% Number](f:Field[O, T]) {
+  case class NumericOperations[O <: DomainObject, T <% Number](f:Field[O, T]) {
 
     def lt(t1:T): Query[O] = operate(f, t1, "$lt")
 
@@ -28,14 +28,12 @@ trait OperatorTypes {
 
     def >=(t1:T): Query[O] = gte(t1)
 
-    def between(t1:T, t2:T): Query[O] = createFieldValueJoiner(
-      mongo.putMongo(f.name, mongo.merge("$gte" -> t1).merge(mongo.merge("$lte" -> t2))))
+    def between(t1:T, t2:T): Query[O] = createQuery(mongo.putMongo(f.name, mongo.merge("$gte" -> t1).merge(mongo.merge("$lte" -> t2))))
 
     def |<>|(t1:T, t2:T): Query[O] = between(t1, t2)
 
-    private def operate(f:Field[O, T], value: => T, func: => String): Query[O] =
-      createFieldValueJoiner($funcPrimitive(f.name, func, value))
+    private def operate(f:Field[O, T], value: => T, func: => String): Query[O] = createQuery($funcPrimitive(f.name, func, value))
 
-    private def createFieldValueJoiner(mo: MongoObject): Query[O] = Query[O](MongoQueryJoiner[O](mo))
+    private def createQuery(mo: MongoObject): Query[O] = Query[O](MongoQueryJoiner[O](mo))
   }
 }

@@ -20,7 +20,7 @@
 19. Clean up unnecessary methods on MongoObjectBehaviour
 20. create example from Casbah
 21. make field search type safe on the owner object. (done)
-22. Rename and2 in FieldValueJoiner
+22. Rename and2 in FieldValueJoiner (done)
 23. simplify FieldValueJoiner to one class. (done)
 24. Migrate find one, many and update to use FieldValueJoiners. (done)
 25. Make Regex typesafe. (done for find one, find many, update) (done)
@@ -30,6 +30,6 @@
 29. Do we need find one and many? Can't we used find (many returned by default) (done)
 30. Unifiy update|updsert|findModifyReturn|findModifyDelete|findModifyUpsert (done through update and modify and remove)
 31. Need to use find without (). Eg find (Blog) should be find Blog.
-32. Make SortObjectJoiner type safe or remove it all together.
+32. Make SortObjectJoiner type safe or remove it all together. (done)
 33. Order now takes in a list of field and SortOrders. Eg. constrainBy (Order(field1 -> ASC, field2 -> DSC)) (done)
-34. Rename FieldValueJoiner to Query
+34. Rename FieldValueJoiner to Query (done)
