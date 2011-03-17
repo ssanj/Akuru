@@ -4,14 +4,14 @@
  */
 package akuru
 
-final class MongoCollectionModifyWithoutSortingSpec extends CommonSpec with ModifyDSL {
+final class MongoCollectionModifyWithoutSortingSpec extends CommonSpec with ModifyDSL with DSLTools {
 
   import Blog._
   import MongoTypes.MongoObject._
   "A MongoCollection with findAndModify" should "find and modify an existing object" in {
     ( initBlog ~~>
             save(Blog(titleField("Parry Hotter"), labelsField(Seq("book", "movie")))) ~~>
-            ( modify a Blog where titleField === "Parry Hotter" using noSort
+            ( modify a Blog where titleField === "Parry Hotter" noSort()
                     updateWith Blog(titleField("Harry Potter"), labelsField(Seq("books", "movies")))
                     withUpdated { b =>
                       b.title.value should equal ("Harry Potter")
@@ -19,7 +19,7 @@ final class MongoCollectionModifyWithoutSortingSpec extends CommonSpec with Modi
                       success }
                     onError error("Parry Hotter was not updated!!")
             ) ~~>
-            ( modify a Blog where titleField === "Harry Potter" using noSort updateWith set(titleField === "Rahhy Ropper") withUpdated { b =>
+            ( modify a Blog where titleField === "Harry Potter" noSort() updateWith set(titleField === "Rahhy Ropper") withUpdated { b =>
               b.title.value should equal ("Rahhy Ropper") //only title has changed
               b.labels.value should equal (Seq("books", "movies")) //has not changed
               success

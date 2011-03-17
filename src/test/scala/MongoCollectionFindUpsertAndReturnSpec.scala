@@ -12,7 +12,7 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec with Akuru
   "A MongoCollection with Modify and Upsert" should "create a non-existant object" in {
     var handlerCalled = false
     ( initTask ~~>
-            ( modify a Task where nameField === "Clean Room" using noSort upsertWith createTask withUpserted { t =>
+            ( modify a Task where nameField === "Clean Room" noSort() upsertWith createTask withUpserted { t =>
                 t.name.value should equal ("Clean Room")
                 t.priority.value should equal (5)
                 t.owner.value should equal ("sanj")
@@ -26,7 +26,7 @@ final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec with Akuru
             save(createTask) ~~>
             save(createHPTask1) ~~>
             save(createHPTask2) ~~>
-            ( modify a Task where nameField === "Clean Room" using (sort(priorityField, DSC) and sort(ownerField, ASC))
+            ( modify a Task where nameField === "Clean Room" sortBy (priorityField -> DSC, ownerField -> ASC)
                     upsertWith (set(nameField("Clean Den") & priorityField(6))) withUpserted {t =>
               t.name.value should equal ("Clean Den")
               t.priority.value should equal (6)

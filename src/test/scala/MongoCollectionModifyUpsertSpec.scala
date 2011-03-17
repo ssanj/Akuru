@@ -4,13 +4,12 @@
  */
 package akuru;
 
-final class MongoCollectionModifyUpsertSpec extends CommonSpec with ModifyDSL {
+final class MongoCollectionModifyUpsertSpec extends CommonSpec with ModifyDSL with DSLTools {
 
   import Blog._
-  import MongoTypes.MongoObject._
   "A MongoCollection with Modify and Upsert" should "find and modify an existing object" in {
     ( initBlog ~~>
-            ( modify a Blog where titleField === "Functor" using sort(titleField, ASC)
+            ( modify a Blog where titleField === "Functor" sortBy (titleField -> ASC)
                     upsertWith Blog(titleField("Functor"), labelsField(Seq("fp", "programming")))
                     withUpserted { b =>
                       b.title.value should equal ("Functor")

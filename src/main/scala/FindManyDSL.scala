@@ -7,7 +7,7 @@ package akuru
 import MongoTypes.MongoCursor
 import MongoTypes.MongoSortObject
 import MongoTypes.MongoObject.mongo
-trait FindManyDSL { this:MongoFunctions with Tools =>
+trait FindManyDSL { this:MongoFunctions with Tools with DSLTools =>
 
   final class QueryForMultipleResults[T <: DomainObject : CollectionName : MongoToDomain] {
 
@@ -37,7 +37,7 @@ trait FindManyDSL { this:MongoFunctions with Tools =>
 
   final case class Order[T <: DomainObject, U](first:(Field[T, _], SortOrder), rest: (Field[T, _], SortOrder)*) extends Constraint[T] {
     def apply(): MongoCursor => MongoCursor = mc => {
-      mc.orderBy(MongoSortObject((first :: rest.toList).foldLeft(mongo){ case (mo, (k, v)) => mo.putPrimitiveObject(k.name, v.id) }))
+      mc.orderBy(orderToSortObject[T](first :: rest.toList))
     }
   }
 

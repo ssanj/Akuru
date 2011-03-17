@@ -33,7 +33,7 @@ final class MongoCollectionModifyWithSortingSpec extends CommonSpec with AkuruDS
 
   private def verifySort(sortOrder:SortOrder, updated:Book, unUpdatedVersion:Int) {
    (setup ~~>
-              ( modify a Book where nameField === "Programming in Scala" using sort(printVersionField, sortOrder) updateWith updated
+              ( modify a Book where nameField === "Programming in Scala" sortBy (printVersionField -> sortOrder) updateWith updated
                   withUpdated{ b =>
                       b.name.value should equal (updated.name.value)
                       success

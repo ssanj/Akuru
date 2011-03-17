@@ -4,4 +4,4 @@
  */
 package akuru
 
-trait AkuruDSL extends FindDSL with UpdateDSL with ModifyDSL with MongoFunctions with Tools
+trait AkuruDSL extends FindDSL with UpdateDSL with ModifyDSL with MongoFunctions with DSLTools with Tools
