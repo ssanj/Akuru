@@ -5,7 +5,7 @@
 
 package akuru
 
-final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec with AkuruDSL {
+final class MongoCollectionModifyWithSortingSpec extends CommonSpec with AkuruDSL {
 
   import Book._
   import MongoTypes.MongoObject._

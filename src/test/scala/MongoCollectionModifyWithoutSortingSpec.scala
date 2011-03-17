@@ -4,7 +4,7 @@
  */
 package akuru
 
-final class MongoCollectionFindModifyAndReturnSpec extends CommonSpec with ModifyDSL {
+final class MongoCollectionModifyWithoutSortingSpec extends CommonSpec with ModifyDSL {
 
   import Blog._
   import MongoTypes.MongoObject._
