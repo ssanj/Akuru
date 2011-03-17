@@ -22,7 +22,7 @@ trait MongoCollectionCommonUpdateSpec { this:AkuruDSL with CommonSpec =>
 
   it should "handle Exceptions in the update" in {
     ( initBlog ~~>
-            ( update many Blog where (titleField === "blah") withValues (ex("claboom!")) returnErrors )
+            ( update * Blog where (titleField === "blah") withValues (ex("claboom!")) returnErrors )
     ) ~~>() verifyError(_ should startWith ("claboom!"))
   }
 
@@ -33,7 +33,7 @@ trait MongoCollectionCommonUpdateSpec { this:AkuruDSL with CommonSpec =>
         ( cardinality where titleField === ("Functor.*"/) withValues ($push(labelsField, "tech"))
                 expectResults (wr => if (wr.getN == Some(expectedResults)) None else
                   Some("Expected  Some(" + expectedResults + ") updates but got: " + wr.getN)) ) ~~>
-        ( find many Blog where labelsField === ("tech"/) withResults {b => b.size should equal (expectedResults); success}
+        ( find * Blog where labelsField === ("tech"/) withResults {b => b.size should equal (expectedResults); success}
                 withoutResults error("Expected " + expectedResults + " but got 0") )
     ) ~~>() verifySuccess
   }

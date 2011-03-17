@@ -5,15 +5,15 @@
 package akuru
 
 /**
- * find (X) where (field1 === value1 and field2 === value2) withResults (b => doSomething) withoutResults (handleError)
- * find (X) where (field1 === value1) constrainedBy (Limit(N) and Order(field1 -> ASC)) withResults {b => doSomething)  withoutResults (handleError)
+ * find * X where (field1 === value1 and field2 === value2) withResults (b => doSomething) withoutResults (handleError)
+ * find a X where (field1 === value1) constrainedBy (Limit(N) and Order(field1 -> ASC)) withResults {b => doSomething)  withoutResults (handleError)
  */
 trait FindDSL extends FindManyDSL { this:MongoFunctions with Tools with DSLTools =>
 
   def find: FindMany = new FindMany
 
   final class FindMany {
-    def many[T <: DomainObject : CollectionName : MongoToDomain](template: => DomainTemplate[T]): QueryForMultipleResults[T]  =
+    def *[T <: DomainObject : CollectionName : MongoToDomain](template: => DomainTemplate[T]): QueryForMultipleResults[T]  =
             new QueryForMultipleResults[T]
   }
 }

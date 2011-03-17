@@ -9,9 +9,10 @@ import MongoTypes.MongoWriteResult
 import MongoTypes.Query
 
 /**
- * update one Blog where (titleField === "lessons learned" and labelsField === Seq("misc")) withValues ($$set(titleField === "Lessons Learned")) expectResults(_) ~~>
- * update one Blog where titleField === "lessons learned" withValues (new Blog(..)) expectResults(_) ~~>
- * update many Blog where (titleField("lessons learned")) withValues ($$set(titleField("Lessons Learned"))) returnErrors ~~>
+ * update a Blog where (titleField === "lessons learned" and labelsField === Seq("misc"))
+ *  withValues ($$set(titleField === "Lessons Learned")) expectResults(_) ~~>
+ * update a Blog where titleField === "lessons learned" withValues (new Blog(..)) expectResults(_) ~~>
+ * update * Blog where (titleField("lessons learned")) withValues ($$set(titleField("Lessons Learned"))) returnErrors ~~>
  */
 trait UpdateDSL { this:MongoFunctions with Tools =>
 
@@ -20,16 +21,16 @@ trait UpdateDSL { this:MongoFunctions with Tools =>
   def upsert: InsertOne = new InsertOne
 
   class InsertOne {
-    def one[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](multiple = false,
+    def a[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](multiple = false,
       upsert = true)
   }
 
   class HowMany {
 
-    def one[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](multiple = false,
+    def a[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](multiple = false,
       upsert = false)
 
-    def many[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](multiple = true,
+    def *[T <: DomainObject : CollectionName : ClassManifest](template:DomainTemplate[T]): UpdateQuery[T] = new UpdateQuery[T](multiple = true,
       upsert = false)
   }
 

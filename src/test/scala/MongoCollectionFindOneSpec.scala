@@ -13,7 +13,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec with FindDSL with DSLT
     (onTestDB ~~>
             drop[Blog] ~~>
             save(Blog(titleField === "blah1")) ~~> save(Blog(titleField === "blah2")) ~~> save(Blog(titleField === "blah3")) ~~>
-            ( find many Blog where titleField === ("blah.*"/i) constrainedBy (Limit(1)) withResults { blogs =>
+            ( find * Blog where titleField === ("blah.*"/i) constrainedBy (Limit(1)) withResults { blogs =>
                 blogs.size should equal (1)
                 blogs(0).title.value should include regex ("blah")
                 success
@@ -24,7 +24,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec with FindDSL with DSLT
   it  should "call a nomatches handler function if it does not have any matches" in {
     var handlerCalled = false
     (
-      onTestDB ~~> drop[Blog] ~~> ( find many Blog where titleField === ("blah"/) withResults (b => Some("Unexpected blog returned -> " + b))
+      onTestDB ~~> drop[Blog] ~~> ( find * Blog where titleField === ("blah"/) withResults (b => Some("Unexpected blog returned -> " + b))
               withoutResults  { handlerCalled = true; None } ) ~~>()
     ) verifySuccess()
 
@@ -33,14 +33,14 @@ final class MongoCollectionFindOneSpec extends CommonSpec with FindDSL with DSLT
 
   it should "handle exceptions thrown on finder execution" in {
     (
-      onTestDB ~~> ( find many Person where Person.nameField === ("*"/) withResults (_ => Some("Should not have return results"))
+      onTestDB ~~> ( find * Person where Person.nameField === ("*"/) withResults (_ => Some("Should not have return results"))
               withoutResults noOp ) ~~>()
     ) verifyError has (Person.expectedError)
   }
 
   it should "handle exceptions thrown on creating a query" in {
     (
-      onTestDB ~~> ( find many Blog where (exceptionalFieldValueJoiner) withResults ( _ => Some("Should not have return results"))
+      onTestDB ~~> ( find * Blog where (exceptionalFieldValueJoiner) withResults ( _ => Some("Should not have return results"))
               withoutResults  (Some("Handler should not be called on error")) ) ~~>()
     ) verifyError has (mongoCreationException)
   }
@@ -50,7 +50,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec with FindDSL with DSLT
       onTestDB ~~>
               drop[Blog] ~~>
               save(Blog(titleField("blah1"))) ~~>
-              ( find many Blog where titleField === (".*"/) withResults (_ => ex("Exception thrown handling match"))
+              ( find * Blog where titleField === (".*"/) withResults (_ => ex("Exception thrown handling match"))
                       withoutResults error("Handler should not be called on error") ) ~~>()
     ) verifyError has ("Exception thrown handling match")
   }
@@ -59,7 +59,7 @@ final class MongoCollectionFindOneSpec extends CommonSpec with FindDSL with DSLT
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              ( find many Blog where titleField === (".*"/) withResults (b => Some("Should not have return results -> " + b))
+              ( find * Blog where titleField === (".*"/) withResults (b => Some("Should not have return results -> " + b))
                       withoutResults(Some("Handler function threw an Exception")) ) ~~>()
     ) verifyError has ("Handler function threw an Exception")
   }

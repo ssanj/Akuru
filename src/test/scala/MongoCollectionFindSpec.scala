@@ -15,7 +15,7 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTool
               save(Blog(titleField === "sample1", labelsField === Seq("sample"))) ~~>
               save(Blog(titleField === "sample2", labelsField === Seq("sample"))) ~~>
               save(Blog(titleField === "sample3", labelsField === Seq("sample"))) ~~>
-              ( find many Blog where titleField === ("sample*"/) withResults { blogs =>
+              ( find * Blog where titleField === ("sample*"/) withResults { blogs =>
                 blogs.size should equal (3)
                 blogs.exists(_.title.value == "sample1") should be (true)
                 blogs.exists(_.title.value == "sample2") should be (true)
@@ -28,7 +28,7 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTool
   it should "return zero results if there are no matches" in {
     (onTestDB ~~>
               drop[Blog] ~~>
-              ( find many Blog where titleField === ("*"/) withResults { b => error("Expected 0 but received: " + b.size) } withoutResults success)
+              ( find * Blog where titleField === ("*"/) withResults { b => error("Expected 0 but received: " + b.size) } withoutResults success)
     ) ~~>() verifySuccess
   }
 
@@ -36,7 +36,7 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTool
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              (find many Person where Person.nameField === ("*"/) withResults (_ => error("Should not have return results"))
+              (find * Person where Person.nameField === ("*"/) withResults (_ => error("Should not have return results"))
               withoutResults error("should not have been called when an Exception is thrown!")) ~~>()
     ) verifyError has (Person.expectedError)
   }
@@ -45,7 +45,7 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTool
     (
       onTestDB ~~>
               drop[Blog] ~~>
-              ( find many Blog where (exceptionalFieldValueJoiner) withResults (_ => error("Should not have return results"))
+              ( find * Blog where (exceptionalFieldValueJoiner) withResults (_ => error("Should not have return results"))
               withoutResults error("should not have been called when an Exception is thrown!") ) ~~>()
     ) verifyError has (mongoCreationException)
   }
@@ -55,7 +55,7 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTool
       onTestDB ~~>
               drop[Blog] ~~>
               save(Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) ~~>
-              ( find many Blog where titleField === (".*"/) withResults (_ => ex("Handler threw an Exception"))
+              ( find * Blog where titleField === (".*"/) withResults (_ => ex("Handler threw an Exception"))
               withoutResults error("should not have been called when an Exception is thrown!") ) ~~>()
     ) verifyError has ("Handler threw an Exception")
   }
@@ -65,11 +65,11 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTool
       onTestDB ~~>
               drop[Blog] ~~>
               save(Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) ~~>
-              ( find many Blog where titleField === ("querying with RegEx"/) withResults { b => error("Expected 0 but received: " + b.size) }
+              ( find * Blog where titleField === ("querying with RegEx"/) withResults { b => error("Expected 0 but received: " + b.size) }
                       withoutResults success ) ~~>
-              ( find many Blog where titleField === ("Querying with RegEx"/i) withResults { expectOne } withoutResults error("Expected 1") ) ~~>
-              ( find many Blog where titleField === (".* with RegEx"/) withResults { expectOne } withoutResults error("Expected 1") ) ~~>
-              ( find many Blog where titleField === (".*query.*"/i) withResults { expectOne } withoutResults error("Expected 1"))
+              ( find * Blog where titleField === ("Querying with RegEx"/i) withResults { expectOne } withoutResults error("Expected 1") ) ~~>
+              ( find * Blog where titleField === (".* with RegEx"/) withResults { expectOne } withoutResults error("Expected 1") ) ~~>
+              ( find * Blog where titleField === (".*query.*"/i) withResults { expectOne } withoutResults error("Expected 1"))
       ~~>()) verifySuccess
   }
 
@@ -82,7 +82,7 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTool
             save(Blog(titleField === "Orange", labelsField === Seq("citrus", "fruit", "navel", "jaffa"))) ~~>
             save(Blog(titleField === "Apple", labelsField === Seq("apples", "fruit", "green", "red"))) ~~>
             save(Blog(titleField === "WaterMellon", labelsField === Seq("mellon", "fruit", "striped"))) ~~>
-            ( find many Blog where labelsField === ("fruit"/) constrainedBy (Limit(2) and Order(titleField -> ASC)) withResults {b =>
+            ( find * Blog where labelsField === ("fruit"/) constrainedBy (Limit(2) and Order(titleField -> ASC)) withResults {b =>
               b.size should equal (2)
               b(0).title.value should equal ("Apple")
               b(1).title.value should equal ("Orange")
