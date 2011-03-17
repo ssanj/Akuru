@@ -5,7 +5,7 @@
 
 package akuru
 
-final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec {
+final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec with AkuruDSL {
 
   import Book._
   import MongoTypes.MongoObject._
@@ -18,8 +18,7 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
     verifySort(DSC, createVersion2, 1)
   }
   private def setup: FutureConnection = {
-    onTestDB ~~>
-    drop[Book] ~~>
+    initBook ~~>
     save(Book(nameField("Programming in Scala"),
               authorsField(Seq("Martin Odersky", "Lex Spoon", "Bill Venners")),
               publisherField("artima"),
@@ -34,17 +33,18 @@ final class MongoCollectionFindModifyAndReturnWithSortingSpec extends CommonSpec
 
   private def verifySort(sortOrder:SortOrder, updated:Book, unUpdatedVersion:Int) {
    (setup ~~>
-              findAndModifyAndReturn[Book](nameField("Programming in Scala"))(sort(printVersionField, sortOrder)) { updated }{ b =>
-                b.name.value should equal (updated.name.value)
-                success
-              } { Some("Book was not updated!!") } ~~>
-              mfind[Book](nameField("Programming in Scala")) { all }  { books =>
+              ( modify a Book where nameField === "Programming in Scala" using sort(printVersionField, sortOrder) updateWith updated
+                  withUpdated{ b =>
+                      b.name.value should equal (updated.name.value)
+                      success
+                  } onError error("Book was not updated!!") ) ~~>
+              ( find (Book) where nameField === "Programming in Scala" withResults { books =>
                 books.size should equal (1)
                 books.foreach { b:Book =>
                   b.name.value should equal ("Programming in Scala")
                   b.printVersion.value should equal (unUpdatedVersion)
                 }
-                success} { error("Expected 1 but got 0 hits") }
+                success} withoutResults error("Expected 1 but got 0 hits") )
    ) ~~>() verifySuccess
   }
 

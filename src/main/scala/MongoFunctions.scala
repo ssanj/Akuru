@@ -45,6 +45,10 @@ trait MongoFunctions { this:Tools  =>
       col => col(collectionName[T]).findAndModify[T](query, sort.done, false, update.value, true, true).fold(l => Some(l), r=> foldOption(r){h}(f))
   }
 
+  def mfindAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner
+          )(upsert: => Boolean)(update: => UpdateObject[T])(f: T => Option[String])(h: => Option[String]): UserFunction =
+  { col => col(collectionName[T]).findAndModify[T](query, sort.done, false, update.value, true, upsert).fold(l => Some(l), r=> foldOption(r){h}(f)) }
+
   def noOp: Option[String] = None
 
   def all(mc:MongoCursor): MongoCursor = identity(mc)

@@ -4,25 +4,26 @@
  */
 package akuru
 
-final class MongoCollectionFindModifyAndReturnSpec extends CommonSpec {
+final class MongoCollectionFindModifyAndReturnSpec extends CommonSpec with ModifyDSL {
 
   import Blog._
   import MongoTypes.MongoObject._
   "A MongoCollection with findAndModify" should "find and modify an existing object" in {
-    (onTestDB ~~>
-            drop[Blog] ~~>
+    ( initBlog ~~>
             save(Blog(titleField("Parry Hotter"), labelsField(Seq("book", "movie")))) ~~>
-            findAndModifyAndReturn[Blog](titleField("Parry Hotter")) { noSort } {
-              Blog(titleField("Harry Potter"), labelsField(Seq("books", "movies"))) }{ b =>
-              b.title.value should equal ("Harry Potter")
-              b.labels.value should equal (Seq("books", "movies"))
-              success
-            } { Some("Parry Hotter was not updated!!") } ~~>
-            findAndModifyAndReturn[Blog](titleField("Harry Potter")) { noSort } ( set(titleField("Rahhy Ropper"))) { b =>
+            ( modify a Blog where titleField === "Parry Hotter" using noSort
+                    updateWith Blog(titleField("Harry Potter"), labelsField(Seq("books", "movies")))
+                    withUpdated { b =>
+                      b.title.value should equal ("Harry Potter")
+                      b.labels.value should equal (Seq("books", "movies"))
+                      success }
+                    onError error("Parry Hotter was not updated!!")
+            ) ~~>
+            ( modify a Blog where titleField === "Harry Potter" using noSort updateWith set(titleField === "Rahhy Ropper") withUpdated { b =>
               b.title.value should equal ("Rahhy Ropper") //only title has changed
               b.labels.value should equal (Seq("books", "movies")) //has not changed
               success
-            } { Some("Harry Potter was not updated!!") } ~~>()
+            } onError error("Harry Potter was not updated!!") ) ~~>()
     ) verifySuccess
   }
 }

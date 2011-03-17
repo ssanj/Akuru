@@ -9,7 +9,8 @@ import MongoTypes.MongoWriteResult
 import MongoTypes.FieldValueJoiner
 
 /**
- * update one Blog where (titleField("lessons learned")) withValues (set(titleField("Lessons Learned"))) expectResults(_) ~~>
+ * update one Blog where (titleField === "lessons learned" and2 labelsField === Seq("misc")) withValues (set(titleField === "Lessons Learned")) expectResults(_) ~~>
+ * update one Blog where titleField === "lessons learned" withValues (new Blog(..)) expectResults(_) ~~>
  * update many Blog where (titleField("lessons learned")) withValues (set(titleField("Lessons Learned"))) returnErrors ~~>
  */
 trait UpdateDSL { this:MongoFunctions with Tools =>

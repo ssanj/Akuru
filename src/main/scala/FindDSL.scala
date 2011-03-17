@@ -4,6 +4,10 @@
  */
 package akuru
 
+/**
+ * find (X) where (field1 === value1 and2 field2 === value2) withResults (b => doSomething) withoutResults (handleError)
+ * find (X) where (field1 === value1) constrainedBy (Limit(N) and Order(field1, ASC)) withResults {b => doSomething)  withoutResults (handleError)
+ */
 trait FindDSL extends FindManyDSL { this:MongoFunctions with Tools =>
 
   def find[T <: DomainObject : CollectionName : MongoToDomain](template: => DomainTemplate[T]): QueryForMultipleResults[T]  =
