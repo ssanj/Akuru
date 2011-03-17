@@ -19,12 +19,12 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
   it should "update a single matching DomainObject" in {
     ( initBlog ~~>
             save(Blog(titleField === "Blog updates", labelsField === Seq("blog, update"))) ~~>
-            ( find (Blog) where (titleField === "Blog updates") withResults  (b => ignoreSuccess)
+            ( find many Blog where (titleField === "Blog updates") withResults  (b => ignoreSuccess)
                     withoutResults error("Could not find Blog") ) ~~>
             ( update one Blog where (titleField === "Blog updates") withValues
                     ($set(titleField === "Blog Updatees" & labelsField === Seq("bl%%g", "sm%%g"))) returnErrors ) ~~>
-            ( find (Blog) where (titleField === "Blog updates") withResults (b => ex("found old Blog")) withoutResults success )  ~~>
-            ( find (Blog) where (titleField === "Blog Updatees") withResults { blogs =>
+            ( find many Blog where (titleField === "Blog updates") withResults (b => ex("found old Blog")) withoutResults success )  ~~>
+            ( find many Blog where (titleField === "Blog Updatees") withResults { blogs =>
               blogs.size should equal (1)
               val b = blogs(0)
               b.title.value should equal ("Blog Updatees")
@@ -42,7 +42,7 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
                       printVersionField === 2,
                       priceField === 54.95D)
             ) ~~>
-            ( find (Book) where (nameField === "Programming in Scala") withResults { books =>
+            ( find many Book where (nameField === "Programming in Scala") withResults { books =>
                 books.size should equal (1)
                 val b = books(0)
                 b.name.value should equal ("Programming in Scala")
@@ -54,9 +54,9 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
             } withoutResults error("Could not find Book") ) ~~>
             ( update one Book where (publisherField === "artima" and printVersionField === 2 and priceField === 54.95D)
                       withValues ($set(nameField === "PISC" & printVersionField === 3 & priceField === 99.99D)) returnErrors ) ~~>
-            ( find (Blog) where (titleField === "Programming in Scala") withResults (b => error("Found old Book"))
+            ( find many Blog where (titleField === "Programming in Scala") withResults (b => error("Found old Book"))
                     withoutResults success ) ~~>
-            ( find (Book) where (nameField === "PISC" and printVersionField === 3) withResults {books =>
+            ( find many Book where (nameField === "PISC" and printVersionField === 3) withResults {books =>
               books.size should equal (1)
               val b = books(0)
               b.name.value should equal ("PISC")

@@ -33,7 +33,7 @@ trait MongoCollectionCommonUpdateSpec { this:AkuruDSL with CommonSpec =>
         ( cardinality where titleField === ("Functor.*"/) withValues ($push(labelsField, "tech"))
                 expectResults (wr => if (wr.getN == Some(expectedResults)) None else
                   Some("Expected  Some(" + expectedResults + ") updates but got: " + wr.getN)) ) ~~>
-        ( find (Blog) where labelsField === ("tech"/) withResults {b => b.size should equal (expectedResults); success}
+        ( find many Blog where labelsField === ("tech"/) withResults {b => b.size should equal (expectedResults); success}
                 withoutResults error("Expected " + expectedResults + " but got 0") )
     ) ~~>() verifySuccess
   }

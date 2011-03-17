@@ -10,6 +10,10 @@ package akuru
  */
 trait FindDSL extends FindManyDSL { this:MongoFunctions with Tools with DSLTools =>
 
-  def find[T <: DomainObject : CollectionName : MongoToDomain](template: => DomainTemplate[T]): QueryForMultipleResults[T]  =
-      new QueryForMultipleResults[T]
+  def find: FindMany = new FindMany
+
+  final class FindMany {
+    def many[T <: DomainObject : CollectionName : MongoToDomain](template: => DomainTemplate[T]): QueryForMultipleResults[T]  =
+            new QueryForMultipleResults[T]
+  }
 }

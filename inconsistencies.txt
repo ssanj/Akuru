@@ -1,38 +1,41 @@
+1. Better array support. Something of the sort: [F[_] <: Traversable[_], T <: DomainObject](value:F[T])
+2. Handle nulls in getElement
+3. Created NestedFields for nested objects
+4. allow equality between 2 Fields and 2 FieldValues
+5. Get rid of imports from MongoTypes.MongoObject._
+6. Convert regex to Scala RegEx.
+7. Add Command Objects to run any JSon command
+8. Allow saving of multiple DomainObjects at once. save (list) ~~>
+9. MongoWriteResult should only return Boolean. true if valid false if not. The users function should be safe (runWithEither[Option[String], Boolean]
+10. Find a way to not have to type in idField for each DomainObject
+11. Clean up unnecessary methods on MongoObjectBehaviour
+12. create example from Casbah
+13. Need to use find without (). Eg find (Blog) should be find Blog. (done)
+14. Write support and scenarios for similar to Numeric Operators:
+    $pull : { field : {$gt: 3} } } removes array elements greater than 3 (could not get this to work in the console)
+    $pull : { field : {<match-criteria>} } removes array elements meeting match criteria
+
+-------------------------------------------------------------------------------------------------------------
+
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)
 2. update many does not exist (done)
-3. Better array support. Something of the sort: [F[_] <: Traversable[_], T <: DomainObject](value:F[T])
-4. renamed update operations to include $: $set, $put, $push etc (done)
-5. Get rid of Splat for arrays. Arrays should work as per everything else (done)
-6. Handle nulls in getElement
-7. Created NestedFields for nested objects
-8. allow equality between 2 Fields and 2 FieldValues
-9. Get rid of imports from MongoTypes.MongoObject._
-10. Convert regex to Scala RegEx.
-11. Add Command Objects to run any JSon command
-12. Are Query objects needed? (done)
-13. Clean up update operator syntax. (set (field === value) and set (field2 === value2)) is ugly.
+3. renamed update operations to include $: $set, $put, $push etc (done)
+4. Get rid of Splat for arrays. Arrays should work as per everything else (done)
+5. Are Query objects needed? (done)
+6. Clean up update operator syntax. (set (field === value) and set (field2 === value2)) is ugly.
  (done - we can now do set(field1 === value1 & field2 === value2)
-14. update one/many have an unnecessary returnErrors clause. Remove. (done. we need this.)
-15. Allow saving of multiple DomainObjects at once. save (list) ~~>
-16. MongoWriteResult should only return Boolean. true if valid false if not. The users function should be safe (runWithEither[Option[String], Boolean]
-17. Make Order subdsl better. Current Order(field1, ASC|DSC) -> OrderBy field1 | ASC (done. We can now use field1 -> ASC)
-18. Find a way to not have to type in idField for each DomainObject
-19. Clean up unnecessary methods on MongoObjectBehaviour
-20. create example from Casbah
-21. make field search type safe on the owner object. (done)
-22. Rename and2 in FieldValueJoiner (done)
-23. simplify FieldValueJoiner to one class. (done)
-24. Migrate find one, many and update to use FieldValueJoiners. (done)
-25. Make Regex typesafe. (done for find one, find many, update) (done)
-26. Remove ?* syntax for regex. (done)
-27. Make set() type-safe MongoUpdateObject needs a type of O <: DomainObject. (done)
-28. Make Order method type-safe. (done)
-29. Do we need find one and many? Can't we used find (many returned by default) (done)
-30. Unifiy update|updsert|findModifyReturn|findModifyDelete|findModifyUpsert (done through update and modify and remove)
-31. Need to use find without (). Eg find (Blog) should be find Blog.
-32. Make SortObjectJoiner type safe or remove it all together. (done)
-33. Order now takes in a list of field and SortOrders. Eg. constrainBy (Order(field1 -> ASC, field2 -> DSC)) (done)
-34. Rename FieldValueJoiner to Query (done)
-35. Write support and scenarios for similar to Numeric Operators:
-    $pull : { field : {$gt: 3} } } removes array elements greater than 3
-    $pull : { field : {<match-criteria>} } removes array elements meeting match criteria
+7. update one/many have an unnecessary returnErrors clause. Remove. (done. we need this.)
+8. Make Order subdsl better. Current Order(field1, ASC|DSC) -> OrderBy field1 | ASC (done. We can now use field1 -> ASC)
+9. make field search type safe on the owner object. (done)
+10. Rename and2 in FieldValueJoiner (done)
+11. simplify FieldValueJoiner to one class. (done)
+12. Migrate find one, many and update to use FieldValueJoiners. (done)
+13. Make Regex typesafe. (done for find one, find many, update) (done)
+14. Remove ?* syntax for regex. (done)
+15. Make set() type-safe MongoUpdateObject needs a type of O <: DomainObject. (done)
+16. Make Order method type-safe. (done)
+17. Do we need find one and many? Can't we used find (many returned by default) (done)
+18. Unifiy update|updsert|findModifyReturn|findModifyDelete|findModifyUpsert (done through update and modify and remove)
+19. Make SortObjectJoiner type safe or remove it all together. (done)
+20. Order now takes in a list of field and SortOrders. Eg. constrainBy (Order(field1 -> ASC, field2 -> DSC)) (done)
+21. Rename FieldValueJoiner to Query (done)

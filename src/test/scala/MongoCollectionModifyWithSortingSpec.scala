@@ -38,7 +38,7 @@ final class MongoCollectionModifyWithSortingSpec extends CommonSpec with AkuruDS
                       b.name.value should equal (updated.name.value)
                       success
                   } onError error("Book was not updated!!") ) ~~>
-              ( find (Book) where nameField === "Programming in Scala" withResults { books =>
+              ( find many Book where nameField === "Programming in Scala" withResults { books =>
                 books.size should equal (1)
                 books.foreach { b:Book =>
                   b.name.value should equal ("Programming in Scala")

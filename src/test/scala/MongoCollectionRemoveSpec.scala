@@ -18,13 +18,13 @@ final class MongoCollectionRemoveSpec extends CommonSpec with AkuruDSL {
   it should "find and remove an existing object" in {
     ( initBlog ~~>
             save(Blog(titleField("Storms"), labelsField(Seq("qld", "weather")))) ~~>
-            ( find (Blog) where titleField === "Storms" withResults {b => success} withoutResults error("could not find Blog")) ~~>
+            ( find many Blog where titleField === "Storms" withResults {b => success} withoutResults error("could not find Blog")) ~~>
             ( remove a Blog where titleField === "Storms" withDeleted {b =>
               b.title.value should equal ("Storms")
               b.labels.value should equal (Seq("qld", "weather"))
               success
             } onError error("Could not remove Blog")) ~~>
-            ( find (Blog) where titleField === "Storms" withResults {b => Some("Returned deleted Blog " + b)} withoutResults success )
+            ( find many Blog where titleField === "Storms" withResults {b => Some("Returned deleted Blog " + b)} withoutResults success )
       ) ~~>() verifySuccess
   }
 }
