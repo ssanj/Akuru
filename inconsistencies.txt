@@ -1,7 +1,7 @@
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)
 2. update many does not exist (done)
 3. Better array support. Something of the sort: [F[_] <: Traversable[_], T <: DomainObject](value:F[T])
-4. renamed update operations to include $: $set, $put, $push etc
+4. renamed update operations to include $: $set, $put, $push etc (done)
 5. Get rid of Splat for arrays. Arrays should work as per everything else (done)
 6. Handle nulls in getElement
 7. Created NestedFields for nested objects
@@ -33,3 +33,6 @@
 32. Make SortObjectJoiner type safe or remove it all together. (done)
 33. Order now takes in a list of field and SortOrders. Eg. constrainBy (Order(field1 -> ASC, field2 -> DSC)) (done)
 34. Rename FieldValueJoiner to Query (done)
+35. Write support and scenarios for similar to Numeric Operators:
+    $pull : { field : {$gt: 3} } } removes array elements greater than 3
+    $pull : { field : {<match-criteria>} } removes array elements meeting match criteria

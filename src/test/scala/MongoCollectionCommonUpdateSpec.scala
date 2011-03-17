@@ -6,8 +6,8 @@ package akuru
 
 trait MongoCollectionCommonUpdateSpec { this:AkuruDSL with CommonSpec =>
 
-  import MongoTypes.MongoObject.set
-  import MongoTypes.MongoObject.push
+  import MongoTypes.MongoObject.$set
+  import MongoTypes.MongoObject.$push
   import Blog._
 
   def cardinality: UpdateQuery[Blog]
@@ -16,7 +16,7 @@ trait MongoCollectionCommonUpdateSpec { this:AkuruDSL with CommonSpec =>
 
   specName should "handle Exceptions in the query" in {
     ( initBlog ~~>
-            ( cardinality where (ex("boom!")) withValues (set(titleField === "Exceptional")) returnErrors )
+            ( cardinality where (ex("boom!")) withValues ($set(titleField === "Exceptional")) returnErrors )
     ) ~~>() verifyError(_ should startWith ("boom!"))
   }
 
@@ -30,7 +30,7 @@ trait MongoCollectionCommonUpdateSpec { this:AkuruDSL with CommonSpec =>
     ( initBlog ~~>
         save(Blog(titleField === "Functor1", labelsField === Seq("fp"))) ~~>
         save(Blog(titleField === "Functor2", labelsField === Seq("fp"))) ~~>
-        ( cardinality where titleField === ("Functor.*"/) withValues (push(labelsField, "tech"))
+        ( cardinality where titleField === ("Functor.*"/) withValues ($push(labelsField, "tech"))
                 expectResults (wr => if (wr.getN == Some(expectedResults)) None else
                   Some("Expected  Some(" + expectedResults + ") updates but got: " + wr.getN)) ) ~~>
         ( find (Blog) where labelsField === ("tech"/) withResults {b => b.size should equal (expectedResults); success}
@@ -41,14 +41,14 @@ trait MongoCollectionCommonUpdateSpec { this:AkuruDSL with CommonSpec =>
   it should "handle Exceptions on expectResults on matched updates" in {
     ( initBlog ~~>
         save(Blog(titleField === "Functor", labelsField === Seq("fp"))) ~~>
-        ( cardinality where titleField === ("Functor"/) withValues (set(titleField === "^^functor^^"))
+        ( cardinality where titleField === ("Functor"/) withValues ($set(titleField === "^^functor^^"))
                 expectResults (wr => ex("flattened functor")) )
     ) ~~>() verifyError(_ should startWith ("flattened functor"))
   }
 
   it should "not update multiple unmatched values" in {
     ( initBlog ~~>
-            ( cardinality where (titleField === "Blog updates") withValues (set(titleField === "Phantom updates"))
+            ( cardinality where (titleField === "Blog updates") withValues ($set(titleField === "Phantom updates"))
                     expectResults {wr =>
                       runSafelyWithOptionReturnError {
                         wr.updatedExisting should equal (false)

@@ -8,13 +8,13 @@ import MongoTypes.Query
 import MongoTypes.MongoSortObject
 import MongoTypes.UpdateObject
 /**
- * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) updateWith (set()) withUpdated(b => ) onError()
- * modify a Blog where titleField === "blah" sortBy (titleField -> DSC) updateWith (set()) onError()
- * modify a Blog where titleField === "blah" updateWith (set()) onError()
+ * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) updateWith ($$set()) withUpdated(b => ) onError()
+ * modify a Blog where titleField === "blah" sortBy (titleField -> DSC) updateWith ($$set()) onError()
+ * modify a Blog where titleField === "blah" updateWith ($$set()) onError()
  *
- * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) upsertWith (set()) withUpdated(b => ) onError()
- * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) upsertWith (set()) onError()
- * modify a Blog where titleField === "blah" upsertWith (set()) onError()
+ * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) upsertWith ($$set()) withUpdated(b => ) onError()
+ * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) upsertWith ($$set()) onError()
+ * modify a Blog where titleField === "blah" upsertWith ($$set()) onError()
  *
  */
 trait ModifyDSL { this:MongoFunctions with Tools with DSLTools =>

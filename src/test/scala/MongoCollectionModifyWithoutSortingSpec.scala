@@ -18,7 +18,7 @@ final class MongoCollectionModifyWithoutSortingSpec extends CommonSpec with Modi
                       success }
                     onError error("Parry Hotter was not updated!!")
             ) ~~>
-            ( modify a Blog where titleField === "Harry Potter" updateWith set(titleField === "Rahhy Ropper")
+            ( modify a Blog where titleField === "Harry Potter" updateWith $set(titleField === "Rahhy Ropper")
                     withUpdated { b =>
                       b.title.value should equal ("Rahhy Ropper") //only title has changed
                       b.labels.value should equal (Seq("books", "movies")) //has not changed

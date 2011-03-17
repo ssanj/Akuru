@@ -26,7 +26,7 @@ final class MongoCollectionModifyUpsertAndReturnSpec extends CommonSpec with Aku
             save(createHPTask1) ~~>
             save(createHPTask2) ~~>
             ( modify a Task where nameField === "Clean Room" sortBy (priorityField -> DSC, ownerField -> ASC)
-                    upsertWith (set(nameField("Clean Den") & priorityField(6))) withUpserted {t =>
+                    upsertWith ($set(nameField("Clean Den") & priorityField(6))) withUpserted {t =>
               t.name.value should equal ("Clean Den")
               t.priority.value should equal (6)
               t.owner.value should equal ("Litterbug")

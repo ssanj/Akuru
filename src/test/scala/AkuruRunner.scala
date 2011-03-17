@@ -11,7 +11,7 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
 
 
   def main(args: Array[String]) {
-    import MongoTypes.MongoObject.set
+    import MongoTypes.MongoObject.$set
     import Blog._
     import Label._
 
@@ -31,7 +31,7 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     ( find (Blog) where (titleField === "Hello World Lift" and labelsField === Seq("lift", "scala", "sbt"))
                             withResults printBlogs withoutResults noOp ) ~~>
                     ( find (Blog) where (labelsField === {"ubuntu|work"/i} and titleField === ("less"/i)) withResults printBlogs withoutResults noOp ) ~~>
-                    ( update one Blog where titleField === "lessons learned" withValues set(titleField === "Lessons Learned") returnErrors ) ~~>
+                    ( update one Blog where titleField === "lessons learned" withValues $set(titleField === "Lessons Learned") returnErrors ) ~~>
                     ( find (Blog) where labelsField === {"work"/i} withResults printBlogs withoutResults  noOp ) ~~>
                     ( update one Blog where titleField === "Lessons Learned" withValues b2 returnErrors ) ~~>
                     ( find (Blog) where labelsField === {"work"/i} withResults printBlogs withoutResults  noOp ) ~~>

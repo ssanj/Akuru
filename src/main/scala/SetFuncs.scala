@@ -8,8 +8,8 @@ package akuru
 import MongoTypes.MongoUpdateObject
 
 /**
- * { $set : { field : value } }
- * sets field to value. All datatypes are supported with $set.
+ * { $$$set : { field : value } }
+ * sets field to value. All datatypes are supported with $$$set.
  */
 trait SetFuncs { this:Funcs =>
 
@@ -19,7 +19,13 @@ trait SetFuncs { this:Funcs =>
 
   import SetFuncs._
 
-  def set[O <: DomainObject](update: MongoUpdateObject[O]): MongoUpdateObject[O] =  toMongoUpdateObject[O]($funcMongo(functionName, update.value))
+  /**
+   * Used when you do $set(field1 === value1 & field2 === value2 & .... fieldx === valuex)
+   */
+  def $set[O <: DomainObject](update: MongoUpdateObject[O]): MongoUpdateObject[O] =  toMongoUpdateObject[O]($funcMongo(functionName, update.value))
 
-  def set[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject[O] = toMongoUpdateObject[O](anyFunction1[O, T](functionName, fv))
+  /**
+   * Used when you do $set(field1 === value1)
+   */
+  def $set[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject[O] = toMongoUpdateObject[O](anyFunction1[O, T](functionName, fv))
 }
