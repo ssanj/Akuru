@@ -54,7 +54,7 @@ trait TestDomainObjects {
 
   lazy val mongoCreationException = "Exceptional MongoObject"
 
-  def exceptionalFieldValueJoiner[O <: DomainObject]: FieldValueJoiner[O] = throw new RuntimeException(mongoCreationException)
+  def exceptionalFieldValueJoiner[O <: DomainObject]: Query[O] = throw new RuntimeException(mongoCreationException)
 
   case class Person(name:Person.nameField.Value, id:Person.idField.Value = Person.defaultId) extends DomainObject
 

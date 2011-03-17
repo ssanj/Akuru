@@ -4,35 +4,33 @@
  */
 package akuru
 
-trait QueryTypes extends SortTypes with UpdateTypes {
+trait QueryTypes {
 
   import MongoObject.mongo
 
-  sealed abstract class JoinerValue[O <: DomainObject] {
-    def done: MongoObject
+  sealed abstract class QueryJoiner[O <: DomainObject] {
+    def splat: MongoObject
   }
 
-  case class FieldValueJoinerValue[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]) extends JoinerValue[O] {
-    def done: MongoObject = mongo.putAnything[O, T](fv)
+  private[akuru] case class FieldValueQueryJoiner[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]) extends QueryJoiner[O] {
+    def splat: MongoObject = mongo.putAnything[O, T](fv)
   }
 
-  case class MongoJoinerValue[O <: DomainObject](mo: MongoObject) extends JoinerValue[O] {
-    def done: MongoObject = mo
+  private[akuru] case class MongoQueryJoiner[O <: DomainObject](mo: MongoObject) extends QueryJoiner[O] {
+    def splat: MongoObject = mo
   }
 
-  case class FieldValueJoiner[O <: DomainObject](join: JoinerValue[O]) {
-    def and2[S : ClassManifest](fv2:FieldValue[O, S]): FieldValueJoiner[O] =
-      FieldValueJoiner[O](MongoJoinerValue[O](join.done.putAnything[O, S](fv2)))
+  case class Query[O <: DomainObject]private[akuru] (join: QueryJoiner[O]) {
+    def and2[S : ClassManifest](fv2:FieldValue[O, S]): Query[O] =
+      Query[O](MongoQueryJoiner[O](join.splat.putAnything[O, S](fv2)))
 
-    def and2(another:FieldValueJoiner[O]): FieldValueJoiner[O] = FieldValueJoiner[O](MongoJoinerValue[O](join.done.merge(another.done)))
+    def and2(another:Query[O]): Query[O] = Query[O](MongoQueryJoiner[O](join.splat.merge(another.splat)))
 
-    def done: MongoObject = join.done
+    def splat: MongoObject = join.splat
   }
 
   case class MongoJoiner(mo:MongoObject) {
 
-    def and(another:MongoObject): MongoJoiner = MongoJoiner(mo.merge(another))
-
-    def done: MongoObject = mo
+    def splat: MongoObject = mo
   }
 }

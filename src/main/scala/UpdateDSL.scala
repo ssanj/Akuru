@@ -6,7 +6,7 @@ package akuru
 
 import MongoTypes.UpdateObject
 import MongoTypes.MongoWriteResult
-import MongoTypes.FieldValueJoiner
+import MongoTypes.Query
 
 /**
  * update one Blog where (titleField === "lessons learned" and2 labelsField === Seq("misc")) withValues (set(titleField === "Lessons Learned")) expectResults(_) ~~>
@@ -34,17 +34,17 @@ trait UpdateDSL { this:MongoFunctions with Tools =>
   }
 
   class UpdateQuery[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, upsert: => Boolean) {
-    def where(fvj: => FieldValueJoiner[T]): UpdatedObject[T] = new UpdatedObject[T](multiple, upsert, fvj)
+    def where(fvj: => Query[T]): UpdatedObject[T] = new UpdatedObject[T](multiple, upsert, fvj)
   }
 
-  class UpdatedObject[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, upsert: => Boolean, q: => FieldValueJoiner[T]) {
+  class UpdatedObject[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, upsert: => Boolean, q: => Query[T]) {
     def withValues(u: => UpdateObject[T]): ExpectWriteResult[T] = new ExpectWriteResult[T](multiple, upsert, q, u)
   }
 
-  class ExpectWriteResult[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, upsert: => Boolean, q: => FieldValueJoiner[T],
+  class ExpectWriteResult[T <: DomainObject : CollectionName : ClassManifest](multiple: => Boolean, upsert: => Boolean, q: => Query[T],
                                                                               u: => UpdateObject[T]) {
 
-    def expectResults(f: MongoWriteResult => Option[String]): UserFunction = msafeUpdate[T](q.done)(u)(f)(multiple)(upsert)
+    def expectResults(f: MongoWriteResult => Option[String]): UserFunction = msafeUpdate[T](q.splat)(u)(f)(multiple)(upsert)
 
     def returnErrors: UserFunction = expectResults(defaultHandler)
   }

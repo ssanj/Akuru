@@ -2,7 +2,7 @@
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-package akuru;
+package akuru
 
 trait SortTypes {
 
@@ -15,7 +15,7 @@ trait SortTypes {
     val DSC  = Value(-1)
   }
 
-  case class MongoSortObject(mo:MongoObject) extends SortObject {
+  private[akuru] case class MongoSortObject(mo:MongoObject) extends SortObject {
     override val value:MongoObject = mo
   }
 }

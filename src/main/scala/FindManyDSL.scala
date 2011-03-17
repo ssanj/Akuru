@@ -9,8 +9,8 @@ trait FindManyDSL { this:MongoFunctions with Tools with DSLTools =>
 
   final class QueryForMultipleResults[T <: DomainObject : CollectionName : MongoToDomain] {
 
-    import MongoTypes.FieldValueJoiner
-    def where(fvj: => FieldValueJoiner[T]): ConstrainedBy[T] = new ConstrainedBy[T](fvj.done)
+    import MongoTypes.Query
+    def where(fvj: => Query[T]): ConstrainedBy[T] = new ConstrainedBy[T](fvj.splat)
   }
 
   final class ConstrainedBy[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject) {

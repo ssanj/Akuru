@@ -18,5 +18,7 @@ package akuru {
                             MongoRegEx with
                             DomainSupport with
                             QueryTypes with
+                            SortTypes with
+                            UpdateTypes with
                             OperatorTypes
 }
