@@ -30,7 +30,7 @@ trait ModifyDSL { this:MongoFunctions with Tools with DSLTools =>
   }
 
   sealed abstract class BaseModifyUpdate[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T],
-                                                                                                      sort: => MongoSortObject) {
+                                                                                                             sort: => MongoSortObject) {
     def updateWith(update: => UpdateObject[T]): WithUpdated[T]= new WithUpdated[T](query, sort, update, false)
 
     def upsertWith(upsert: => UpdateObject[T]): WithUpserted[T] = new WithUpserted[T](query, sort, upsert, true)

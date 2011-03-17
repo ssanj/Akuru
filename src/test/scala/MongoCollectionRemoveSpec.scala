@@ -5,7 +5,7 @@
 
 package akuru
 
-final class MongoCollectionFindModifyAndRemoveSpec extends CommonSpec with AkuruDSL {
+final class MongoCollectionRemoveSpec extends CommonSpec with AkuruDSL {
 
   import Blog._
   "A MongoCollection with remove" should "not find or remove a non-existant object" in {

@@ -9,7 +9,6 @@ import MongoTypes.MongoUpdateObject
 import MongoTypes.FieldValueJoiner
 import MongoTypes.FieldValueJoinerValue
 import MongoTypes.MongoJoiner
-import MongoTypes.SortObjectJoiner
 import MongoObject.fieldToMongo1
 import MongoObject.mongo
 
@@ -39,8 +38,6 @@ trait AkuruImplicits {
   implicit def mongoJoinerToMongo(mj:MongoJoiner): MongoObject = mj.done
 
   implicit def fieldToOperation[O <: DomainObject, T <% Number](f:Field[O, T]): OperatorObject[O, T] = OperatorObject[O, T](f)
-
-  implicit def mongoSortToSortObjectJoiner(mso:MongoSortObject): SortObjectJoiner = SortObjectJoiner(mso)
 
   implicit def defaultRegExOption: RegexConstants.Value = RegexConstants.none
 

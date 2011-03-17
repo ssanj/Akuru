@@ -18,11 +18,4 @@ trait SortTypes {
   case class MongoSortObject(mo:MongoObject) extends SortObject {
     override val value:MongoObject = mo
   }
-
-  case class SortObjectJoiner(mso: MongoSortObject) {
-
-    def and(another: MongoSortObject): SortObjectJoiner = SortObjectJoiner(MongoSortObject(mso.value.merge(another.value)))
-
-    def done: MongoObject = mso.value
-  }
 }

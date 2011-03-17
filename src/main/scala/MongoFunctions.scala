@@ -5,7 +5,7 @@
 
 package akuru
 import MongoTypes._
-import MongoTypes.SortObjectJoiner
+import MongoTypes.MongoSortObject
 import MongoTypes.MongoObject.empty
 
 trait MongoFunctions { this:Tools  =>
@@ -31,14 +31,14 @@ trait MongoFunctions { this:Tools  =>
                                                      (multiple: => Boolean)(up: => Boolean): UserFunction =
     col => col(collectionName[T]).update3(query = q, update = u.value, handler = g, multi = multiple, upsert = up)
 
-  def mfindAndModifyAndRemove[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner)
+  def mfindAndModifyAndRemove[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => MongoSortObject)
       (f: T => Option[String])(h: => Option[String]): UserFunction = {
-      col => col(collectionName[T]).findAndModify[T](query, sort.done, true, empty, true, false).fold(l => Some(l), r=> foldOption(r){h}(f))
+      col => col(collectionName[T]).findAndModify[T](query, sort.value, true, empty, true, false).fold(l => Some(l), r=> foldOption(r){h}(f))
   }
 
-  def mfindAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner
+  def mfindAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => MongoSortObject
           )(upsert: => Boolean)(update: => UpdateObject[T])(f: T => Option[String])(h: => Option[String]): UserFunction =
-  { col => col(collectionName[T]).findAndModify[T](query, sort.done, false, update.value, true, upsert).fold(l => Some(l), r=> foldOption(r){h}(f)) }
+  { col => col(collectionName[T]).findAndModify[T](query, sort.value, false, update.value, true, upsert).fold(l => Some(l), r=> foldOption(r){h}(f)) }
 
   def noOp: Option[String] = None
 
