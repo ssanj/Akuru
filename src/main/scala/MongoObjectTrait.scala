@@ -15,7 +15,6 @@ trait MongoObjectTrait {
       SetFuncs with
       PullFuncs with
       PushFuncs with
-      SortFuncs with
       Funcs
 
 
