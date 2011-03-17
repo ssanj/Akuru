@@ -37,7 +37,7 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     ( find (Blog) where labelsField === {"work"/i} withResults printBlogs withoutResults  noOp ) ~~>
                     ( upsert one Blog where titleField === "Semigroup" withValues b3 returnErrors ) ~~>
                     ( find (Blog) where labelsField === {"functional"/} withResults printBlogs withoutResults  noOp ) ~~>
-                    ( find (Blog) where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField, ASC)) withResults printBlogs withoutResults noOp)
+                    ( find (Blog) where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField -> ASC)) withResults printBlogs withoutResults noOp)
                  } ~~>() getOrElse("success >>")
     println(result)
   }

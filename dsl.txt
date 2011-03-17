@@ -34,10 +34,10 @@ DomainObject.field1 ?* ("regex"/[i/u/o/]) and DomainObject.field2 === value and 
 
 find
 ----
-find {DomainObject} where {query} (constrainedBy{Limit|Order(ASC|DSC)}*) withResults {handler} withoutResults {errorHandler}
+find {DomainObject} where {query} (constrainedBy{Limit|Order(field -> (ASC|DSC))}*) withResults {handler} withoutResults {errorHandler}
 
 find (X) where (field1 === value1 and field2 === value2) withResults (b => doSomething) withoutResults (handleError)
-find (X) where (field1 === value1) constrainedBy (Limit(N) and Order(field1, ASC)) withResults {b => doSomething)  withoutResults (handleError)
+find (X) where (field1 === value1) constrainedBy (Limit(N) and Order(field1 -> ASC, field2 -> DSC)) withResults {b => doSomething)  withoutResults (handleError)
 
 The handler function is (Seq[DomainObject] => Option[String]). If there is an error handling the results then return Some(errorMessage) else None.
 The errorHandler function is => Option[String]. If you want processing to stop at this point return Some(errorMessage) else None.

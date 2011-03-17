@@ -31,3 +31,4 @@
 30. Unifiy update|updsert|findModifyReturn|findModifyDelete|findModifyUpsert
 31. Need to use find without (). Eg find (Blog) should be find Blog.
 32. Make SortObjectJoiner type safe.
+33. Order now takes in a list of field and SortOrders. Eg. constrainBy (Order(field1 -> ASC, field2 -> DSC)) (done)

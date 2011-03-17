@@ -5,9 +5,8 @@
 package akuru
 
 import MongoTypes.MongoCursor
-import MongoTypes.MongoObject.sort
-import MongoTypes.SortObjectJoiner
-
+import MongoTypes.MongoSortObject
+import MongoTypes.MongoObject.mongo
 trait FindManyDSL { this:MongoFunctions with Tools =>
 
   final class QueryForMultipleResults[T <: DomainObject : CollectionName : MongoToDomain] {
@@ -32,21 +31,14 @@ trait FindManyDSL { this:MongoFunctions with Tools =>
     def apply(): MongoCursor => MongoCursor = mc => constraint2.apply()(constraint1.apply()(mc))
   }
 
-  final class MergedOrderConstraint[T <: DomainObject](soj:SortObjectJoiner, f: MongoCursor => SortObjectJoiner => MongoCursor)
-          extends Constraint[T] {
-    def apply(): MongoCursor => MongoCursor = mc => f(mc)(soj)
-    def ++(other: Order[T, _]): MergedOrderConstraint[T] = new MergedOrderConstraint[T](soj and (sort(other.fv, other.order)) ,
-      mc => soj => mc.orderBy(soj))
-  }
-
   final case class Limit[T <: DomainObject](n:Int) extends Constraint[T] {
     def apply(): MongoCursor => MongoCursor = mc => mc.limit(n)
   }
 
-  final case class Order[T <: DomainObject, U](fv:Field[T, U], order:SortOrder) extends Constraint[T] {
-    def apply(): MongoCursor => MongoCursor = mc => mc.orderBy(sort(fv, order))
-    def ++(other: Order[T, _]): MergedOrderConstraint[T] = new MergedOrderConstraint[T](sort(fv, order) and sort(other.fv, other.order),
-      mc => soj => mc.orderBy(soj))
+  final case class Order[T <: DomainObject, U](first:(Field[T, _], SortOrder), rest: (Field[T, _], SortOrder)*) extends Constraint[T] {
+    def apply(): MongoCursor => MongoCursor = mc => {
+      mc.orderBy(MongoSortObject((first :: rest.toList).foldLeft(mongo){ case (mo, (k, v)) => mo.putPrimitiveObject(k.name, v.id) }))
+    }
   }
 
   final case class All[T <: DomainObject]() extends Constraint[T] {

@@ -7,7 +7,6 @@ package akuru
 final class MongoCursorSpec extends CommonSpec with AkuruDSL {
 
   import Task._
-  import MongoTypes.MongoObject.sort
   "A MongoCursor" should "limit results on finds" in {
     (setup ~~>
       ( find (Task) where (priorityField > 1) constrainedBy Limit(2) withResults { tasks => tasks.size should equal (2);  success }
@@ -19,7 +18,7 @@ final class MongoCursorSpec extends CommonSpec with AkuruDSL {
 
   it should "sort by the fields supplied" in {
     (setup ~~>
-      ( find (Task) where (priorityField > 1) constrainedBy (Order(ownerField, ASC) ++ Order(priorityField, DSC) and Limit(2))
+      ( find (Task) where (priorityField > 1) constrainedBy (Order(ownerField -> ASC, priorityField -> DSC) and Limit(2))
               withResults {tasks =>
                 tasks.size should equal (2)
                 tasks(0).name.value should equal ("Polish Ring")

@@ -82,7 +82,7 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL {
             save(Blog(titleField === "Orange", labelsField === Seq("citrus", "fruit", "navel", "jaffa"))) ~~>
             save(Blog(titleField === "Apple", labelsField === Seq("apples", "fruit", "green", "red"))) ~~>
             save(Blog(titleField === "WaterMellon", labelsField === Seq("mellon", "fruit", "striped"))) ~~>
-            ( find (Blog) where labelsField === ("fruit"/) constrainedBy (Limit(2) and Order(titleField, ASC)) withResults {b =>
+            ( find (Blog) where labelsField === ("fruit"/) constrainedBy (Limit(2) and Order(titleField -> ASC)) withResults {b =>
               b.size should equal (2)
               b(0).title.value should equal ("Apple")
               b(1).title.value should equal ("Orange")
