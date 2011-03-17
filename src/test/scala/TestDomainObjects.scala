@@ -5,7 +5,8 @@
 
 package akuru
 
-import MongoTypes._
+import MongoTypes.putId
+import MongoTypes.Query
 import MongoTypes.MongoObject.empty
 
 trait TestDomainObjects {
