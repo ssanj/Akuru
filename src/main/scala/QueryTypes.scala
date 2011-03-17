@@ -21,16 +21,15 @@ trait QueryTypes {
   }
 
   case class Query[O <: DomainObject]private[akuru] (join: QueryJoiner[O]) {
-    def and2[S : ClassManifest](fv2:FieldValue[O, S]): Query[O] =
+    def and[S : ClassManifest](fv2:FieldValue[O, S]): Query[O] =
       Query[O](MongoQueryJoiner[O](join.splat.putAnything[O, S](fv2)))
 
-    def and2(another:Query[O]): Query[O] = Query[O](MongoQueryJoiner[O](join.splat.merge(another.splat)))
+    def and(another:Query[O]): Query[O] = Query[O](MongoQueryJoiner[O](join.splat.merge(another.splat)))
 
     def splat: MongoObject = join.splat
   }
 
   case class MongoJoiner(mo:MongoObject) {
-
     def splat: MongoObject = mo
   }
 }

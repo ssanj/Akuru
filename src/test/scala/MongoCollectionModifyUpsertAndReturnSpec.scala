@@ -32,12 +32,12 @@ final class MongoCollectionModifyUpsertAndReturnSpec extends CommonSpec with Aku
               t.owner.value should equal ("Litterbug")
               success
             } onError error("Could not upsert Task") ) ~~>
-            ( find (Task) where (nameField === "Clean Room" and2 priorityField < 6) withResults {tasks =>
+            ( find (Task) where (nameField === "Clean Room" and priorityField < 6) withResults {tasks =>
               tasks.size should equal (1)
               verifyEqual(tasks(0), createTask)
               success
             } withoutResults error("expected 1 but got 0 hits") ) ~~>
-            ( find (Task) where (nameField === "Clean Room" and2 priorityField |<>| (7, 10)) withResults { tasks =>
+            ( find (Task) where (nameField === "Clean Room" and priorityField |<>| (7, 10)) withResults { tasks =>
               tasks.size should equal (1)
               verifyEqual(tasks(0), createHPTask1)
               success

@@ -52,11 +52,11 @@ final class MongoCollectionUpdateSingleSpec extends AkuruDSL with CommonSpec wit
                 b.price.value  should equal (54.95D)
                 success
             } withoutResults error("Could not find Book") ) ~~>
-            ( update one Book where (publisherField === "artima" and2 printVersionField === 2 and2 priceField === 54.95D)
+            ( update one Book where (publisherField === "artima" and printVersionField === 2 and priceField === 54.95D)
                       withValues (set(nameField === "PISC" & printVersionField === 3 & priceField === 99.99D)) returnErrors ) ~~>
             ( find (Blog) where (titleField === "Programming in Scala") withResults (b => error("Found old Book"))
                     withoutResults success ) ~~>
-            ( find (Book) where (nameField === "PISC" and2 printVersionField === 3) withResults {books =>
+            ( find (Book) where (nameField === "PISC" and printVersionField === 3) withResults {books =>
               books.size should equal (1)
               val b = books(0)
               b.name.value should equal ("PISC")

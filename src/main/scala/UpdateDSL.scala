@@ -9,7 +9,7 @@ import MongoTypes.MongoWriteResult
 import MongoTypes.Query
 
 /**
- * update one Blog where (titleField === "lessons learned" and2 labelsField === Seq("misc")) withValues (set(titleField === "Lessons Learned")) expectResults(_) ~~>
+ * update one Blog where (titleField === "lessons learned" and labelsField === Seq("misc")) withValues (set(titleField === "Lessons Learned")) expectResults(_) ~~>
  * update one Blog where titleField === "lessons learned" withValues (new Blog(..)) expectResults(_) ~~>
  * update many Blog where (titleField("lessons learned")) withValues (set(titleField("Lessons Learned"))) returnErrors ~~>
  */
