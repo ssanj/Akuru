@@ -10,11 +10,9 @@
 10. Find a way to not have to type in idField for each DomainObject
 11. Clean up unnecessary methods on MongoObjectBehaviour
 12. create example from Casbah
-13. Need to use find without (). Eg find (Blog) should be find Blog. (done)
-14. Write support and scenarios for similar to Numeric Operators:
+13. Write support and scenarios for similar to Numeric Operators:
     $pull : { field : {$gt: 3} } } removes array elements greater than 3 (could not get this to work in the console)
     $pull : { field : {<match-criteria>} } removes array elements meeting match criteria
-
 -------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)
@@ -39,3 +37,4 @@
 19. Make SortObjectJoiner type safe or remove it all together. (done)
 20. Order now takes in a list of field and SortOrders. Eg. constrainBy (Order(field1 -> ASC, field2 -> DSC)) (done)
 21. Rename FieldValueJoiner to Query (done)
+22. Need to use find without (). Eg find (Blog) should be find Blog. (done)
