@@ -31,9 +31,9 @@ trait MongoFunctions { this:Tools  =>
                                                      (multiple: => Boolean)(up: => Boolean): UserFunction =
     col => col(collectionName[T]).update3(query = q, update = u.value, handler = g, multi = multiple, upsert = up)
 
-  def findAndModifyAndRemove[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner)
+  def mfindAndModifyAndRemove[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner)
       (f: T => Option[String])(h: => Option[String]): UserFunction = {
-      col => col(collectionName[T]).findAndModify[T](query, sort.done, true, empty, false, false).fold(l => Some(l), r=> foldOption(r){h}(f))
+      col => col(collectionName[T]).findAndModify[T](query, sort.done, true, empty, true, false).fold(l => Some(l), r=> foldOption(r){h}(f))
   }
 
   def mfindAndModifyAndReturn[T <: DomainObject : CollectionName : MongoToDomain](query: => MongoObject)(sort: => SortObjectJoiner

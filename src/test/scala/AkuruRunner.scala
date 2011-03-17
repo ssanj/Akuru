@@ -43,7 +43,7 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
   }
 
   def printBlogs(blogs:Seq[Blog]): Option[String] = {
-    blogs foreach {blog => println("blog title -> " + blog.title.value + blog.labels.value.mkString("[", ",", "]") ) }
+    blogs foreach {blog => println("blog title -> " + blog.title.value + ", labels -> " + blog.labels.value.mkString("[", ",", "]") ) }
     None
   }
 

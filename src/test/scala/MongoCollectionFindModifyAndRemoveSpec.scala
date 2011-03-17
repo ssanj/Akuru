@@ -5,33 +5,26 @@
 
 package akuru
 
-final class MongoCollectionFindModifyAndRemoveSpec extends CommonSpec {
+final class MongoCollectionFindModifyAndRemoveSpec extends CommonSpec with AkuruDSL {
 
   import Blog._
-  import MongoTypes.MongoObject._
-  "A MongoCollection with findModifyAndRemove" should "not find or remove a non-existant object" in {
-    var handlerCalled = false
-    (onTestDB ~~>
-            drop[Blog] ~~>
-            findAndModifyAndRemove[Blog](titleField("Storms")) (noSort) {b => Some("Found an non-existant blog " + b)} {
-              handlerCalled = true
-              success
-            }
-    ~~>()) verifySuccess
-
-    handlerCalled should equal (true)
+  "A MongoCollection with remove" should "not find or remove a non-existant object" in {
+    ( initBlog ~~>
+            ( remove a Blog where titleField === "Storms" sortBy (titleField -> ASC) withDeleted (b => Some("Found an non-existant blog " + b))
+            onError error("Could not delete Blog"))
+    ) ~~>() verifyError (_ should equal ("Could not delete Blog"))
   }
 
   it should "find and remove an existing object" in {
-    (onTestDB ~~>
-            drop[Blog] ~~>
+    ( initBlog ~~>
             save(Blog(titleField("Storms"), labelsField(Seq("qld", "weather")))) ~~>
-            findAndModifyAndRemove[Blog](titleField("Storms")) (noSort) {b =>
+            ( find (Blog) where titleField === "Storms" withResults {b => success} withoutResults error("could not find Blog")) ~~>
+            ( remove a Blog where titleField === "Storms" withDeleted {b =>
               b.title.value should equal ("Storms")
               b.labels.value should equal (Seq("qld", "weather"))
               success
-            } ( throw new RuntimeException("Handler called on success.")) ~~>
-            mfind(titleField("Storms")) (all) {b:Seq[Blog] => Some("Returned deleted Blog") } { error("did not delete Blog") }
-      ) ~~>() verifyError(_ should equal ("did not delete Blog"))
+            } onError error("Could not remove Blog")) ~~>
+            ( find (Blog) where titleField === "Storms" withResults {b => Some("Returned deleted Blog " + b)} withoutResults success )
+      ) ~~>() verifySuccess
   }
 }

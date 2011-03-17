@@ -16,10 +16,6 @@ import MongoTypes.UpdateObject
  * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) upsertWith (set()) onError()
  * modify a Blog where titleField === "blah" upsertWith (set()) onError()
  *
- * remove a Blog where titleField === "blah" sortBy (titleField -> DSC) withDeleted(b => ) onError()
- * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) onError()
- * modify a Blog where titleField === "blah" onError()
- *
  */
 trait ModifyDSL { this:MongoFunctions with Tools with DSLTools =>
 
