@@ -11,15 +11,14 @@ final class MongoCollectionModifyWithoutSortingSpec extends CommonSpec with Modi
   "A MongoCollection with findAndModify" should "find and modify an existing object" in {
     ( initBlog ~~>
             save(Blog(titleField("Parry Hotter"), labelsField(Seq("book", "movie")))) ~~>
-            ( modify a Blog where titleField === "Parry Hotter" noSort()
-                    updateWith Blog(titleField("Harry Potter"), labelsField(Seq("books", "movies")))
+            ( modify a Blog where titleField === "Parry Hotter"  updateWith Blog(titleField("Harry Potter"), labelsField(Seq("books", "movies")))
                     withUpdated { b =>
                       b.title.value should equal ("Harry Potter")
                       b.labels.value should equal (Seq("books", "movies"))
                       success }
                     onError error("Parry Hotter was not updated!!")
             ) ~~>
-            ( modify a Blog where titleField === "Harry Potter" noSort() updateWith set(titleField === "Rahhy Ropper") withUpdated { b =>
+            ( modify a Blog where titleField === "Harry Potter" updateWith set(titleField === "Rahhy Ropper") withUpdated { b =>
               b.title.value should equal ("Rahhy Ropper") //only title has changed
               b.labels.value should equal (Seq("books", "movies")) //has not changed
               success

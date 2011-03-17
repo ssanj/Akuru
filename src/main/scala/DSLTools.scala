@@ -13,4 +13,6 @@ trait DSLTools {
     MongoSortObject(orders.foldLeft(mongo){ case (mo, (k, v)) => mo.putPrimitiveObject(k.name, v.id) })
   }
 
+  def noSorting: MongoSortObject = MongoSortObject(mongo)
+
 }

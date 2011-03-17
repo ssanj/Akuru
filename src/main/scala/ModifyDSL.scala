@@ -7,19 +7,19 @@ package akuru;
 import MongoTypes.FieldValueJoiner
 import MongoTypes.MongoSortObject
 import MongoTypes.UpdateObject
-import MongoTypes.MongoObject.mongo
-
 /**
- * modify a Blog where titleField === "blah" sortBy (titleField) updateWith (set()) withUpdated(b => ) onError()
- * modify a Blog where titleField === "blah" sortBy (titleField) updateWith (set()) onError()
+ * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) updateWith (set()) withUpdated(b => ) onError()
+ * modify a Blog where titleField === "blah" sortBy (titleField -> DSC) updateWith (set()) onError()
+ * modify a Blog where titleField === "blah" updateWith (set()) onError()
  *
- * modify a Blog where titleField === "blah" sortBy (titleField) upsertWith (set()) withUpdated(b => ) onError()
- * modify a Blog where titleField === "blah" sortBy (titleField) upsertWith (set()) onError()
+ * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) upsertWith (set()) withUpdated(b => ) onError()
+ * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) upsertWith (set()) onError()
+ * modify a Blog where titleField === "blah" upsertWith (set()) onError()
  *
- * remove a Blog where titleField === "blah" sortBy (titleField) withDeleted(b => ) onError()
- * modify a Blog where titleField === "blah" sortBy (titleField) onError()
+ * remove a Blog where titleField === "blah" sortBy (titleField -> DSC) withDeleted(b => ) onError()
+ * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) onError()
+ * modify a Blog where titleField === "blah" onError()
  *
- * query:MongoObject, sort:MongoObject, remove:Boolean, update:MongoObject, returnNew:Boolean, upsert:Boolean
  */
 trait ModifyDSL { this:MongoFunctions with Tools with DSLTools =>
 
@@ -33,19 +33,21 @@ trait ModifyDSL { this:MongoFunctions with Tools with DSLTools =>
     def where(query: => FieldValueJoiner[T]): ModifySort[T] = new ModifySort[T](query)
   }
 
-
-  class ModifySort[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T]) {
-    def sortBy(first:(Field[T, _], SortOrder), rest: (Field[T, _], SortOrder)*): ModifyUpdate[T] =
-      new ModifyUpdate[T](query, orderToSortObject[T](first :: rest.toList))
-
-    def noSort(): ModifyUpdate[T] = new ModifyUpdate[T](query, MongoSortObject(mongo))
-  }
-
-  class ModifyUpdate[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T], sort: => MongoSortObject) {
+  sealed abstract class BaseModifyUpdate[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T],
+                                                                                                      sort: => MongoSortObject) {
     def updateWith(update: => UpdateObject[T]): WithUpdated[T]= new WithUpdated[T](query, sort, update, false)
 
     def upsertWith(upsert: => UpdateObject[T]): WithUpserted[T] = new WithUpserted[T](query, sort, upsert, true)
   }
+
+  class ModifySort[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T])
+          extends BaseModifyUpdate[T](query, noSorting){
+    def sortBy(first:(Field[T, _], SortOrder), rest: (Field[T, _], SortOrder)*): ModifyUpdate[T] =
+      new ModifyUpdate[T](query, orderToSortObject[T](first :: rest.toList))
+  }
+
+  class ModifyUpdate[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T], sort: => MongoSortObject)
+          extends BaseModifyUpdate[T](query, sort)
 
   class WithUpdated[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T],
                                                                                         sort: => MongoSortObject,
