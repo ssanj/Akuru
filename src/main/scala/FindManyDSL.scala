@@ -6,6 +6,7 @@ package akuru
 
 import MongoTypes.MongoCursor
 import MongoTypes.MongoObject.sort
+import MongoTypes.SortObjectJoiner
 
 trait FindManyDSL { this:MongoFunctions with Tools =>
 
@@ -31,12 +32,21 @@ trait FindManyDSL { this:MongoFunctions with Tools =>
     def apply(): MongoCursor => MongoCursor = mc => constraint2.apply()(constraint1.apply()(mc))
   }
 
+  final class MergedConstraint[T <: DomainObject](soj:SortObjectJoiner, f: MongoCursor => SortObjectJoiner => MongoCursor)
+          extends Constraint[T] {
+    def apply(): MongoCursor => MongoCursor = mc => f(mc)(soj)
+    def +[V](other: Order[T, V]): MergedConstraint[T] = new MergedConstraint[T](soj and (sort(other.fv, other.order)) ,
+      mc => soj => mc.orderBy(soj))
+  }
+
   case class Limit[T <: DomainObject](n:Int) extends Constraint[T] {
     def apply(): MongoCursor => MongoCursor = mc => mc.limit(n)
   }
 
   case class Order[T <: DomainObject, U](fv:Field[T, U], order:SortOrder) extends Constraint[T] {
     def apply(): MongoCursor => MongoCursor = mc => mc.orderBy(sort(fv, order))
+    def +[V](other: Order[T, V]): MergedConstraint[T] = new MergedConstraint[T](sort(fv, order) and sort(other.fv, other.order),
+      mc => soj => mc.orderBy(soj))
   }
 
   case class All[T <: DomainObject]() extends Constraint[T] {

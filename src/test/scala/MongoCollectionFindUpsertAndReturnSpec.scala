@@ -5,46 +5,44 @@
 
 package akuru
 
-final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec {
+final class MongoCollectionFindUpsertAndReturnSpec extends CommonSpec with AkuruDSL {
 
   import Task._
   import MongoTypes.MongoObject._
-  "A MongoCollection with findUpsertAndReturn" should "create a non-existant object" in {
+  "A MongoCollection with Modify and Upsert" should "create a non-existant object" in {
     var handlerCalled = false
-    (onTestDB ~~>
-            drop[Task] ~~>
-            findAndUpsertAndReturn[Task](nameField("Clean Room")) (noSort) { createTask } { t =>
+    ( initTask ~~>
+            ( modify a Task where nameField === "Clean Room" using noSort upsertWith createTask withUpserted { t =>
                 t.name.value should equal ("Clean Room")
                 t.priority.value should equal (5)
                 t.owner.value should equal ("sanj")
                 success
-              } { throw new RuntimeException("Could not upsert Task") }
+              } onError error("Could not upsert Task") )
     ) ~~>() verifySuccess
   }
 
   it should "update an existing object" in {
-    (onTestDB ~~>
-            drop[Task] ~~>
+    ( initTask ~~>
             save(createTask) ~~>
             save(createHPTask1) ~~>
             save(createHPTask2) ~~>
-            findAndUpsertAndReturn[Task](nameField("Clean Room")) { sort(priorityField, DSC) and sort(ownerField, ASC) } {
-              set(nameField("Clean Den") & priorityField(6)) } {t =>
+            ( modify a Task where nameField === "Clean Room" using (sort(priorityField, DSC) and sort(ownerField, ASC))
+                    upsertWith (set(nameField("Clean Den") & priorityField(6))) withUpserted {t =>
               t.name.value should equal ("Clean Den")
               t.priority.value should equal (6)
               t.owner.value should equal ("Litterbug")
               success
-            } { throw new RuntimeException("Could not upsert Task") } ~~>
-            mfind[Task](nameField("Clean Room") and (priorityField < 6)) { all } {tasks =>
+            } onError error("Could not upsert Task") ) ~~>
+            ( find (Task) where (nameField === "Clean Room" and2 priorityField < 6) withResults {tasks =>
               tasks.size should equal (1)
               verifyEqual(tasks(0), createTask)
               success
-            } ( error("expected 1 but got 0 hits") ) ~~>
-            mfind[Task](nameField("Clean Room") and (priorityField |<>| (7, 10))) { all } { tasks =>
+            } withoutResults error("expected 1 but got 0 hits") ) ~~>
+            ( find (Task) where (nameField === "Clean Room" and2 priorityField |<>| (7, 10)) withResults { tasks =>
               tasks.size should equal (1)
               verifyEqual(tasks(0), createHPTask1)
               success
-            } ( error("expected 1 but got 0 hits") )
+            } withoutResults error("expected 1 but got 0 hits") )
     ) ~~>() verifySuccess
   }
 

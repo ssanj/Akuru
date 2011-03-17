@@ -7,6 +7,7 @@ package akuru;
 import MongoTypes.FieldValueJoiner
 import MongoTypes.MongoSortObject
 import MongoTypes.UpdateObject
+import MongoTypes.SortObjectJoiner
 /**
  * modify a Blog where titleField === "blah" using (titleField) updateWith (set()) withUpdated(b => ) onError()
  * modify a Blog where titleField === "blah" using (titleField) updateWith (set()) onError()
@@ -33,31 +34,31 @@ trait ModifyDSL { this:MongoFunctions with Tools =>
 
 
   class ModifySort[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T]) {
-    def using[A](sort: => MongoSortObject): ModifyUpdate[T] = new ModifyUpdate[T](query, sort)
+    def using[A](sort: => SortObjectJoiner): ModifyUpdate[T] = new ModifyUpdate[T](query, sort)
   }
 
-  class ModifyUpdate[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T], sort: => MongoSortObject) {
+  class ModifyUpdate[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T], sort: => SortObjectJoiner) {
     def updateWith(update: => UpdateObject[T]): WithUpdated[T]= new WithUpdated[T](query, sort, update, false)
 
     def upsertWith(upsert: => UpdateObject[T]): WithUpserted[T] = new WithUpserted[T](query, sort, upsert, true)
   }
 
   class WithUpdated[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T],
-                                                                                        sort: => MongoSortObject,
+                                                                                        sort: => SortObjectJoiner,
                                                                                         update: => UpdateObject[T],
                                                                                         upsert: => Boolean) {
     def withUpdated(wu: T => Option[String]): ModifyOnError[T] = new ModifyOnError[T](query, sort, update, upsert, wu)
   }
 
   class WithUpserted[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T],
-                                                                                         sort: => MongoSortObject,
+                                                                                         sort: => SortObjectJoiner,
                                                                                          update: => UpdateObject[T],
                                                                                          upsert: => Boolean) {
     def withUpserted(wu: T => Option[String]): ModifyOnError[T] = new ModifyOnError[T](query, sort, update, upsert, wu)
   }
 
   class ModifyOnError[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => FieldValueJoiner[T],
-                                                                                          sort: => MongoSortObject,
+                                                                                          sort: => SortObjectJoiner,
                                                                                           update: => UpdateObject[T],
                                                                                           upsert: => Boolean,
                                                                                           withUpdated: T => Option[String]) {

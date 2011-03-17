@@ -8,7 +8,7 @@ final class MongoCollectionModifyUpsertSpec extends CommonSpec with ModifyDSL {
 
   import Blog._
   import MongoTypes.MongoObject._
-  "A MongoCollection with findAndModify" should "find and modify an existing object" in {
+  "A MongoCollection with Modify and Upsert" should "find and modify an existing object" in {
     ( initBlog ~~>
             ( modify a Blog where titleField === "Functor" using sort(titleField, ASC)
                     upsertWith Blog(titleField("Functor"), labelsField(Seq("fp", "programming")))

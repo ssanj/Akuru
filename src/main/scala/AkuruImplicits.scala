@@ -9,7 +9,7 @@ import MongoTypes.MongoUpdateObject
 import MongoTypes.FieldValueJoiner
 import MongoTypes.FieldValueJoinerValue
 import MongoTypes.MongoJoiner
-import MongoObject.SortObjectJoiner
+import MongoTypes.SortObjectJoiner
 import MongoObject.fieldToMongo1
 import MongoObject.mongo
 

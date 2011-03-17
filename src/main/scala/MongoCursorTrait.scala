@@ -6,7 +6,7 @@ package akuru
 
 import com.mongodb.{DBObject, DBCursor}
 import MongoTypes._
-import MongoTypes.MongoObject.SortObjectJoiner
+import MongoTypes.SortObjectJoiner
 
 trait MongoCursorTrait {
 
@@ -21,7 +21,7 @@ trait MongoCursorTrait {
 
     def limit(hits: => Int): MongoCursor = dbc.limit(hits)
 
-    def orderBy(sorting: => SortObjectJoiner): MongoCursor = dbc.sort(sorting.done)
+    def orderBy(sorting: => SortObjectJoiner): MongoCursor =  dbc.sort(sorting.done)
 
     def all: MongoCursor = this
   }
