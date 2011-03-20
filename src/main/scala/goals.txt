@@ -1,4 +1,8 @@
 1. Functional
-2. No/Low side effecting code
-3. Type safe
-4. Easy to use
+    - Side-effecting code delayed until execution
+    - no exceptions are thrown. Errors returned by Options[String] or Either[String, _]
+    - Any exceptions thrown by user code is wrapped in an Option[String]
+2. Type safe
+3. Easy to use
+4. Consistent
+5. Subset of functions
