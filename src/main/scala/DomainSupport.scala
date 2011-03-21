@@ -56,7 +56,18 @@ trait DomainSupport { this:Tools =>
     private val idKey = "_id"
     val idField: Field[O, MID] = new Owner[O].createField[MID](idKey)
     val defaultId: idField.Value = idField === None
+
     def field[T](name:String): Field[O, T] = new Owner[O].createField[T](name)
+
+    implicit def domainToMongoObject(domain: O): MongoObject
+
+    implicit def mongoToDomain(mo:MongoObject): Option[O]
+
+    val collectionName:String
+
+    implicit object DomainCollectionName extends CollectionName[O] {
+      override lazy val name:String = collectionName
+    }
   }
 
   trait CollectionName[T <: DomainObject] {

@@ -19,20 +19,18 @@ trait TestDomainObjects extends NestedDomainObjects {
     val titleField = field[String]("title")
     val labelsField = field[Seq[String]]("labels")
 
-    implicit def mongoToBlogConverter(mo:MongoObject): Option[Blog] = {
+    implicit def mongoToDomain(mo:MongoObject): Option[Blog] = {
        for {
         title <- mo.getPrimitiveObject(titleField)
         labels <- mo.getPrimitiveObjects(labelsField)
       } yield (Blog(titleField === title, labelsField === labels, idField === mo.getId))
     }
 
-    implicit def blogToMongoConverter(domain:Blog): MongoObject = {
+    implicit def domainToMongoObject(domain:Blog): MongoObject = {
       putId(domain.id.value).putAnything(domain.title).putAnything(domain.labels)
     }
 
-    implicit object BlogCollection extends CollectionName[Blog] {
-      override val name = "blog"
-    }
+    val collectionName = "blog"
   }
 
   case class Label(value:Label.valueField.Value, id:Label.idField.Value = Label.defaultId) extends DomainObject
@@ -41,16 +39,14 @@ trait TestDomainObjects extends NestedDomainObjects {
 
     val valueField = field[String]("value")
 
-    implicit def mongoToLabelConverter(mo:MongoObject): Option[Label] =
+    implicit def mongoToDomain(mo:MongoObject): Option[Label] =
       for {
         value <- mo.getPrimitiveObject(valueField)
       } yield Label(valueField === value, idField === mo.getId)
 
-    implicit def labelToMongoConverter(domain:Label): MongoObject = putId(domain.id.value).putAnything(domain.value)
+    implicit def domainToMongoObject(domain:Label): MongoObject = putId(domain.id.value).putAnything(domain.value)
 
-    implicit object LabelCollection extends CollectionName[Label] {
-      override val name = "label"
-    }
+    val collectionName = "label"
   }
 
   lazy val mongoCreationException = "Exceptional MongoObject"
@@ -63,15 +59,13 @@ trait TestDomainObjects extends NestedDomainObjects {
 
     val nameField = field[String]("name")
 
-    implicit def personToMongo(p:Person): MongoObject = empty
+    implicit def domainToMongoObject(p:Person): MongoObject = empty
 
-    implicit def mongoToPerson(mo:MongoObject): Option[Person] = Some(Person(name = nameField === "testing"))
+    implicit def mongoToDomain(mo:MongoObject): Option[Person] = Some(Person(name = nameField === "testing"))
 
     lazy val expectedError = "no person collection here!"
 
-    implicit object PersonCollectionName extends CollectionName[Person] {
-      lazy val name = throw new RuntimeException(expectedError)
-    }
+    lazy val collectionName = throw new RuntimeException(expectedError)
   }
 
   case class Book(name:Book.nameField.Value,
@@ -88,10 +82,10 @@ trait TestDomainObjects extends NestedDomainObjects {
     val printVersionField = field[Int]("version")
     val priceField = field[Double]("price")
 
-    implicit def bookToMongo(b:Book): MongoObject = putId(b.id.value).
+    implicit def domainToMongoObject(b:Book): MongoObject = putId(b.id.value).
             putAnything(b.name).putAnything(b.authors).putAnything(b.publisher).putAnything(b.printVersion).putAnything(b.price)
 
-    implicit def mongoToBook(mo:MongoObject): Option[Book] =
+    implicit def mongoToDomain(mo:MongoObject): Option[Book] =
     for {
       name <- mo.getPrimitiveObject(nameField)
       authors <- mo.getPrimitiveObjects(authorsField)
@@ -102,9 +96,7 @@ trait TestDomainObjects extends NestedDomainObjects {
       Book(nameField === name, authorsField === authors, publisherField === publisher, printVersionField === printVersion, priceField === price,
         idField === mo.getId)
 
-    implicit object BookCollectionName extends CollectionName[Book] {
-      override val name = "book"
-    }
+    val collectionName = "book"
   }
 
   case class Task(name:Task.nameField.Value,
@@ -117,18 +109,16 @@ trait TestDomainObjects extends NestedDomainObjects {
     val priorityField = field[Int]("priority")
     val ownerField = field[String]("owner")
 
-    implicit def taskToMongoObject(task:Task): MongoObject =
+    implicit def domainToMongoObject(task:Task): MongoObject =
       putId(task.id.value).putAnything(task.name).putAnything(task.priority).putAnything(task.owner)
 
-    implicit def mongoToTask(mo:MongoObject): Option[Task] =
+    implicit def mongoToDomain(mo:MongoObject): Option[Task] =
      for {
       name <- mo.getPrimitiveObject(nameField)
       priority <- mo.getPrimitiveObject(priorityField)
       owner <-mo.getPrimitiveObject(ownerField)
      } yield Task(nameField === name, priorityField === priority, ownerField === owner, idField === mo.getId)
 
-    implicit object TaskCollection extends CollectionName[Task] {
-      override val name = "task"
-    }
+    val collectionName = "task"
   }
 }

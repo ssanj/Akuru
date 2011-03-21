@@ -17,20 +17,18 @@ trait NestedDomainObjects {
     val dateField = field[Long]("currentDate")
     val spendsField = field[Spend]("spends")
 
-    implicit def dailySpendToMongoObject(ds: DailySpend): MongoObject = {
+    implicit def domainToMongoObject(ds: DailySpend): MongoObject = {
       putId(ds.id.value).putAnything(ds.date).putNested(spendsField, ds.spends)
     }
 
-    implicit def mongoToDailySpend(mo:MongoObject): Option[DailySpend] = {
+    implicit def mongoToDomain(mo:MongoObject): Option[DailySpend] = {
       for {
         date <- mo.getPrimitiveObject(dateField)
         spends <- mo.getNestedObject(spendsField)
       } yield DailySpend(dateField === date, spendsField === spends, idField === mo.getId)
     }
 
-    implicit object DSCollection extends CollectionName[DailySpend] {
-      override val name = "ds"
-    }
+    val collectionName = "ds"
 
     case class Spend(cost: Spend.costField.Value, description: Spend.descriptionField.Value, tags: Spend.tagsField.Value) extends NestedObject
 
