@@ -17,6 +17,8 @@ trait DomainSupport { this:Tools =>
 
   type NestedToMongo[T <: NestedObject] = T => MongoObject
 
+  type MongoToNested[T <: NestedObject] = MongoObject => Option[T]
+
   sealed abstract class FieldType[O <: DomainObject, T] {
     val name:String
 

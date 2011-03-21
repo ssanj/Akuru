@@ -5,7 +5,6 @@
 package akuru
 
 import MongoTypes.putId
-import MongoTypes.Query
 import MongoTypes.MongoObject.empty
 
 trait NestedDomainObjects {
@@ -20,6 +19,13 @@ trait NestedDomainObjects {
 
     implicit def dailySpendToMongoObject(ds: DailySpend): MongoObject = {
       putId(ds.id.value).putAnything(ds.date).putNested(spendsField, ds.spends)
+    }
+
+    implicit def mongoToDailySpend(mo:MongoObject): Option[DailySpend] = {
+      for {
+        date <- mo.getPrimitiveObject(dateField)
+        spends <- mo.getNestedObject(spendsField)
+      } yield DailySpend(dateField === date, spendsField === spends, idField === mo.getId)
     }
 
     implicit object DSCollection extends CollectionName[DailySpend] {
@@ -37,28 +43,27 @@ trait NestedDomainObjects {
         empty.putAnything(spend.cost).putAnything(spend.description).putNestedArray(tagsField, spend.tags)
       }
 
+      implicit def mongoToSpend(mo:MongoObject): Option[Spend] = {
+        for {
+          cost <- mo.getPrimitiveObject(costField)
+          description <- mo.getPrimitiveObject(descriptionField)
+          tags <- mo.getNestedObjectArray(tagsField)
+        } yield Spend(costField === cost, descriptionField === description, tagsField === tags)
+      }
+
       case class Tag(name: Tag.nameField.Value) extends NestedObject
 
       object Tag extends Template[DailySpend] {
         val nameField = nestedField[String](tagsField, "name")
 
         implicit def tagToMongo(tag: Tag): MongoObject =  empty.putAnything(tag.name)
+
+        implicit def mongoToTag(mo:MongoObject): Option[Tag] = {
+          for {
+            name <- mo.getPrimitiveObject(nameField)
+          } yield Tag(nameField === name)
+        }
       }
     }
-//    implicit def mongoToDailySpend(mo:MongoObject): Option[DailySpend] = {
-//      for {
-//        date <- mo.getPrimitiveObject(dateField)
-//        spends <- mo.getMongoObject(spendsField)
-//      } yield DailySpend(dateField === date, spendsField === spends, idField === mo.getId)
-//    }
-
-
-//    implicit def mongoToSpend(mo:MongoObject): Option[Spend] = {
-//      for {
-//        cost <- mo.getPrimitiveObject(costField)
-//        description <- mo.getPrimitiveObject(descriptionField)
-//        labels <- mo.getPrimitiveObjects(labelsField)
-//      } yield Spend(costField === cost, descriptionField === description, labelsField === labels)
-//    }
   }
 }

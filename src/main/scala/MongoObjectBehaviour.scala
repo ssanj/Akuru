@@ -15,20 +15,24 @@ trait MongoObjectBehaviour { this:Tools =>
 
   def getMongoObject(key:String): Option[MongoObject] = getTypeSafeObject(key, { case x:DBObject => Some(x) })
 
-  //TODO: Do we need these funcs?
-//  def getDomainObject[T <: DomainObject : MongoToDomain](f:Field[T]): Option[T] = getTypeSafeObject[T](f.name, {
-//    case o:DBObject => implicitly[MongoToDomain[T]].apply(o) })
-//
-//  def getDomainObjects[T <: DomainObject : MongoToDomain : ClassManifest](key:String): Seq[T] = getTypeSafeObject[Seq[T]](key, {
-//    case o:BasicDBList => Some(MongoObject.fromList[T](o)) }) getOrElse(Seq.empty[T])
-//
-//  def getDomainObjects[T <: DomainObject : MongoToDomain : ClassManifest, R](f:Field[R]): Seq[T] = getDomainObjects[T](f.name)
+  def getNestedObject[O <: DomainObject, T <: NestedObject : MongoToNested](ft:FieldType[O, T]): Option[T] =
+    getTypeSafeObject(ft.name, { case x:DBObject => implicitly[MongoToNested[T]].apply(x) })
+
+  def getNestedObjectArray[O <: DomainObject, T <: NestedObject : MongoToNested : ClassManifest](ft:FieldType[O, Seq[T]]): Option[Seq[T]] =
+    getTypeSafeObject(ft.name, { case list:BasicDBList =>
+      Some(MongoObject.fromSomeList[T](list,
+        _ map (_ match {
+          case dbo:DBObject => implicitly[MongoToNested[T]].apply(dbo)
+          case _ => None
+        })
+      ))
+  })
 
   def getPrimitiveObject[T : ClassManifest](key:String): Option[T] = {
     getTypeSafeObject[T](key, { case x:AnyRef => getElement[T](x) })
   }
 
-  def getPrimitiveObject[O <: DomainObject, T : ClassManifest](f:Field[O, T]): Option[T] = getPrimitiveObject[T](f.name)
+  def getPrimitiveObject[O <: DomainObject, T : ClassManifest](f:FieldType[O, T]): Option[T] = getPrimitiveObject[T](f.name)
 
   def getPrimitiveObjects[T : ClassManifest](key:String): Option[Seq[T]] = {
     getTypeSafeObject[Seq[T]](key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })

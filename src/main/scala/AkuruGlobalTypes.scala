@@ -45,6 +45,8 @@ trait AkuruGlobalTypes {
 
   type NestedToMongo[T <: NestedObject] = akuru.MongoTypes.NestedToMongo[T]
 
+  type MongoToNested[T <: NestedObject] = akuru.MongoTypes.MongoToNested[T]
+
   type CollectionName[T <: DomainObject] = akuru.MongoTypes.CollectionName[T]
 
   type UserFunction = akuru.MongoTypes.UserFunction
