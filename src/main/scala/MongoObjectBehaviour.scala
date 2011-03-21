@@ -16,12 +16,10 @@ trait MongoObjectBehaviour { this:Tools =>
   private[akuru] def getMongoObject(key:String): Option[MongoObject] = getTypeSafeObject(key, { case x:DBObject => Some(x) })
 
   def getNestedObject[O <: DomainObject, T <: NestedObject : MongoToNested](ft:FieldType[O, T]): Option[T] = {
-    println("getNestedObject called with " + ft)
     getTypeSafeObject(ft.name, { case x:DBObject => implicitly[MongoToNested[T]].apply(x) })
   }
 
   def getNestedObjectArray[O <: DomainObject, T <: NestedObject : MongoToNested : ClassManifest](ft:FieldType[O, Seq[T]]): Option[Seq[T]] = {
-      println("getNestedObjectArray called with " + ft)
       getTypeSafeObject(ft.name, { case list:BasicDBList =>
         Some(MongoObject.fromSomeList[T](list,
           _ map (_ match {
