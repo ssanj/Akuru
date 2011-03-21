@@ -25,7 +25,10 @@ trait MongoFunctions { this:Tools  =>
 
   def mfind[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(c: MongoCursor => MongoCursor)(g: Seq[T] => Option[String])
                                                               (h: => Option[String]):
-    UserFunction = col => col(collectionName[T]).find[T](f)(c).fold(l => Some(l), r => if (r.isEmpty) h else g(r))
+    UserFunction = col => {
+    val found = col(collectionName[T]).find[T](f)(c)
+    found.fold(l => Some(l), r => if (r.isEmpty) h else g(r))
+  }
 
   def msafeUpdate[T <: DomainObject : CollectionName](q: => MongoObject)(u: => UpdateObject[T])(g: MongoWriteResult => Option[String])
                                                      (multiple: => Boolean)(up: => Boolean): UserFunction =

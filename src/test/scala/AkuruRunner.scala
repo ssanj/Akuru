@@ -6,12 +6,11 @@
 package runners
 
 import _root_.akuru._
+import MongoTypes.MongoObject.$set
 
 object AkuruRunner extends TestDomainObjects with AkuruDSL {
 
-
   def main(args: Array[String]) {
-    import MongoTypes.MongoObject.$set
     import Blog._
     import Label._
     import DailySpend._
@@ -42,9 +41,11 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     ( find * Blog where labelsField === {"functional"/} withResults printBlogs withoutResults  noOp ) ~~>
                     ( find * Blog where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField -> ASC)) withResults printBlogs withoutResults noOp) ~~>
                     drop[DailySpend] ~~>
-                    save(DailySpend(dateField === 123456L, spendsField ===
-                            Spend(costField === 12.23D, descriptionField === "blah", tagsField ===
-                                    Seq(Tag(nameField === "tag1"), Tag(nameField ==="tag2")))))
+                    save(DailySpend(dateField === 123456L,
+                                    spendsField ===
+                                            Spend(costField === 12.23D, descriptionField === "blah",
+                                              tagsField === Seq(Tag(nameField === "tag1"), Tag(nameField ==="tag2"))))) ~~>
+                    ( find * DailySpend where (dateField === 123456L) withResults (printDS) withoutResults showError("got nothing") )
                  } ~~>() getOrElse("success >>")
     println(result)
   }
@@ -54,5 +55,23 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
     None
   }
 
+  def printDS(dses:Seq[DailySpend]): Option[String] = {
+
+    import DailySpend._
+    import DailySpend.Spend._
+
+    def tagString(tag:Tag): String = tag.name.value
+
+    def spendString(spend:Spend): String = {
+      "cost -> " + spend.cost.value + ", description -> " + spend.description.value + ", tags: " +
+              spend.tags.value.map(tag => tagString(tag)).mkString("[", ",", "]")
+    }
+
+    dses foreach (ds => println("DailySpend { date -> " + ds.date.value + ", spend { " + spendString(ds.spends.value) + " } }"))
+    None
+  }
+
   def withAkuru: FutureConnection = onDatabase("akuru_test")
+
+  def showError(msg:String) : Option[String] = Some(msg)
 }
