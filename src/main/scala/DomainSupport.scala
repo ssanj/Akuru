@@ -59,11 +59,15 @@ trait DomainSupport { this:Tools =>
 
     def field[T](name:String): Field[O, T] = new Owner[O].createField[T](name)
 
-    implicit def domainToMongoObject(domain: O): MongoObject
+    def domainToMongoObject(domain: O): MongoObject
 
-    implicit def mongoToDomain(mo:MongoObject): Option[O]
+    def mongoToDomain(mo:MongoObject): Option[O]
 
     val collectionName:String
+
+    implicit def _domainToMongoObject(domain: O): MongoObject = domainToMongoObject(domain)
+
+    implicit def _mongoToDomain(mo:MongoObject): Option[O] = mongoToDomain(mo)
 
     implicit object DomainCollectionName extends CollectionName[O] {
       override lazy val name:String = collectionName
