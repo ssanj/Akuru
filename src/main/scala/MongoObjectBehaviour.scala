@@ -78,11 +78,13 @@ trait MongoObjectBehaviour { this:Tools =>
 
   def putPrimitiveObject[O <: DomainObject, T](fv:FieldValue[O, T]): MongoObject = { putPrimitiveObject(fv.name, fv.value) }
 
-  def putPrimitiveObjects2[O <: DomainObject, T](fv:FieldValue[O, Seq[T]]): MongoObject = {
+  def putPrimitiveObjects2[O <: DomainObject](fv:FieldValue[O, Seq[Any]]): MongoObject = {
      merge(fv.name -> convertToJavaList(fv.value map (_.asInstanceOf[AnyRef])))
   }
 
   def putMongo(key:String, mongo:MongoObject): MongoObject = putAnyArray(asJavaObject)(key, Seq(mongo.toDBObject))
+
+  def putMongoArray(key:String, mongos:Seq[MongoObject]): MongoObject = putAnyArray(convertToJavaList)(key, mongos map (_.toDBObject))
 
   //todo: a DomainObject should already have a FieldValue[MongoObjectId]
   def putId(id:MongoObjectId): MongoObject = MongoObject(dbo + ("_id" -> id.toObjectId))
@@ -108,10 +110,18 @@ trait MongoObjectBehaviour { this:Tools =>
     mo
   }
 
-  def putAnything[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]) : MongoObject = {
+  def putNested[O <: DomainObject, T <: NestedObject : NestedToMongo](pf:FieldType[O, _], nested: FieldValue[O, T]): MongoObject = {
+      putMongo(pf.name, implicitly[NestedToMongo[T]].apply(nested.value))
+  }
+
+  def putNestedArray[O <: DomainObject, T <: NestedObject : NestedToMongo](pf:FieldType[O, _], nested: FieldValue[O, Seq[T]]): MongoObject = {
+      putMongoArray(pf.name, nested.value map (implicitly[NestedToMongo[T]].apply(_)))
+  }
+
+  def putAnything[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]): MongoObject = {
     getElement[T](fv.value.asInstanceOf[AnyRef]) match {
       case Some(element) => element match {
-        case seq:Seq[_] => merge(putPrimitiveObjects2[O, T](new Field[O, Seq[T]](fv.name) === seq.asInstanceOf[Seq[T]]))
+        case seq:Seq[_] => merge(putPrimitiveObjects2[O](new Field[O, Seq[Any]](fv.name) === seq))
         case mo:MongoObject => merge(putMongo(fv.name, mo))
         case id:MongoObjectId =>   merge(putId(id))
         case _:Any => MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))

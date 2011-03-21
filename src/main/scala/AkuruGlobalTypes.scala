@@ -20,8 +20,11 @@ trait AkuruGlobalTypes {
   val d = akuru.MongoTypes.RegexConstants.d
   val none = akuru.MongoTypes.RegexConstants.none
 
-  type FieldValue[O <: DomainObject, T] = Field[O, T]#Value
+  type FieldValue[O <: DomainObject, T] = FieldType[O, T]#Value
   type Field[O <: DomainObject, T] = akuru.MongoTypes.Field[O, T]
+  type NestedField[O <: DomainObject, T] = akuru.MongoTypes.NestedField[O, T]
+  type NestedFieldValue[O <: DomainObject, T] = NestedField[O, T]#Value
+  type FieldType[O <: DomainObject, T] = akuru.MongoTypes.FieldType[O, T]
 
   type MongoObject = akuru.MongoTypes.MongoObject
   val MongoObject = akuru.MongoTypes.MongoObject
@@ -30,13 +33,17 @@ trait AkuruGlobalTypes {
   val MongoObjectId = akuru.MongoTypes.MongoObjectId
 
   type DomainObject = akuru.MongoTypes.DomainObject
+  type NestedObject = akuru.MongoTypes.NestedObject
   type DomainTemplate[T <: DomainObject] = akuru.MongoTypes.DomainTemplate[T]
+  type Template[T <: DomainObject] = akuru.MongoTypes.Template[T]
 
   type MID = akuru.MongoTypes.MID
 
   type MongoToDomain[T <: DomainObject] = akuru.MongoTypes.MongoToDomain[T]
 
   type DomainToMongo[T <: DomainObject] = akuru.MongoTypes.DomainToMongo[T]
+
+  type NestedToMongo[T <: NestedObject] = akuru.MongoTypes.NestedToMongo[T]
 
   type CollectionName[T <: DomainObject] = akuru.MongoTypes.CollectionName[T]
 

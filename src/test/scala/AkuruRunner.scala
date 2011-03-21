@@ -14,6 +14,9 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
     import MongoTypes.MongoObject.$set
     import Blog._
     import Label._
+    import DailySpend._
+    import DailySpend.Spend._
+    import DailySpend.Spend.Tag._
 
     val b1 = Blog(titleField === "lessons learned", labelsField === Seq("jobs", "lessons", "work"))
     val b2 = Blog(titleField === "lessons learned", labelsField === Seq("jobs", "work"))
@@ -37,7 +40,11 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     ( find * Blog where labelsField === {"work"/i} withResults printBlogs withoutResults  noOp ) ~~>
                     ( upsert a Blog where titleField === "Semigroup" withValues b3 returnErrors ) ~~>
                     ( find * Blog where labelsField === {"functional"/} withResults printBlogs withoutResults  noOp ) ~~>
-                    ( find * Blog where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField -> ASC)) withResults printBlogs withoutResults noOp)
+                    ( find * Blog where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField -> ASC)) withResults printBlogs withoutResults noOp) ~~>
+                    drop[DailySpend] ~~>
+                    save(DailySpend(dateField === 123456L, spendsField ===
+                            Spend(costField === 12.23D, descriptionField === "blah", tagsField ===
+                                    Seq(Tag(nameField === "tag1"), Tag(nameField ==="tag2")))))
                  } ~~>() getOrElse("success >>")
     println(result)
   }

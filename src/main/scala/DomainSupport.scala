@@ -15,7 +15,10 @@ trait DomainSupport { this:Tools =>
 
   type DomainToMongo[T <: DomainObject] = T => MongoObject
 
-  case class Field[O <: DomainObject, T](name:String) {
+  type NestedToMongo[T <: NestedObject] = T => MongoObject
+
+  sealed abstract class FieldType[O <: DomainObject, T] {
+    val name:String
 
     def apply(value:T): Value = Value(value)
 
@@ -23,19 +26,31 @@ trait DomainSupport { this:Tools =>
 
     final case class Value(value:T) {
       val name = field.name
-      lazy val field = Field.this  //we need this lazy as it should be accessed only after Field instantiation.
+      lazy val field = FieldType.this  //we need this lazy as it should be accessed only after Field instantiation.
     }
+  }
+
+  case class Field[O <: DomainObject, T](override val name:String) extends FieldType[O, T]
+
+  case class NestedField[O <: DomainObject, T](parentField:FieldType[O, _], override val name:String) extends FieldType[O, T] {
+    //override val name = parentField.name + "." + _name
   }
 
   class Owner[O <: DomainObject] {
     def createField[T](name:String): Field[O, T] = Field[O, T](name)
+    def createNestedField[T](parentField:FieldType[O, _], name:String): NestedField[O, T] = NestedField[O, T](parentField, name)
   }
 
   trait DomainObject
+  trait NestedObject
 
-  abstract class DomainTemplate[O <: DomainObject] {
-    private val idKey = "_id"
+  abstract class Template[O <: DomainObject] {
     def field[T](name:String): Field[O, T] = new Owner[O].createField[T](name)
+    def nestedField[T](parentField:FieldType[O, _], name:String): NestedField[O, T] = new Owner[O].createNestedField[T](parentField, name)
+  }
+
+  abstract class DomainTemplate[O <: DomainObject] extends Template[O] {
+    private val idKey = "_id"
     val idField: Field[O, MID] = new Owner[O].createField[MID](idKey)
     val defaultId: idField.Value = idField === None
   }

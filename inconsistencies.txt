@@ -14,6 +14,7 @@
     $pull : { field : {$gt: 3} } } removes array elements greater than 3 (could not get this to work in the console)
     $pull : { field : {<match-criteria>} } removes array elements meeting match criteria
 14. Make all DSL read consistently. See update/upsert and modify syntax
+15. Find a way to write arbitrary type safe json/bson.
 -------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)
