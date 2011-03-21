@@ -18,6 +18,7 @@
 16. Regex does not work for Numbers. Eg. (dateField === (".*"/) yields nothing
 17. Make NestedFields and NestedObjects the only fields to access nestedMethods. (putNestedObject)
 18. Create definitions for implicits on the template domain object.s
+19. NestedFields should append "." to each level of nesting.
 -------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)

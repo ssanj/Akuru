@@ -46,18 +46,17 @@ trait DomainSupport { this:Tools =>
   trait DomainObject
   trait NestedObject
 
-  abstract class Template[O <: DomainObject] {
-    def field[T](name:String): Field[O, T] = new Owner[O].createField[T](name)
-  }
+  sealed abstract class Template[O <: DomainObject]
 
   abstract class NestedTemplate[O <: DomainObject](parentField:FieldType[O, _]) extends Template[O] {
-    def nestedField[T](name:String): NestedField[O, T] = new Owner[O].createNestedField[T](parentField, name)
+    def field[T](name:String): NestedField[O, T] = new Owner[O].createNestedField[T](parentField, name)
   }
 
   abstract class DomainTemplate[O <: DomainObject] extends Template[O] {
     private val idKey = "_id"
     val idField: Field[O, MID] = new Owner[O].createField[MID](idKey)
     val defaultId: idField.Value = idField === None
+    def field[T](name:String): Field[O, T] = new Owner[O].createField[T](name)
   }
 
   trait CollectionName[T <: DomainObject] {
