@@ -32,24 +32,35 @@ trait DomainSupport { this:Tools =>
     }
   }
 
-  case class Field[O <: DomainObject, T](override val name:String) extends FieldType[O, T]
+  final case class Field[O <: DomainObject, T](override val name:String) extends FieldType[O, T]
 
-  case class NestedField[O <: DomainObject, T](parentField:FieldType[O, _], override val name:String) extends FieldType[O, T] {
-    //override val name = parentField.name + "." + _name
-  }
+  final case class ArrayField[O <: DomainObject, T](override val name:String) extends FieldType[O, Seq[T]]
+
+  final case class NestedField[O <: DomainObject, T](parentField:FieldType[O, _], override val name:String) extends FieldType[O, T]
+
+  final case class NestedArrayField[O <: DomainObject, T](parentField:FieldType[O, _], override val name:String) extends FieldType[O, Seq[T]]
 
   class Owner[O <: DomainObject] {
     def createField[T](name:String): Field[O, T] = Field[O, T](name)
+    def createArrayField[T](name:String): ArrayField[O, T] = ArrayField[O, T](name)
+
     def createNestedField[T](parentField:FieldType[O, _], name:String): NestedField[O, T] = NestedField[O, T](parentField, name)
+    def createNestedArrayField[T](parentField:FieldType[O, _], name:String): NestedArrayField[O, T] = NestedArrayField[O, T](parentField, name)
   }
 
-  trait DomainObject
-  trait NestedObject
+  sealed trait AkuruObject
+  trait DomainObject extends AkuruObject
+  trait NestedObject extends AkuruObject
 
   sealed abstract class Template[O <: DomainObject]
 
-  abstract class NestedTemplate[O <: DomainObject, N <: NestedObject](parentField:FieldType[O, _]) extends Template[O] {
+  abstract class NestedTemplate[O <: DomainObject, N <: NestedObject](parentField:FieldType[O, N]) extends Template[O] {
+
+    def this(parentField:NestedArrayField[O, N]) = this(Field[O, N](parentField.name))
+
     def field[T](name:String): NestedField[O, T] = new Owner[O].createNestedField[T](parentField, name)
+
+    def arrayField[T](name:String): NestedArrayField[O, T] = new Owner[O].createNestedArrayField[T](parentField, name)
 
     def nestedToMongoObject(nested: N): MongoObject
 
@@ -66,6 +77,8 @@ trait DomainSupport { this:Tools =>
     val defaultId: idField.Value = idField === None
 
     def field[T](name:String): Field[O, T] = new Owner[O].createField[T](name)
+
+    def arrayField[T](name:String): ArrayField[O, T] = new Owner[O].createArrayField[T](name)
 
     val collectionName:String
 

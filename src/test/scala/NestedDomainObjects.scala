@@ -36,7 +36,7 @@ trait NestedDomainObjects {
   object Spend extends NestedTemplate[DailySpend, Spend](DailySpend.spendsField){
     val costField = field[Double]("cost")
     val descriptionField = field[String]( "description")
-    val tagsField = field[Seq[Tag]]("tags")
+    val tagsField = arrayField[Tag]("tags")
 
     override def nestedToMongoObject(spend:Spend): MongoObject = {
       empty.putAnything(spend.cost).putAnything(spend.description).putNestedArray(tagsField, spend.tags)

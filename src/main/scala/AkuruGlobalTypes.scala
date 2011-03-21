@@ -32,8 +32,10 @@ trait AkuruGlobalTypes {
   type MongoObjectId = akuru.MongoTypes.MongoObjectId
   val MongoObjectId = akuru.MongoTypes.MongoObjectId
 
+  type AkuruObject = akuru.MongoTypes.AkuruObject
   type DomainObject = akuru.MongoTypes.DomainObject
   type NestedObject = akuru.MongoTypes.NestedObject
+
   type DomainTemplate[T <: DomainObject] = akuru.MongoTypes.DomainTemplate[T]
   type Template[T <: DomainObject] = akuru.MongoTypes.Template[T]
   type NestedTemplate[T <: DomainObject, N <: NestedObject] = akuru.MongoTypes.NestedTemplate[T, N]
