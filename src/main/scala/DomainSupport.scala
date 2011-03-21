@@ -48,8 +48,16 @@ trait DomainSupport { this:Tools =>
 
   sealed abstract class Template[O <: DomainObject]
 
-  abstract class NestedTemplate[O <: DomainObject](parentField:FieldType[O, _]) extends Template[O] {
+  abstract class NestedTemplate[O <: DomainObject, N <: NestedObject](parentField:FieldType[O, _]) extends Template[O] {
     def field[T](name:String): NestedField[O, T] = new Owner[O].createNestedField[T](parentField, name)
+
+    def nestedToMongoObject(nested: N): MongoObject
+
+    def mongoToNested(mo:MongoObject): Option[N]
+
+    implicit def _nestedToMongoObject(nested: N): MongoObject = nestedToMongoObject(nested)
+
+    implicit def _mongoToNested(mo:MongoObject): Option[N] = mongoToNested(mo)
   }
 
   abstract class DomainTemplate[O <: DomainObject] extends Template[O] {
@@ -59,15 +67,16 @@ trait DomainSupport { this:Tools =>
 
     def field[T](name:String): Field[O, T] = new Owner[O].createField[T](name)
 
+    val collectionName:String
+
     def domainToMongoObject(domain: O): MongoObject
 
     def mongoToDomain(mo:MongoObject): Option[O]
 
-    val collectionName:String
-
     implicit def _domainToMongoObject(domain: O): MongoObject = domainToMongoObject(domain)
 
     implicit def _mongoToDomain(mo:MongoObject): Option[O] = mongoToDomain(mo)
+
 
     implicit object DomainCollectionName extends CollectionName[O] {
       override lazy val name:String = collectionName

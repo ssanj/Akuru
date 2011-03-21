@@ -36,7 +36,7 @@ trait AkuruGlobalTypes {
   type NestedObject = akuru.MongoTypes.NestedObject
   type DomainTemplate[T <: DomainObject] = akuru.MongoTypes.DomainTemplate[T]
   type Template[T <: DomainObject] = akuru.MongoTypes.Template[T]
-  type NestedTemplate[T <: DomainObject] = akuru.MongoTypes.NestedTemplate[T]
+  type NestedTemplate[T <: DomainObject, N <: NestedObject] = akuru.MongoTypes.NestedTemplate[T, N]
 
   type MID = akuru.MongoTypes.MID
 

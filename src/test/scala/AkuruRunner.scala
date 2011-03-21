@@ -14,8 +14,8 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
     import Blog._
     import Label._
     import DailySpend._
-    import DailySpend.Spend._
-    import DailySpend.Spend.Tag._
+    import Spend._
+    import Tag._
 
     val b1 = Blog(titleField === "lessons learned", labelsField === Seq("jobs", "lessons", "work"))
     val b2 = Blog(titleField === "lessons learned", labelsField === Seq("jobs", "work"))
@@ -56,9 +56,6 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
   }
 
   def printDS(dses:Seq[DailySpend]): Option[String] = {
-
-    import DailySpend._
-    import DailySpend.Spend._
 
     def tagString(tag:Tag): String = tag.name.value
 

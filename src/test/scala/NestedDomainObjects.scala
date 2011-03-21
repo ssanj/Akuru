@@ -29,39 +29,39 @@ trait NestedDomainObjects {
     }
 
     val collectionName = "ds"
+  }
 
-    case class Spend(cost: Spend.costField.Value, description: Spend.descriptionField.Value, tags: Spend.tagsField.Value) extends NestedObject
+  case class Spend(cost: Spend.costField.Value, description: Spend.descriptionField.Value, tags: Spend.tagsField.Value) extends NestedObject
 
-    object Spend extends NestedTemplate[DailySpend](spendsField){
-      val costField = field[Double]("cost")
-      val descriptionField = field[String]( "description")
-      val tagsField = field[Seq[Spend.Tag]]("tags")
+  object Spend extends NestedTemplate[DailySpend, Spend](DailySpend.spendsField){
+    val costField = field[Double]("cost")
+    val descriptionField = field[String]( "description")
+    val tagsField = field[Seq[Tag]]("tags")
 
-      implicit def spendsToMongo(spend:Spend): MongoObject = {
-        empty.putAnything(spend.cost).putAnything(spend.description).putNestedArray(tagsField, spend.tags)
-      }
+    override def nestedToMongoObject(spend:Spend): MongoObject = {
+      empty.putAnything(spend.cost).putAnything(spend.description).putNestedArray(tagsField, spend.tags)
+    }
 
-      implicit def mongoToSpend(mo:MongoObject): Option[Spend] = {
-        for {
-          cost <- mo.getPrimitiveObject(costField)
-          description <- mo.getPrimitiveObject(descriptionField)
-          tags <- mo.getNestedObjectArray(tagsField)
-        } yield Spend(costField === cost, descriptionField === description, tagsField === tags)
-      }
+    override def mongoToNested(mo:MongoObject): Option[Spend] = {
+      for {
+        cost <- mo.getPrimitiveObject(costField)
+        description <- mo.getPrimitiveObject(descriptionField)
+        tags <- mo.getNestedObjectArray(tagsField)
+      } yield Spend(costField === cost, descriptionField === description, tagsField === tags)
+    }
+  }
 
-      case class Tag(name: Tag.nameField.Value) extends NestedObject
+  case class Tag(name: Tag.nameField.Value) extends NestedObject
 
-      object Tag extends NestedTemplate[DailySpend](tagsField) {
-        val nameField = field[String]("name")
+  object Tag extends NestedTemplate[DailySpend, Tag](Spend.tagsField) {
+    val nameField = field[String]("name")
 
-        implicit def tagToMongo(tag: Tag): MongoObject =  empty.putAnything(tag.name)
+    override def nestedToMongoObject(tag: Tag): MongoObject =  empty.putAnything(tag.name)
 
-        implicit def mongoToTag(mo:MongoObject): Option[Tag] = {
-          for {
-            name <- mo.getPrimitiveObject(nameField)
-          } yield Tag(nameField === name)
-        }
-      }
+    override def mongoToNested(mo:MongoObject): Option[Tag] = {
+      for {
+        name <- mo.getPrimitiveObject(nameField)
+      } yield Tag(nameField === name)
     }
   }
 }
