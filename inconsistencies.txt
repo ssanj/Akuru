@@ -16,6 +16,8 @@
 14. Make all DSL read consistently. See update/upsert and modify syntax
 15. Find a way to write arbitrary type safe json/bson.
 16. Regex does not work for Numbers. Eg. (dateField === (".*"/) yields nothing
+17. Make NestedFields and NestedObjects the only fields to access nestedMethods. (putNestedObject)
+18. Create definitions for implicits on the template domain object.s
 -------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)

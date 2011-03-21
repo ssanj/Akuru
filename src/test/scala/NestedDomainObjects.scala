@@ -34,10 +34,10 @@ trait NestedDomainObjects {
 
     case class Spend(cost: Spend.costField.Value, description: Spend.descriptionField.Value, tags: Spend.tagsField.Value) extends NestedObject
 
-    object Spend extends Template[DailySpend]{
-      val costField = nestedField[Double](spendsField, "cost")
-      val descriptionField = nestedField[String](spendsField, "description")
-      val tagsField = nestedField[Seq[Spend.Tag]](spendsField, "tags")
+    object Spend extends NestedTemplate[DailySpend](spendsField){
+      val costField = nestedField[Double]("cost")
+      val descriptionField = nestedField[String]( "description")
+      val tagsField = nestedField[Seq[Spend.Tag]]("tags")
 
       implicit def spendsToMongo(spend:Spend): MongoObject = {
         empty.putAnything(spend.cost).putAnything(spend.description).putNestedArray(tagsField, spend.tags)
@@ -53,8 +53,8 @@ trait NestedDomainObjects {
 
       case class Tag(name: Tag.nameField.Value) extends NestedObject
 
-      object Tag extends Template[DailySpend] {
-        val nameField = nestedField[String](tagsField, "name")
+      object Tag extends NestedTemplate[DailySpend](tagsField) {
+        val nameField = nestedField[String]("name")
 
         implicit def tagToMongo(tag: Tag): MongoObject =  empty.putAnything(tag.name)
 
