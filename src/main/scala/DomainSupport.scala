@@ -22,23 +22,45 @@ trait DomainSupport { this:Tools =>
   sealed abstract class FieldType[O <: DomainObject, T] {
     val name:String
 
+    val path:String = name
+
     def apply(value:T): Value = Value(value)
 
     def === (value:T) : Value = apply(value)
 
     final case class Value(value:T) {
       val name = field.name
+      val path = field.path
       lazy val field = FieldType.this  //we need this lazy as it should be accessed only after Field instantiation.
     }
   }
 
-  final case class Field[O <: DomainObject, T](override val name:String) extends FieldType[O, T]
+  sealed abstract class Flat[O <: DomainObject, T] extends FieldType[O, T]
 
-  final case class ArrayField[O <: DomainObject, T](override val name:String) extends FieldType[O, Seq[T]]
+  final case class Field[O <: DomainObject, T](override val name:String) extends Flat[O, T]
 
-  final case class NestedField[O <: DomainObject, T](parentField:FieldType[O, _], override val name:String) extends FieldType[O, T]
+  final case class ArrayField[O <: DomainObject, T](override val name:String) extends Flat[O, Seq[T]]
 
-  final case class NestedArrayField[O <: DomainObject, T](parentField:FieldType[O, _], override val name:String) extends FieldType[O, Seq[T]]
+  sealed abstract class Nested[O <: DomainObject, T] extends FieldType[O, T] {
+    val parentField:FieldType[O, _]
+
+    object Constants {
+      val pathSeparator = "."
+    }
+
+    import Constants._
+    override val path = findPath(parentField) + pathSeparator + name
+
+    private def findPath(ft:FieldType[O, _]): String =
+      ft match {
+        case f:Flat[_, _] => f.name
+        case n:Nested[_, _] => findPath(n.parentField)  + pathSeparator + n.name
+      }
+  }
+
+  final case class NestedField[O <: DomainObject, T](override val parentField:FieldType[O, _], override val name:String) extends Nested[O, T]
+
+  final case class NestedArrayField[O <: DomainObject, T](override val parentField:FieldType[O, _], override val name:String) extends Nested[O, Seq[T]]
 
   class Owner[O <: DomainObject] {
     def createField[T](name:String): Field[O, T] = Field[O, T](name)

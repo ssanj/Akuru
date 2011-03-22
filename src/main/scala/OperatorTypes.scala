@@ -32,7 +32,7 @@ trait OperatorTypes {
 
     def |<>|(t1:T, t2:T): Query[O] = between(t1, t2)
 
-    private def operate(f:FieldType[O, T], value: => T, func: => String): Query[O] = createQuery($funcPrimitive(f.name, func, value))
+    private def operate(f:FieldType[O, T], value: => T, func: => String): Query[O] = createQuery($funcPrimitive(f.path, func, value))
 
     private def createQuery(mo: MongoObject): Query[O] = Query[O](MongoQueryJoiner[O](mo))
   }

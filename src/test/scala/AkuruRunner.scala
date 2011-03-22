@@ -45,7 +45,7 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                                     spendsField ===
                                             Spend(costField === 12.23D, descriptionField === "blah",
                                               tagsField === Seq(Tag(nameField === "tag1"), Tag(nameField ==="tag2"))))) ~~>
-                    ( find * DailySpend where (dateField === 123456L) withResults (printDS) withoutResults showError("got nothing") )
+                    ( find * DailySpend where (nameField === ("tag"/i)) withResults (printDS) withoutResults showError("got nothing") )
                  } ~~>() getOrElse("success >>")
     println(result)
   }

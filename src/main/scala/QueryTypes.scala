@@ -13,7 +13,7 @@ trait QueryTypes {
   }
 
   private[akuru] case class FieldValueQueryJoiner[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]) extends QueryJoiner[O] {
-    def splat: MongoObject = mongo.putAnything[O, T](fv)
+    def splat: MongoObject = mongo.putAnything[O, T](fv, _.path)
   }
 
   private[akuru] case class MongoQueryJoiner[O <: DomainObject](mo: MongoObject) extends QueryJoiner[O] {
@@ -22,7 +22,7 @@ trait QueryTypes {
 
   case class Query[O <: DomainObject]private[akuru] (join: QueryJoiner[O]) {
     def and[S : ClassManifest](fv2:FieldValue[O, S]): Query[O] =
-      Query[O](MongoQueryJoiner[O](join.splat.putAnything[O, S](fv2)))
+      Query[O](MongoQueryJoiner[O](join.splat.putAnything[O, S](fv2, _.path)))
 
     def and(another:Query[O]): Query[O] = Query[O](MongoQueryJoiner[O](join.splat.merge(another.splat)))
 

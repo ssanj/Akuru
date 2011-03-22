@@ -124,13 +124,14 @@ trait MongoObjectBehaviour { this:Tools =>
       putMongoArray(pf.name, nested.value map (implicitly[NestedToMongo[T]].apply(_)))
   }
 
-  def putAnything[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T]): MongoObject = {
+  def putAnything[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T],
+                                                        name: FieldValue[O, T] => String = { fd:FieldValue[O, T] => fd.name }): MongoObject = {
     getElement[T](fv.value.asInstanceOf[AnyRef]) match {
       case Some(element) => element match {
-        case seq:Seq[_] => merge(putPrimitiveObjects2[O](new Field[O, Seq[Any]](fv.name) === seq))
-        case mo:MongoObject => merge(putMongo(fv.name, mo))
+        case seq:Seq[_] => merge(putPrimitiveObjects2[O](new Field[O, Seq[Any]](name(fv)) === seq))
+        case mo:MongoObject => merge(putMongo(name(fv), mo))
         case id:MongoObjectId =>   merge(putId(id))
-        case _:Any => MongoObject(dbo + (fv.name -> fv.value.asInstanceOf[AnyRef]))
+        case _:Any => MongoObject(dbo + (name(fv) -> fv.value.asInstanceOf[AnyRef]))
       }
       case None => copyMongoObject
     }
