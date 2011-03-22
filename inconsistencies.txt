@@ -19,6 +19,10 @@
 17. Create definitions for implicits on the template domain object.s
 18. Remove the need for wrapWith.
 19. Update UpdateObject to set the correct path for NestedObjects.
+20. Update doco.
+21. You can currently do this: $set(costField === 60.00D) & descriptionField === "updated". This does not make sense. Use the type system to
+disallow this. $set(costField === 60.00D & descriptionField === "updated") is fine and so is
+$set(costField === 60.00D) & $set(descriptionField === "updated")
 -------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)

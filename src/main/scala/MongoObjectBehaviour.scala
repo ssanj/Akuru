@@ -8,8 +8,8 @@ import com.mongodb.DBObject
 import com.mongodb.BasicDBObject
 import com.mongodb.BasicDBList
 import org.bson.types.ObjectId
-import Funcs.PathProvider
-import Funcs.namePath
+import MongoObject.PathProvider
+import MongoObject.namePath
 
 trait MongoObjectBehaviour { this:Tools =>
 

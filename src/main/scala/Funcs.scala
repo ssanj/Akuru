@@ -56,5 +56,3 @@ trait Funcs {
 
   def namePath[O <: DomainObject, T]:PathProvider[O, T] = fv => fv.name
 }
-
-object Funcs extends Funcs

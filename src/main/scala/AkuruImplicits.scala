@@ -8,6 +8,8 @@ import MongoTypes.MongoUpdateObject
 import MongoTypes.Query
 import MongoTypes.FieldValueQueryJoiner
 import MongoObject.fieldToMongo1
+import MongoObject.nestedPath
+
 
 trait AkuruImplicits {
 
@@ -19,7 +21,7 @@ trait AkuruImplicits {
     Query[O](FieldValueQueryJoiner[O, T](fv))
 
   implicit def fieldValueToUpdateObject[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject[O] =
-    MongoUpdateObject[O](fieldToMongo1[O, T](fv))
+    MongoUpdateObject[O](fieldToMongo1[O, T](fv, nestedPath))
 
   implicit def dbObjectToMongoObject(dbo: DBObject): MongoObject = {
     import scala.collection.JavaConversions._

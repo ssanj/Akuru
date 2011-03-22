@@ -4,7 +4,7 @@
  */
 package akuru;
 
-import Funcs.nestedPath
+import MongoObject.nestedPath
 
 trait UpdateTypes {
 

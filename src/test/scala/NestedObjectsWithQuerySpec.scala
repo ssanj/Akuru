@@ -4,11 +4,9 @@
  */
 package akuru
 
-final class NestedObjectsWithQuerySpec extends CommonSpec with AkuruDSL {
+final class NestedObjectsWithQuerySpec extends CommonSpec with AkuruDSL with NestedObjectCommon {
 
-  import DailySpend._
   import Spend._
-  import Tag._
 
   "A Nested object" should "be found by field a search" in  {
     ( init ~~>
@@ -41,12 +39,5 @@ final class NestedObjectsWithQuerySpec extends CommonSpec with AkuruDSL {
       ( find * DailySpend where (descriptionField === ("mis*"/)) withResults (_ => error("shouldn't have found DS.")) withoutResults success ) ~~>
       ( find * DailySpend where (descriptionField === ("boo*"/)) withResults (_ => success) withoutResults error("could not find DS.") )
     ) ~~>() verifySuccess
-  }
-
-  private def init: FutureConnection = {
-    initDailySpend ~~>
-      save(DailySpend(dateField === 123456L,
-            spendsField === Spend(costField === 50.99D, descriptionField === "books",
-              tagsField === Seq(Tag(nameField === "books"), Tag(nameField === "misc")))))
   }
 }
