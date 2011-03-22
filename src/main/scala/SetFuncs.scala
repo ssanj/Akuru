@@ -29,4 +29,7 @@ trait SetFuncs { this:Funcs =>
    */
   def $set[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject[O] =
     toMongoUpdateObject[O](anyFunction1[O, T](functionName, fv, nestedPath))
+
+  def $set[O <: DomainObject, T <: NestedObject : ClassManifest : NestedToMongo](fv: FieldType[O, T], value: => T): MongoUpdateObject[O] =
+    toMongoUpdateObject[O](($funcMongo(functionName, mongo.putMongo(fv.path, implicitly[NestedToMongo[T]].apply(value) ))))
 }
