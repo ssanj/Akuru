@@ -56,7 +56,8 @@ trait DomainSupport { this:Tools =>
 
   abstract class NestedTemplate[O <: DomainObject, N <: NestedObject](parentField:FieldType[O, N]) extends Template[O] {
 
-    def this(parentField:NestedArrayField[O, N]) = this(Field[O, N](parentField.name))
+    //TODO: Find a better way to do this.
+    def this(parentField:NestedArrayField[O, N]) = this(NestedField[O, N](parentField.parentField, parentField.name))
 
     def field[T](name:String): NestedField[O, T] = new Owner[O].createNestedField[T](parentField, name)
 
