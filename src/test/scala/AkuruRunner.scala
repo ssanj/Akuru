@@ -32,19 +32,20 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     (blogs.flatMap(b => b.labels.value.map(l => save(Label(valueField === l)))).toList) ~~>
                     ( find * Blog where (titleField === "Hello World Lift" and labelsField === Seq("lift", "scala", "sbt"))
                             withResults printBlogs withoutResults noOp ) ~~>
-                    ( find * Blog where (labelsField === {"ubuntu|work"/i} and titleField === ("less"/i)) withResults printBlogs withoutResults noOp ) ~~>
+                    ( find * Blog where (labelsField === {"ubuntu|work"/i} and titleField === ("less"/i)) withResults printBlogs
+                            withoutResults noOp ) ~~>
                     ( update a Blog where titleField === "lessons learned" withValues $set(titleField === "Lessons Learned") returnErrors ) ~~>
                     ( find * Blog where labelsField === {"work"/i} withResults printBlogs withoutResults  noOp ) ~~>
                     ( update a Blog where titleField === "Lessons Learned" withValues b2 returnErrors ) ~~>
                     ( find * Blog where labelsField === {"work"/i} withResults printBlogs withoutResults  noOp ) ~~>
                     ( upsert a Blog where titleField === "Semigroup" withValues b3 returnErrors ) ~~>
                     ( find * Blog where labelsField === {"functional"/} withResults printBlogs withoutResults  noOp ) ~~>
-                    ( find * Blog where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField -> ASC)) withResults printBlogs withoutResults noOp) ~~>
+                    ( find * Blog where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField -> ASC)) withResults printBlogs
+                            withoutResults noOp) ~~>
                     drop[DailySpend] ~~>
                     save(DailySpend(dateField === 123456L,
-                                    spendsField ===
-                                            Spend(costField === 12.23D, descriptionField === "blah",
-                                              tagsField === Seq(Tag(nameField === "tag1"), Tag(nameField ==="tag2"))))) ~~>
+                                      spendsField === Spend(costField === 12.23D, descriptionField === "blah",
+                                        tagsField === Seq(Tag(nameField === "tag1"), Tag(nameField ==="tag2"))))) ~~>
                     ( find * DailySpend where (nameField === ("tag"/i)) withResults (printDS) withoutResults showError("got nothing") )
                  } ~~>() getOrElse("success >>")
     println(result)
