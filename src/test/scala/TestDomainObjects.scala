@@ -17,7 +17,7 @@ trait TestDomainObjects extends NestedDomainObjects {
 
   object Blog extends DomainTemplate[Blog] {
     val titleField = field[String]("title")
-    val labelsField = field[Seq[String]]("labels")
+    val labelsField = arrayField[String]("labels")
 
     override def mongoToDomain(mo:MongoObject): Option[Blog] = {
        for {

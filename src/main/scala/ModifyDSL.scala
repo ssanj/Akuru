@@ -38,7 +38,7 @@ trait ModifyDSL { this:MongoFunctions with Tools with DSLTools =>
 
   class ModifySort[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => Query[T])
           extends BaseModifyUpdate[T](query, noSorting){
-    def sortBy(first:(Field[T, _], SortOrder), rest: (Field[T, _], SortOrder)*): ModifyUpdate[T] =
+    def sortBy(first:(FieldType[T, _], SortOrder), rest: (FieldType[T, _], SortOrder)*): ModifyUpdate[T] =
       new ModifyUpdate[T](query, orderToSortObject[T](first :: rest.toList))
   }
 

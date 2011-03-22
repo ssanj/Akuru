@@ -34,7 +34,7 @@ trait RemoveDSL { this: MongoFunctions with Tools with DSLTools =>
 
   final class RemoveSort[T <: DomainObject : CollectionName : MongoToDomain : ClassManifest](query: => Query[T])
           extends BaseWithDeleted[T](query, noSorting) {
-    def sortBy(first:(Field[T, _], SortOrder), rest: (Field[T, _], SortOrder)*): WithDeleted[T] =
+    def sortBy(first:(FieldType[T, _], SortOrder), rest: (FieldType[T, _], SortOrder)*): WithDeleted[T] =
       new WithDeleted[T](query, orderToSortObject[T](first :: rest.toList))
   }
 

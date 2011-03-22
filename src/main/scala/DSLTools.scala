@@ -9,7 +9,7 @@ import MongoTypes.MongoObject.mongo
 
 trait DSLTools {
 
-  def orderToSortObject[T <: DomainObject](orders:List[(Field[T, _], SortOrder)]): MongoSortObject = {
+  def orderToSortObject[T <: DomainObject](orders:List[(FieldType[T, _], SortOrder)]): MongoSortObject = {
     MongoSortObject(orders.foldLeft(mongo){ case (mo, (k, v)) => mo.putPrimitiveObject(k.name, v.id) })
   }
 

@@ -28,11 +28,11 @@ trait AkuruImplicits {
 
   implicit def MongoObjectToDBObject(mo: MongoObject): DBObject = mo.toDBObject
 
-  implicit def fieldToOperation[O <: DomainObject, T <% Number](f:Field[O, T]): NumericOperations[O, T] = NumericOperations[O, T](f)
+  implicit def fieldToOperation[O <: DomainObject, T <% Number](f:FieldType[O, T]): NumericOperations[O, T] = NumericOperations[O, T](f)
 
   implicit val defaultRegExOption: RegexConstants.Value = RegexConstants.none
 
   implicit def stringToRegX(reg: String): RegExWithOptions = RegExWithOptions(reg)
 
-  implicit def fieldToFieldRegEx[O <: DomainObject, T](f:Field[O, T]): FieldRegEx[O, T] = FieldRegEx[O, T](f)
+  implicit def fieldToFieldRegEx[O <: DomainObject, T](f:FieldType[O, T]): FieldRegEx[O, T] = FieldRegEx[O, T](f)
 }

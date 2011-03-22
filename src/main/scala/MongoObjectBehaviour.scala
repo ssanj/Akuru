@@ -40,7 +40,7 @@ trait MongoObjectBehaviour { this:Tools =>
     getTypeSafeObject[Seq[T]](key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
   }
 
-  def getPrimitiveObjects[O <: DomainObject, T : ClassManifest](f:Field[O, Seq[T]]): Option[Seq[T]] = getPrimitiveObjects[T](f.name)
+  def getPrimitiveObjects[O <: DomainObject, T : ClassManifest](f:FieldType[O, Seq[T]]): Option[Seq[T]] = getPrimitiveObjects[T](f.name)
 
   def getId: Option[MongoObjectId] = getPrimitiveObject[ObjectId]("_id") map (MongoObjectId(_))
 
