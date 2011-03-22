@@ -18,16 +18,15 @@
 16. Regex does not work for Numbers. Eg. (dateField === (".*"/) yields nothing
 17. Create definitions for implicits on the template domain object.s
 18. Remove the need for wrapWith.
-19. Update UpdateObject to set the correct path for NestedObjects.
-20. Update doco.
-21. You can currently do this: $set(costField === 60.00D) & descriptionField === "updated". This does not make sense. Use the type system to
+19. Update doco.
+20. You can currently do this: $set(costField === 60.00D) & descriptionField === "updated". This does not make sense. Use the type system to
 disallow this. $set(costField === 60.00D & descriptionField === "updated") is fine and so is
 $set(costField === 60.00D) & $set(descriptionField === "updated")
-22. Implement other MongoCursor methods:
+21. Implement other MongoCursor methods:
     count()
     skip()
     snapshot()
-23. $push does not work.
+22. Test $set which updates an array of NestedObjects.
 -------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)
@@ -53,5 +52,7 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 20. Order now takes in a list of field and SortOrders. Eg. constrainBy (Order(field1 -> ASC, field2 -> DSC)) (done)
 21. Rename FieldValueJoiner to Query (done)
 22. Need to use find without (). Eg find (Blog) should be find Blog. (done)
-23. NestedFields should append "." to each level of nesting when doing a query.
-24. Make NestedFields and NestedObjects the only fields to access nestedMethods. (putNestedObject)
+23. NestedFields should append "." to each level of nesting when doing a query. (done)
+24. Make NestedFields and NestedObjects the only fields to access nestedMethods. (putNestedObject) (done)
+24. $push does not work. (done)
+25. Update UpdateObject to set the correct path for NestedObjects. (done)
