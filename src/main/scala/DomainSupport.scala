@@ -22,7 +22,7 @@ trait DomainSupport { this:Tools =>
   sealed abstract class FieldType[O <: DomainObject, T] {
     val name:String
 
-    val path:String = name
+    val path:String
 
     def apply(value:T): Value = Value(value)
 
@@ -35,7 +35,9 @@ trait DomainSupport { this:Tools =>
     }
   }
 
-  sealed abstract class Flat[O <: DomainObject, T] extends FieldType[O, T]
+  sealed abstract class Flat[O <: DomainObject, T] extends FieldType[O, T] {
+    override val path:String = name
+  }
 
   final case class Field[O <: DomainObject, T](override val name:String) extends Flat[O, T]
 
@@ -44,7 +46,7 @@ trait DomainSupport { this:Tools =>
   sealed abstract class Nested[O <: DomainObject, T] extends FieldType[O, T] {
     val parentField:FieldType[O, _]
 
-    object Constants {
+    private object Constants {
       val pathSeparator = "."
     }
 
