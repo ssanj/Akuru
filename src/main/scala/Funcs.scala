@@ -12,13 +12,16 @@ trait Funcs {
 
   import com.mongodb.{BasicDBList, DBObject}
 
+  type PathProvider[O <: DomainObject, T] = FieldValue[O, T] => String
+
   def $funcMongo(action: String, col: String, value: MongoObject): MongoObject = mongo.putMongo(action, mongo.putMongo(col, value))
 
   def $funcMongo(action: String, value: MongoObject): MongoObject = mongo.putMongo(action, value)
 
   def $funcPrimitive(action: String, col: String, value: AnyRef): MongoObject = mongo.putMongo(action, mongo.putPrimitiveObject(col, value))
 
-  def fieldToMongo1[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoObject = mongo.putAnything[O, T](fv)
+  def fieldToMongo1[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T], pp: PathProvider[O, T] = namePath[O, T]): MongoObject =
+    mongo.putAnything[O, T](fv, pp)
 
   def empty = new MongoObject
 
@@ -30,7 +33,8 @@ trait Funcs {
 
   def combine(value:MongoObject*): MongoObject = if (value.isEmpty) mongo else value.foldLeft(value.head)((a, b) => a.merge(b))
 
-  def anyFunction1[O <: DomainObject, T : ClassManifest](fname:String, fv:FieldValue[O, T]): MongoObject = $funcMongo(fname, fieldToMongo1[O, T](fv))
+  def anyFunction1[O <: DomainObject, T : ClassManifest](fname:String, fv:FieldValue[O, T], pp: PathProvider[O, T] = namePath[O, T]): MongoObject =
+    $funcMongo(fname, fieldToMongo1[O, T](fv, pp))
 
   def toMongoUpdateObject[O <: DomainObject](mo: => MongoObject): MongoUpdateObject[O] = MongoUpdateObject[O](mo)
 
@@ -47,4 +51,10 @@ trait Funcs {
     val seq:Seq[AnyRef] = list.toSeq
     f(seq) flatten
   }
+
+  def nestedPath[O <: DomainObject, T]:PathProvider[O, T] = fv => fv.path
+
+  def namePath[O <: DomainObject, T]:PathProvider[O, T] = fv => fv.name
 }
+
+object Funcs extends Funcs

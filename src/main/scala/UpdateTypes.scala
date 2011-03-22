@@ -4,6 +4,8 @@
  */
 package akuru;
 
+import Funcs.nestedPath
+
 trait UpdateTypes {
 
   sealed trait UpdateObject[O <: DomainObject] {
@@ -21,7 +23,7 @@ trait UpdateTypes {
 
     import MongoTypes.MongoObject.mongo
     def &[T : ClassManifest](other:FieldValue[O, T]): MongoUpdateObject[O] =
-      MongoUpdateObject[O](mo.mergeMongoObjectValues(mongo.putAnything[O, T](other)))
+      MongoUpdateObject[O](mo.mergeMongoObjectValues(mongo.putAnything[O, T](other, nestedPath)))
   }
 
   object UpdateObject {

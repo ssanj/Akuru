@@ -8,6 +8,8 @@ import com.mongodb.DBObject
 import com.mongodb.BasicDBObject
 import com.mongodb.BasicDBList
 import org.bson.types.ObjectId
+import Funcs.PathProvider
+import Funcs.namePath
 
 trait MongoObjectBehaviour { this:Tools =>
 
@@ -125,13 +127,13 @@ trait MongoObjectBehaviour { this:Tools =>
   }
 
   def putAnything[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T],
-                                                        name: FieldValue[O, T] => String = { fd:FieldValue[O, T] => fd.name }): MongoObject = {
+                                                        pp: PathProvider[O, T] = namePath[O, T]): MongoObject = {
     getElement[T](fv.value.asInstanceOf[AnyRef]) match {
       case Some(element) => element match {
-        case seq:Seq[_] => merge(putPrimitiveObjects2[O](new Field[O, Seq[Any]](name(fv)) === seq))
-        case mo:MongoObject => merge(putMongo(name(fv), mo))
+        case seq:Seq[_] => merge(putPrimitiveObjects2[O](new Field[O, Seq[Any]](pp(fv)) === seq))
+        case mo:MongoObject => merge(putMongo(pp(fv), mo))
         case id:MongoObjectId =>   merge(putId(id))
-        case _:Any => MongoObject(dbo + (name(fv) -> fv.value.asInstanceOf[AnyRef]))
+        case _:Any => MongoObject(dbo + (pp(fv) -> fv.value.asInstanceOf[AnyRef]))
       }
       case None => copyMongoObject
     }

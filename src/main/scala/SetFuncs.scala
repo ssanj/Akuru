@@ -27,5 +27,6 @@ trait SetFuncs { this:Funcs =>
   /**
    * Used when you do $set(field1 === value1)
    */
-  def $set[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject[O] = toMongoUpdateObject[O](anyFunction1[O, T](functionName, fv))
+  def $set[O <: DomainObject, T : ClassManifest](fv: FieldValue[O, T]): MongoUpdateObject[O] =
+    toMongoUpdateObject[O](anyFunction1[O, T](functionName, fv, nestedPath))
 }
