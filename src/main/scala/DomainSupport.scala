@@ -49,8 +49,8 @@ trait DomainSupport { this:Tools =>
   }
 
   sealed trait AkuruObject
-  trait DomainObject extends AkuruObject
-  trait NestedObject extends AkuruObject
+  abstract class DomainObject extends AkuruObject
+  abstract class NestedObject extends AkuruObject
 
   sealed abstract class Template[O <: DomainObject]
 
