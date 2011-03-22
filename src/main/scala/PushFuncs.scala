@@ -1,6 +1,7 @@
 package akuru
 
 import MongoTypes.MongoUpdateObject
+import MongoObject.namePath
 
 /**
  * { $$push : { field : value } }
@@ -15,6 +16,10 @@ trait PushFuncs  { this:Funcs =>
 
   import PushFuncs._
 
-  def $push[O <: DomainObject, T : ClassManifest](f:FieldType[O, Seq[T]], value: => T): MongoUpdateObject[O] =
-    toMongoUpdateObject[O](anyFunction1[O, T](functionName, new Field[O, T](f.name) === value))
+  def $push[O <: DomainObject, T <: NestedObject : ClassManifest : NestedToMongo](nested:NestedArrayField[O, T], value: => T): MongoUpdateObject[O] =
+    toMongoUpdateObject[O]($funcMongo(functionName, mongo.putMongo(nested.path, implicitly[NestedToMongo[T]].apply(value))))
+
+  def $push[O <: DomainObject, T : ClassManifest](flat:ArrayField[O, T], value: => T): MongoUpdateObject[O] =
+      toMongoUpdateObject[O](anyFunction1[O, T](functionName, new Field[O, T](flat.name) === value))
 }
+

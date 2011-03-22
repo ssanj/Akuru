@@ -8,7 +8,7 @@ package akuru
 import MongoTypes.MongoUpdateObject
 
 /**
- * { $$$set : { field : value } }
+ * { $set : { field : value } }
  * sets field to value. All datatypes are supported with $$$set.
  */
 trait SetFuncs { this:Funcs =>
