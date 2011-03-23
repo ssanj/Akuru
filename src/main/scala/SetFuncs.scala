@@ -31,34 +31,53 @@ trait SetFuncs { this:Funcs =>
     toMongoUpdateObject[O](anyFunction1[O, T](functionName, fv, nestedPath))
 
   /**
-   * Used when you want to replace a NestedObject graph.
+   * Used when you want to replace an EmbeddedField.
    * @param fv FieldType that points to a NestedObject.
    * @param value An instance of a NestedObject.
    *
    * Eg. DailySpends.spendsField, Spend(costField === 10, descriptionField === "blah",
    *  tagsField === Seq(Tag(nameField === "tag1), Tag(nameField === "tag2"))
    */
-  def $set[O <: DomainObject, T <: NestedObject : ClassManifest : NestedToMongo](fv: FieldType[O, T], value: => T): MongoUpdateObject[O] =
-    toMongoUpdateObject[O](($funcMongo(functionName, mongo.putMongo(fv.path, implicitly[NestedToMongo[T]].apply(value) ))))
+  def $set[O <: DomainObject, T <: NestedObject : ClassManifest : NestedToMongo](fv: EmbeddedField[O, T], value: => T): MongoUpdateObject[O] =
+    setObject[O, T](fv.path, implicitly[NestedToMongo[T]].apply(value))
 
-  //TODO: Both arrayField functions are the same. They were introduced to reduce type errors and keep the function name the same.
   /**
-   * Used when you want to replace a nestedFieldArray of NestedObjects.
+   * Used when you want to replace an EmbeddedArrayField.
+   * @param fv FieldType that points to a NestedObject.
+   * @param values A Seq of NestedObjects.
+   * TODO: Test.
+   */
+  def $set[O <: DomainObject, T <: NestedObject : ClassManifest : NestedToMongo](fv: EmbeddedArrayField[O, T], values: => Seq[T]):
+  MongoUpdateObject[O] =
+    setArray[O, T](fv.path, values.map(v => implicitly[NestedToMongo[T]].apply(v)))
+
+  /**
+   * Used to replace a single NestedEmbeddedField value.
+   * @param fv FieldType that points to a NestedObject.
+   * @param value An instance of a NestedObject.
+   * TODO: Test
+   */
+  def $set[O <: DomainObject, T <: NestedObject : ClassManifest : NestedToMongo](fv: NestedEmbeddedField[O, T], value: => T):
+  MongoUpdateObject[O] = setObject[O, T](fv.path, implicitly[NestedToMongo[T]].apply(value))
+//    toMongoUpdateObject[O](($funcMongo(functionName, mongo.putMongo(fv.path, implicitly[NestedToMongo[T]].apply(value) ))))
+
+  /**
+   * Used when you want to replace a NestedEmbeddedArrayField.
+   * @param fv FieldType that points to a NestedObject.
+   * @param values A Seq of NestedObjects.
    * TODO: Test
    *
    * Eg. Spends.tags
    */
-  def $set[O <: DomainObject, T <: NestedObject : ClassManifest : NestedToMongo](fv: NestedArrayField[O, T], values: => Seq[T]): MongoUpdateObject[O] =
-    setArray[O, T](fv.path, values.map(v => implicitly[NestedToMongo[T]].apply(v)))
-
-  /**
-   * Used when you want to replace an array of NestedObjects.
-   * TODO: Test.
-   */
-  def $set[O <: DomainObject, T <: NestedObject : ClassManifest : NestedToMongo](fv: ArrayField[O, T], values: => Seq[T]): MongoUpdateObject[O] =
+  def $set[O <: DomainObject, T <: NestedObject : ClassManifest : NestedToMongo](fv: NestedEmbeddedArrayField[O, T], values: => Seq[T]):
+  MongoUpdateObject[O] =
     setArray[O, T](fv.path, values.map(v => implicitly[NestedToMongo[T]].apply(v)))
 
   private def setArray[O <: DomainObject, T <: NestedObject : ClassManifest](path:String, values: => Seq[MongoObject]): MongoUpdateObject[O] = {
     toMongoUpdateObject[O]($funcMongo(functionName, mongo.putMongoArray(path, values)))
+  }
+
+  private def setObject[O <: DomainObject, T <: NestedObject : ClassManifest](path:String, value: MongoObject): MongoUpdateObject[O] = {
+    toMongoUpdateObject[O](($funcMongo(functionName, mongo.putMongo(path, value))))
   }
 }

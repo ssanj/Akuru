@@ -28,6 +28,11 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
     snapshot()
 22. Test $set which updates an array of NestedObjects.
 23. Implement MongoRef
+24. Create separate tests for:
+    1. $set
+    2. $push
+    3. $pull
+25. Use Primitives where needed.
 -------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)

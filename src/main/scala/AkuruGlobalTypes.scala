@@ -33,6 +33,7 @@ trait AkuruGlobalTypes {
   type NestedArrayField[O <: DomainObject, T] = akuru.MongoTypes.NestedArrayField[O, T]
   type NestedEmbeddedArrayField[O <: DomainObject, T <: NestedObject] = akuru.MongoTypes.NestedEmbeddedArrayField[O, T]
   type NestedFieldValue[O <: DomainObject, T] = NestedField[O, T]#Value
+  type Primitive[T] = akuru.MongoTypes.Primitive[T]
 
   type MongoObject = akuru.MongoTypes.MongoObject
   val MongoObject = akuru.MongoTypes.MongoObject
