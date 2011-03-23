@@ -35,15 +35,23 @@ trait DomainSupport { this:Tools =>
     }
   }
 
-  sealed abstract class Flat[O <: DomainObject, T] extends FieldType[O, T] {
+  /**
+   * A DomainTemplateField is any field that is within a DomainTemplate.
+   */
+  sealed abstract class DomainTemplateField[O <: DomainObject, T] extends FieldType[O, T] {
     override val path:String = name
   }
 
-  final case class Field[O <: DomainObject, T](override val name:String) extends Flat[O, T]
+  //tood: Rename to PrimitiveField
+  final case class Field[O <: DomainObject, T](override val name:String) extends DomainTemplateField[O, T]
 
-  final case class ArrayField[O <: DomainObject, T](override val name:String) extends Flat[O, Seq[T]]
+  final case class EmbeddedField[O <: DomainObject, T <: NestedObject](override val name:String) extends DomainTemplateField[O, T]
 
-  sealed abstract class Nested[O <: DomainObject, T] extends FieldType[O, T] {
+  final case class ArrayField[O <: DomainObject, T](override val name:String) extends DomainTemplateField[O, Seq[T]]
+
+  final case class EmbeddedArrayField[O <: DomainObject, T <: NestedObject](override val name:String) extends DomainTemplateField[O, Seq[T]]
+
+  sealed abstract class NestedTemplateField[O <: DomainObject, T] extends FieldType[O, T] {
     val parentField:FieldType[O, _]
 
     private object Constants {
@@ -55,21 +63,35 @@ trait DomainSupport { this:Tools =>
 
     private def findPath(ft:FieldType[O, _]): String =
       ft match {
-        case f:Flat[_, _] => f.name
-        case n:Nested[_, _] => findPath(n.parentField)  + pathSeparator + n.name
+        case f:DomainTemplateField[_, _] => f.name
+        case n:NestedTemplateField[_, _] => findPath(n.parentField)  + pathSeparator + n.name
       }
   }
 
-  final case class NestedField[O <: DomainObject, T](override val parentField:FieldType[O, _], override val name:String) extends Nested[O, T]
+  final case class NestedField[O <: DomainObject, T](override val parentField:FieldType[O, _], override val name:String)
+          extends NestedTemplateField[O, T]
 
-  final case class NestedArrayField[O <: DomainObject, T](override val parentField:FieldType[O, _], override val name:String) extends Nested[O, Seq[T]]
+  final case class NestedEmbeddedField[O <: DomainObject, T <: NestedObject](override val parentField:FieldType[O, _], override val name:String)
+          extends NestedTemplateField[O, T]
+
+  final case class NestedArrayField[O <: DomainObject, T](override val parentField:FieldType[O, _], override val name:String)
+          extends NestedTemplateField[O, Seq[T]]
+
+  final case class NestedEmbeddedArrayField[O <: DomainObject, T <: NestedObject](override val parentField:FieldType[O, _], override val name:String)
+          extends NestedTemplateField[O, Seq[T]]
 
   class Owner[O <: DomainObject] {
     def createField[T](name:String): Field[O, T] = Field[O, T](name)
     def createArrayField[T](name:String): ArrayField[O, T] = ArrayField[O, T](name)
+    def embeddedField[T <: NestedObject](name:String): EmbeddedField[O, T] = EmbeddedField[O, T](name)
+    def embeddedArrayField[T <: NestedObject](name:String): EmbeddedArrayField[O, T] = EmbeddedArrayField[O, T](name)
 
     def createNestedField[T](parentField:FieldType[O, _], name:String): NestedField[O, T] = NestedField[O, T](parentField, name)
     def createNestedArrayField[T](parentField:FieldType[O, _], name:String): NestedArrayField[O, T] = NestedArrayField[O, T](parentField, name)
+    def createNestedEmbeddedField[T <: NestedObject](parentField:FieldType[O, _], name:String): NestedEmbeddedField[O, T] =
+      NestedEmbeddedField[O, T](parentField, name)
+    def createNestedEmbeddedArrayField[T <: NestedObject](parentField:FieldType[O, _], name:String): NestedEmbeddedArrayField[O, T] =
+      NestedEmbeddedArrayField[O, T](parentField, name)
   }
 
   sealed trait AkuruObject

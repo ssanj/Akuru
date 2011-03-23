@@ -8,7 +8,7 @@ final class NestedObjectsWithQuerySpec extends CommonSpec with AkuruDSL with Nes
 
   import Spend._
 
-  "A Nested object" should "be found by field a search" in  {
+  "A NestedTemplateField object" should "be found by field a search" in  {
     ( init ~~>
       ( find * DailySpend where (Tag.nameField === "books") withResults{ds =>
         ds.size should equal (1)
