@@ -9,7 +9,7 @@ package domain
 trait OwnerFieldSupport { this:DomainTypeSupport with DomainTemplateFieldSupport =>
 
   class Owner[O <: DomainObject] {
-    def createField[T](name:String): Field[O, T] = new Field[O, T](name)
+    def field[T](name:String): Field[O, T] = new Field[O, T](name)
 
     def arrayField[T](name:String): ArrayField[O, T] = ArrayField[O, T](name)
 

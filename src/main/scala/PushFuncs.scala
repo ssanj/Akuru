@@ -16,7 +16,6 @@ trait PushFuncs  { this:Funcs =>
 
   import PushFuncs._
 
-  //TODO: Remove the duplication in here!
   /**
    * Allows pushing NestedObjects into an ArrayField.
    */

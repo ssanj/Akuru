@@ -77,7 +77,7 @@ trait TestDomainObjects extends NestedDomainObjects {
 
   object Book extends DomainTemplate[Book] {
     val nameField = field[String]("name")
-    val authorsField = field[Seq[String]]("authors")
+    val authorsField = arrayField[String]("authors")
     val publisherField = field[String]("pub")
     val printVersionField = field[Int]("version")
     val priceField = field[Double]("price")

@@ -22,9 +22,9 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
     def this(parentField:NestedEmbeddedArrayField[O, N]) = this(NestedEmbeddedField[O, N](parentField.parentField, parentField.name).
             asInstanceOf[FieldType[O, N]])
 
-    def field[T](name:String): NestedField[O, T] = new Owner[O].nestedField[T](parentField, name)
+    def field[T : Primitive](name:String): NestedField[O, T] = new Owner[O].nestedField[T](parentField, name)
 
-    def arrayField[T](name:String): NestedArrayField[O, T] = new Owner[O].nestedArrayField[T](parentField, name)
+    def arrayField[T : Primitive](name:String): NestedArrayField[O, T] = new Owner[O].nestedArrayField[T](parentField, name)
 
     def embeddedField[T <: NestedObject](name:String): NestedEmbeddedField[O, T] = NestedEmbeddedField[O, T](parentField, name)
 
@@ -41,14 +41,14 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
 
   abstract class DomainTemplate[O <: DomainObject] extends Template[O] {
     private val idKey = "_id"
-    val idField: Field[O, MID] = new Owner[O].createField[MID](idKey)
+    val idField: Field[O, MID] = new Owner[O].field[MID](idKey)
     val defaultId: idField.Value = idField === None
 
-    def field[T](name:String): Field[O, T] = new Owner[O].createField[T](name)
+    def field[T : Primitive](name:String): Field[O, T] = new Owner[O].field[T](name)
 
     def embeddedField[T <: NestedObject](name:String): EmbeddedField[O, T] = new Owner[O].embeddedField[T](name)
 
-    def arrayField[T](name:String): ArrayField[O, T] = new Owner[O].arrayField[T](name)
+    def arrayField[T : Primitive](name:String): ArrayField[O, T] = new Owner[O].arrayField[T](name)
 
     def embeddedArrayField[T <: NestedObject](name:String): EmbeddedArrayField[O, T] = new Owner[O].embeddedArrayField[T](name)
 

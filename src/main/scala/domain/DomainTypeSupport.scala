@@ -24,8 +24,27 @@ trait DomainTypeSupport {
 
   abstract class NestedObject extends AkuruObject
 
+  sealed trait Primitive[T] extends AkuruObject
+
+  implicit object StringP extends Primitive[String]
+
+  implicit object ByteP extends Primitive[Byte]
+
+  implicit object ShortP extends Primitive[Short]
+
+  implicit object IntP extends Primitive[Int]
+
+  implicit object LongP extends Primitive[Long]
+
+  implicit object BooleanP extends Primitive[Boolean]
+
+  implicit object DoubleP extends Primitive[Double]
+
+  implicit object FloatP extends Primitive[Float]
+
+  implicit object CharP extends Primitive[Char]
+
   trait CollectionName[T <: DomainObject] {
     val name:String
   }
-
 }
