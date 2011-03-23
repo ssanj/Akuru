@@ -17,7 +17,7 @@ final class NestedObjectsWithUpdateSpec extends CommonSpec with AkuruDSL with Ne
     ( init ~~>
       ( update a DailySpend where (costField > 50D) withValues(
               $set(costField === 60.00D & descriptionField === "updated") &
-                      $push(tagsField, Tag(nameField === "blah"))) returnErrors ) ~~>
+                      $push(tagsField, Tag(nameField === "blah"))) returnErrors )~~>
       ( find * DailySpend where (costField > 58D) withResults{ds =>
         ds.size should equal (1)
         val dailyspend = ds(0)

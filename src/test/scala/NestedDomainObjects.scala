@@ -15,7 +15,7 @@ trait NestedDomainObjects {
 
   object DailySpend extends DomainTemplate[DailySpend] {
     val dateField = field[Long]("currentDate")
-    val spendsField = field[Spend]("spends")
+    val spendsField = embeddedField[Spend]("spends")
 
     override def domainToMongoObject(ds: DailySpend): MongoObject = {
       putId(ds.id.value).putAnything(ds.date).putNested(spendsField, ds.spends)
@@ -36,7 +36,7 @@ trait NestedDomainObjects {
   object Spend extends NestedTemplate[DailySpend, Spend](DailySpend.spendsField){
     val costField = field[Double]("cost")
     val descriptionField = field[String]( "description")
-    val tagsField = arrayField[Tag]("tags")
+    val tagsField = embeddedArrayField[Tag]("tags")
 
     override def nestedToMongoObject(spend:Spend): MongoObject = {
       empty.putAnything(spend.cost).putAnything(spend.description).putNestedArray(tagsField, spend.tags)

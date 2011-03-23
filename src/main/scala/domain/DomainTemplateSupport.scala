@@ -12,12 +12,23 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
 
   abstract class NestedTemplate[O <: DomainObject, N <: NestedObject](parentField:FieldType[O, N]) extends Template[O] {
 
-    //TODO: Find a better way to do this.
-    def this(parentField:NestedArrayField[O, N]) = this(NestedField[O, N](parentField.parentField, parentField.name))
+    def this(parentField:EmbeddedField[O, N]) = this(parentField.asInstanceOf[FieldType[O, N]])
 
-    def field[T](name:String): NestedField[O, T] = new Owner[O].createNestedField[T](parentField, name)
+    def this(parentField:EmbeddedArrayField[O, N]) = this(EmbeddedField[O, N](parentField.name).asInstanceOf[FieldType[O, N]])
 
-    def arrayField[T](name:String): NestedArrayField[O, T] = new Owner[O].createNestedArrayField[T](parentField, name)
+    def this(parentField:NestedEmbeddedField[O, N]) = this(NestedEmbeddedField[O, N](parentField.parentField, parentField.name).
+            asInstanceOf[FieldType[O, N]])
+
+    def this(parentField:NestedEmbeddedArrayField[O, N]) = this(NestedEmbeddedField[O, N](parentField.parentField, parentField.name).
+            asInstanceOf[FieldType[O, N]])
+
+    def field[T](name:String): NestedField[O, T] = new Owner[O].nestedField[T](parentField, name)
+
+    def arrayField[T](name:String): NestedArrayField[O, T] = new Owner[O].nestedArrayField[T](parentField, name)
+
+    def embeddedField[T <: NestedObject](name:String): NestedEmbeddedField[O, T] = NestedEmbeddedField[O, T](parentField, name)
+
+    def embeddedArrayField[T <: NestedObject](name:String): NestedEmbeddedArrayField[O, T] = NestedEmbeddedArrayField[O, T](parentField, name)
 
     def nestedToMongoObject(nested: N): MongoObject
 
@@ -37,7 +48,7 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
 
     def embeddedField[T <: NestedObject](name:String): EmbeddedField[O, T] = new Owner[O].embeddedField[T](name)
 
-    def arrayField[T](name:String): ArrayField[O, T] = new Owner[O].createArrayField[T](name)
+    def arrayField[T](name:String): ArrayField[O, T] = new Owner[O].arrayField[T](name)
 
     def embeddedArrayField[T <: NestedObject](name:String): EmbeddedArrayField[O, T] = new Owner[O].embeddedArrayField[T](name)
 
