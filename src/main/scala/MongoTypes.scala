@@ -6,7 +6,7 @@ package object akuru extends akuru.AkuruImplicits with akuru.AkuruGlobalTypes
 
 package akuru {
 
-import akuru.domain.DomainSupport
+import domain.DomainSupport
 
 object MongoTypes extends MongoServerTrait with
                             MongoDatabaseTrait with

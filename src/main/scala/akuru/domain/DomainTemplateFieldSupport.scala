@@ -1,9 +1,9 @@
+package akuru.domain
+
 /*
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-package akuru.domain
-
 trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
 
   sealed abstract class FieldType[O <: DomainObject, T] {
