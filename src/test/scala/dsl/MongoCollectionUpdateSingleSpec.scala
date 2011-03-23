@@ -4,6 +4,7 @@
  */
 
 package akuru
+package dsl
 
 import akuru.MongoTypes.MongoObject._
 

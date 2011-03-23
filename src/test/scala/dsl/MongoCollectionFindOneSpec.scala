@@ -4,6 +4,7 @@
  */
 
 package akuru
+package dsl
 
 final class MongoCollectionFindOneSpec extends CommonSpec with FindDSL with DSLTools {
 

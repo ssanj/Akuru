@@ -1,11 +1,10 @@
-package akuru.domain
-
 /*
- * Copyright (c) 2011 Sanjiv Sahayam
+ * Copyright 2010 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-import akuru.MongoObjectId
-import akuru.MongoObject
+
+package akuru
+package domain
 
 trait DomainTypeSupport {
 

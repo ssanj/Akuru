@@ -2,11 +2,14 @@
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-package akuru;
+
+package akuru
+package dsl
 
 import MongoTypes.Query
 import MongoTypes.MongoSortObject
 import MongoTypes.UpdateObject
+
 /**
  * modify a Blog where titleField === "blah" sortBy (titleField -> ASC) updateWith ($$set()) withUpdated(b => ) onError()
  * modify a Blog where titleField === "blah" sortBy (titleField -> DSC) updateWith ($$set()) onError()

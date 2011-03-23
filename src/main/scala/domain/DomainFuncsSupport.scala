@@ -1,10 +1,11 @@
-package akuru.domain
-
 /*
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-import akuru.MongoObject
+
+package akuru
+package domain
+
 import akuru.MongoObject.empty
 import akuru.Tools
 

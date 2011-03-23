@@ -2,7 +2,9 @@
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
+
 package akuru
+package dsl
 
 /**
  * find * X where (field1 === value1 and field2 === value2) withResults (b => doSomething) withoutResults (handleError)

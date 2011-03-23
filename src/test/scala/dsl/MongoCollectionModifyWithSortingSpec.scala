@@ -4,11 +4,11 @@
  */
 
 package akuru
+package dsl
 
 final class MongoCollectionModifyWithSortingSpec extends CommonSpec with AkuruDSL {
 
   import Book._
-  import MongoTypes.MongoObject._
 
   "A MongoCollection with findAndModifyAndReturnWithSorting" should "find an sorted object sorted ascending" in {
     verifySort(ASC, createVersion1, 2)

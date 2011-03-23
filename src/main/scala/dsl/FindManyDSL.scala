@@ -2,9 +2,12 @@
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
+
 package akuru
+package dsl
 
 import MongoTypes.MongoCursor
+
 trait FindManyDSL { this:MongoFunctions with Tools with DSLTools =>
 
   final class QueryForMultipleResults[T <: DomainObject : CollectionName : MongoToDomain] {

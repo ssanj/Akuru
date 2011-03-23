@@ -2,7 +2,9 @@
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-package akuru;
+
+package akuru
+package dsl
 
 import MongoTypes.MongoSortObject
 import MongoTypes.MongoObject.mongo

@@ -3,8 +3,8 @@
  * Licensed under the Apache License, Version 2.0
  */
 
-
 package akuru
+package dsl
 
 final class MongoCollectionSaveSpec extends AkuruDSL with CommonSpec {
 

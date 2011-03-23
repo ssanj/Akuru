@@ -2,12 +2,14 @@
  * Copyright 2010 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
+
 package akuru
+package dsl
 
 final class MongoCollectionModifyWithoutSortingSpec extends CommonSpec with ModifyDSL with DSLTools {
 
+  import MongoObject.$set
   import Blog._
-  import MongoTypes.MongoObject._
   "A MongoCollection with modify and no sorting" should "find and modify an existing object" in {
     ( initBlog ~~>
             save(Blog(titleField("Parry Hotter"), labelsField(Seq("book", "movie")))) ~~>

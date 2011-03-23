@@ -2,7 +2,10 @@
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-package akuru;
+
+package akuru
+package dsl
+
 final class MongoCollectionUpsertSpec extends AkuruDSL with CommonSpec {
 
   import Task._

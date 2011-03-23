@@ -2,10 +2,13 @@
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-package akuru;
+
+package akuru
+package dsl
 
 import MongoTypes.Query
 import MongoTypes.MongoSortObject
+
 /**
  * remove a Blog where titleField === "blah" sortBy (titleField -> DSC) withDeleted(b => ) onError()
  * remove a Blog where titleField === "blah" withDeleted(b => ) onError()

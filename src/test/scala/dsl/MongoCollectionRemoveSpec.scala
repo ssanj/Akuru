@@ -4,6 +4,7 @@
  */
 
 package akuru
+package dsl
 
 final class MongoCollectionRemoveSpec extends CommonSpec with AkuruDSL {
 
