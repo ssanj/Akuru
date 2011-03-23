@@ -21,12 +21,18 @@ trait AkuruGlobalTypes {
   val none = akuru.MongoTypes.RegexConstants.none
 
   type FieldValue[O <: DomainObject, T] = FieldType[O, T]#Value
-  type Field[O <: DomainObject, T] = akuru.MongoTypes.Field[O, T]
-  type ArrayField[O <: DomainObject, T] = akuru.MongoTypes.ArrayField[O, T]
-  type NestedField[O <: DomainObject, T] = akuru.MongoTypes.NestedField[O, T]
-  type NestedArrayField[O <: DomainObject, T] = akuru.MongoTypes.NestedArrayField[O, T]
-  type NestedFieldValue[O <: DomainObject, T] = NestedField[O, T]#Value
   type FieldType[O <: DomainObject, T] = akuru.MongoTypes.FieldType[O, T]
+
+  type Field[O <: DomainObject, T] = akuru.MongoTypes.Field[O, T]
+  type EmbeddedField[O <: DomainObject, T <: NestedObject] = akuru.MongoTypes.EmbeddedField[O, T]
+  type ArrayField[O <: DomainObject, T] = akuru.MongoTypes.ArrayField[O, T]
+  type EmbeddedArrayField[O <: DomainObject, T <: NestedObject] = akuru.MongoTypes.EmbeddedArrayField[O, T]
+
+  type NestedField[O <: DomainObject, T] = akuru.MongoTypes.NestedField[O, T]
+  type NestedEmbeddedField[O <: DomainObject, T <: NestedObject] = akuru.MongoTypes.NestedEmbeddedField[O, T]
+  type NestedArrayField[O <: DomainObject, T] = akuru.MongoTypes.NestedArrayField[O, T]
+  type NestedEmbeddedArrayField[O <: DomainObject, T <: NestedObject] = akuru.MongoTypes.NestedEmbeddedArrayField[O, T]
+  type NestedFieldValue[O <: DomainObject, T] = NestedField[O, T]#Value
 
   type MongoObject = akuru.MongoTypes.MongoObject
   val MongoObject = akuru.MongoTypes.MongoObject
