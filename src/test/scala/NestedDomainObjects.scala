@@ -18,7 +18,7 @@ trait NestedDomainObjects {
     val spendsField = embeddedField[Spend]("spends")
 
     override def domainToMongoObject(ds: DailySpend): MongoObject = {
-      putId(ds.id.value).putAnything(ds.date).putNested(spendsField, ds.spends)
+      putId(ds.id).putAnything(ds.date).putNested(spendsField, ds.spends)
     }
 
     override def mongoToDomain(mo:MongoObject): Option[DailySpend] = {

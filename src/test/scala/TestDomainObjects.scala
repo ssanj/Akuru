@@ -27,7 +27,7 @@ trait TestDomainObjects extends NestedDomainObjects {
     }
 
     override def domainToMongoObject(domain:Blog): MongoObject = {
-      putId(domain.id.value).putAnything(domain.title).putAnything(domain.labels)
+      putId(domain.id).putAnything(domain.title).putAnything(domain.labels)
     }
   }
 
@@ -42,7 +42,7 @@ trait TestDomainObjects extends NestedDomainObjects {
         value <- mo.getPrimitiveObject(valueField)
       } yield Label(valueField === value, idField === mo.getId)
 
-    override def domainToMongoObject(domain:Label): MongoObject = putId(domain.id.value).putAnything(domain.value)
+    override def domainToMongoObject(domain:Label): MongoObject = putId(domain.id).putAnything(domain.value)
   }
 
   lazy val mongoCreationException = "Exceptional MongoObject"
@@ -78,7 +78,7 @@ trait TestDomainObjects extends NestedDomainObjects {
     val printVersionField = field[Int]("version")
     val priceField = field[Double]("price")
 
-    override def domainToMongoObject(b:Book): MongoObject = putId(b.id.value).
+    override def domainToMongoObject(b:Book): MongoObject = putId(b.id).
             putAnything(b.name).putAnything(b.authors).putAnything(b.publisher).putAnything(b.printVersion).putAnything(b.price)
 
     override def mongoToDomain(mo:MongoObject): Option[Book] =
@@ -104,7 +104,7 @@ trait TestDomainObjects extends NestedDomainObjects {
     val ownerField = field[String]("owner")
 
     override def domainToMongoObject(task:Task): MongoObject =
-      putId(task.id.value).putAnything(task.name).putAnything(task.priority).putAnything(task.owner)
+      putId(task.id).putAnything(task.name).putAnything(task.priority).putAnything(task.owner)
 
     override def mongoToDomain(mo:MongoObject): Option[Task] =
      for {

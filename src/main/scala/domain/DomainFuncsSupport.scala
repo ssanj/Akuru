@@ -11,5 +11,5 @@ import akuru.Tools
 
 trait DomainFuncsSupport { this: DomainTypeSupport with Tools =>
 
-  def putId(id:MID): MongoObject =  foldOption(id)(empty)(id => empty.putId(id))
+  def putId(id:FieldValue[_ <: DomainObject, MID]): MongoObject =  foldOption(id.value)(empty)(value => empty.putId(value))
 }
