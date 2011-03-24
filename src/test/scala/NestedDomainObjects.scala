@@ -27,8 +27,6 @@ trait NestedDomainObjects {
         spends <- mo.getNestedObject(spendsField)
       } yield DailySpend(dateField === date, spendsField === spends, idField === mo.getId)
     }
-
-    val collectionName = "ds"
   }
 
   case class Spend(cost: Spend.costField.Value, description: Spend.descriptionField.Value, tags: Spend.tagsField.Value) extends NestedObject

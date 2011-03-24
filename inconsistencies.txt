@@ -1,4 +1,4 @@
-1. Better array support. Something of the sort: [F[_] <: Traversable[_], T <: DomainObject](value:F[T])
+1. putId(domain.id.value) should be putId(domain.id) to be consistent.
 2. Handle nulls in getElement
 3. Created NestedFields for nested objects
 4. allow equality between 2 Fields and 2 FieldValues
@@ -16,23 +16,32 @@
 14. Make all DSL read consistently. See update/upsert and modify syntax
 15. Find a way to write arbitrary type safe json/bson.
 16. Regex does not work for Numbers. Eg. (dateField === (".*"/) yields nothing
-17. Create definitions for implicits on the template domain object.s
-18. Remove the need for wrapWith.
-19. Update doco.
-20. You can currently do this: $set(costField === 60.00D) & descriptionField === "updated". This does not make sense. Use the type system to
+17. Remove the need for wrapWith.
+18. Update doco.
+19. You can currently do this: $set(costField === 60.00D) & descriptionField === "updated". This does not make sense. Use the type system to
 disallow this. $set(costField === 60.00D & descriptionField === "updated") is fine and so is
 $set(costField === 60.00D) & $set(descriptionField === "updated")
-21. Implement other MongoCursor methods:
+20. Implement other MongoCursor methods:
     count()
     skip()
     snapshot()
-22. Test $set which updates an array of NestedObjects.
-23. Implement MongoRef
-24. Create separate tests for:
+21. Test $set which updates an array of NestedObjects.
+22. Implement MongoRef
+23. Create separate tests for:
     1. $set
     2. $push
     3. $pull
-25. Use Primitives where needed.
+24. Use Primitives where needed.
+25. Add support for Array operations:
+    $in
+    $nin
+    $pop
+    $all
+    $slice
+26. Automate persistence of fields.
+27. Automate retrieval of fields. (not sure about this)
+28. Make defined fields typesafe. Eg. You shouldn't be able to do Person(name:String) instead of Person(name:nameField.Value)
+29. Pool connections and/or set timeouts to prevent running out of connections.
 -------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)
@@ -62,3 +71,6 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 24. Make NestedFields and NestedObjects the only fields to access nestedMethods. (putNestedObject) (done)
 24. $push does not work. (done)
 25. Update UpdateObject to set the correct path for NestedObjects. (done)
+26. Create definitions for implicits on the template domain object.s (done)
+27. Better array support. Something of the sort: [F[_] <: Traversable[_], T <: DomainObject](value:F[T])
+28. Automate collection name from supplied Types. (done)

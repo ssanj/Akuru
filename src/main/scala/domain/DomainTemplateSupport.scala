@@ -39,7 +39,7 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
     implicit def _mongoToNested(mo:MongoObject): Option[N] = mongoToNested(mo)
   }
 
-  abstract class DomainTemplate[O <: DomainObject] extends Template[O] {
+  abstract class DomainTemplate[O <: DomainObject : ClassManifest] extends Template[O] {
     private val idKey = "_id"
     val idField: Field[O, MID] = new Owner[O].field[MID](idKey)
     val defaultId: idField.Value = idField === None
@@ -52,8 +52,6 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
 
     def embeddedArrayField[T <: NestedObject](name:String): EmbeddedArrayField[O, T] = new Owner[O].embeddedArrayField[T](name)
 
-    val collectionName:String
-
     def domainToMongoObject(domain: O): MongoObject
 
     def mongoToDomain(mo:MongoObject): Option[O]
@@ -61,6 +59,8 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
     implicit def _domainToMongoObject(domain: O): MongoObject = domainToMongoObject(domain)
 
     implicit def _mongoToDomain(mo:MongoObject): Option[O] = mongoToDomain(mo)
+
+    lazy val collectionName:String = implicitly[ClassManifest[O]].erasure.getSimpleName.toLowerCase
 
 
     implicit object DomainCollectionName extends CollectionName[O] {

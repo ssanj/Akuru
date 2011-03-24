@@ -29,8 +29,6 @@ trait TestDomainObjects extends NestedDomainObjects {
     override def domainToMongoObject(domain:Blog): MongoObject = {
       putId(domain.id.value).putAnything(domain.title).putAnything(domain.labels)
     }
-
-    val collectionName = "blog"
   }
 
   case class Label(value:Label.valueField.Value, id:Label.idField.Value = Label.defaultId) extends DomainObject
@@ -45,8 +43,6 @@ trait TestDomainObjects extends NestedDomainObjects {
       } yield Label(valueField === value, idField === mo.getId)
 
     override def domainToMongoObject(domain:Label): MongoObject = putId(domain.id.value).putAnything(domain.value)
-
-    val collectionName = "label"
   }
 
   lazy val mongoCreationException = "Exceptional MongoObject"
@@ -65,7 +61,7 @@ trait TestDomainObjects extends NestedDomainObjects {
 
     lazy val expectedError = "no person collection here!"
 
-    lazy val collectionName = throw new RuntimeException(expectedError)
+    override lazy val collectionName = throw new RuntimeException(expectedError)
   }
 
   case class Book(name:Book.nameField.Value,
@@ -95,8 +91,6 @@ trait TestDomainObjects extends NestedDomainObjects {
     } yield
       Book(nameField === name, authorsField === authors, publisherField === publisher, printVersionField === printVersion, priceField === price,
         idField === mo.getId)
-
-    val collectionName = "book"
   }
 
   case class Task(name:Task.nameField.Value,
@@ -118,7 +112,5 @@ trait TestDomainObjects extends NestedDomainObjects {
       priority <- mo.getPrimitiveObject(priorityField)
       owner <-mo.getPrimitiveObject(ownerField)
      } yield Task(nameField === name, priorityField === priority, ownerField === owner, idField === mo.getId)
-
-    val collectionName = "task"
   }
 }
