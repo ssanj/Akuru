@@ -25,7 +25,8 @@ trait NestedDomainObjects {
       for {
         date <- mo.getPrimitiveObject(dateField)
         spends <- mo.getNestedObject(spendsField)
-      } yield DailySpend(dateField === date, spendsField === spends, idField === mo.getId)
+        id <- mo.getIdObject
+      } yield DailySpend(dateField === date, spendsField === spends, idField === id)
     }
   }
 

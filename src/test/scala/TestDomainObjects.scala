@@ -23,7 +23,8 @@ trait TestDomainObjects extends NestedDomainObjects {
        for {
         title <- mo.getPrimitiveObject(titleField)
         labels <- mo.getPrimitiveObjects(labelsField)
-      } yield (Blog(titleField === title, labelsField === labels, idField === mo.getId))
+        id <- mo.getIdObject
+      } yield (Blog(titleField === title, labelsField === labels, idField === id))
     }
 
     override def domainToMongoObject(domain:Blog): MongoObject = {
@@ -40,7 +41,8 @@ trait TestDomainObjects extends NestedDomainObjects {
     override def mongoToDomain(mo:MongoObject): Option[Label] =
       for {
         value <- mo.getPrimitiveObject(valueField)
-      } yield Label(valueField === value, idField === mo.getId)
+        id <- mo.getIdObject
+      } yield Label(valueField === value, idField === id)
 
     override def domainToMongoObject(domain:Label): MongoObject = putId(domain.id).putAnything(domain.value)
   }
@@ -88,9 +90,10 @@ trait TestDomainObjects extends NestedDomainObjects {
       publisher <- mo.getPrimitiveObject(publisherField)
       printVersion <- mo.getPrimitiveObject(printVersionField)
       price <- mo.getPrimitiveObject(priceField)
+      id <- mo.getIdObject
     } yield
       Book(nameField === name, authorsField === authors, publisherField === publisher, printVersionField === printVersion, priceField === price,
-        idField === mo.getId)
+        idField === id)
   }
 
   case class Task(name:Task.nameField.Value,
@@ -111,6 +114,7 @@ trait TestDomainObjects extends NestedDomainObjects {
       name <- mo.getPrimitiveObject(nameField)
       priority <- mo.getPrimitiveObject(priorityField)
       owner <-mo.getPrimitiveObject(ownerField)
-     } yield Task(nameField === name, priorityField === priority, ownerField === owner, idField === mo.getId)
+      id <- mo.getIdObject
+     } yield Task(nameField === name, priorityField === priority, ownerField === owner, idField === id)
   }
 }

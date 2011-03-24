@@ -47,6 +47,11 @@ trait MongoObjectBehaviour { this:Tools =>
   def getId: Option[MongoObjectId] = getPrimitiveObject[ObjectId]("_id") map (MongoObjectId(_))
 
   /**
+   * This has been introduced so it can be used like every other variable in for-comprehension.
+   */
+  def getIdObject: Option[Option[MongoObjectId]] = getPrimitiveObject[ObjectId]("_id") map (MongoObjectId(_)) map(Some(_))
+
+  /**
    * This method only works if the duplicate keys have values of MongoObjects themselves. If the values themselves are not MongoObjects
    * the original key/values are returned unmerged.
    *

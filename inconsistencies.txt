@@ -1,6 +1,8 @@
-1. putId(domain.id.value) should be putId(domain.id) to be consistent.
+TO DO ------------------------------------------------------------------------------------------------------------------
+
+1. Pool connections and/or set timeouts to prevent running out of connections.
 2. Handle nulls in getElement
-3. Created NestedFields for nested objects
+3.   Automate persistence of fields.
 4. allow equality between 2 Fields and 2 FieldValues
 5. Get rid of imports from MongoTypes.MongoObject._
 6. Convert regex to Scala RegEx.
@@ -38,11 +40,8 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
     $pop
     $all
     $slice
-26. Automate persistence of fields.
-27. Automate retrieval of fields. (not sure about this)
-28. Make defined fields typesafe. Eg. You shouldn't be able to do Person(name:String) instead of Person(name:nameField.Value)
-29. Pool connections and/or set timeouts to prevent running out of connections.
--------------------------------------------------------------------------------------------------------------
+
+Done -------------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)
 2. update many does not exist (done)
@@ -74,3 +73,10 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 26. Create definitions for implicits on the template domain object.s (done)
 27. Better array support. Something of the sort: [F[_] <: Traversable[_], T <: DomainObject](value:F[T])
 28. Automate collection name from supplied Types. (done)
+29. putId(domain.id.value) should be putId(domain.id) to be consistent. (done)
+30. Created NestedFields for nested objects (done)
+
+Not doing --------------------------------------------------------------------------------------------------------------
+
+1. Make defined fields typesafe. Eg. You shouldn't be able to do Person(name:String) instead of Person(name:nameField.Value) (not doing)
+2. Automate retrieval of fields. (not doing)
