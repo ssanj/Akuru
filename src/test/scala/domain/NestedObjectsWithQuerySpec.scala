@@ -4,7 +4,9 @@
  */
 
 package akuru
-package dsl
+package domain
+
+import akuru.dsl.AkuruDSL
 
 final class NestedObjectsWithQuerySpec extends CommonSpec with AkuruDSL with NestedObjectCommon {
 

@@ -7,6 +7,7 @@ package akuru
 
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FlatSpec
+import akuru.domain.TestDomainObjects
 
 trait CommonSpec extends FlatSpec with ShouldMatchers
         with TestDomainObjects

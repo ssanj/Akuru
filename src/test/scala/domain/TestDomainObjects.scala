@@ -4,6 +4,7 @@
  */
 
 package akuru
+package domain
 
 import MongoTypes.putId
 import MongoTypes.Query

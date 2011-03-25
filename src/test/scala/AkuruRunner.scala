@@ -7,6 +7,7 @@ package runners
 
 import _root_.akuru._
 import _root_.akuru.dsl._
+import _root_.akuru.domain.TestDomainObjects
 import MongoTypes.MongoObject.$set
 
 object AkuruRunner extends TestDomainObjects with AkuruDSL {
