@@ -26,8 +26,8 @@ trait AllPossibleFieldsDomainObject {
       putId(domain.id).
               putAnything(domain.name).
               putAnything(domain.givenNames).
-              putNested(addressField, domain.address).
-              putNestedArray(coursesField, domain.courses)
+              putNested(domain.address).
+              putNestedArray(domain.courses)
     }
 
     override def mongoToDomain(mo:MongoObject): Option[Student] = {
@@ -53,7 +53,7 @@ trait AllPossibleFieldsDomainObject {
     val countryField = field[String]("country")
 
     override def nestedToMongoObject(domain: Address): MongoObject = {
-      mongo.putAnything(domain.address).putNested(postCodeField, domain.postCode).putAnything(domain.state).putAnything(domain.country)
+      mongo.putAnything(domain.address).putNested(domain.postCode).putAnything(domain.state).putAnything(domain.country)
     }
 
     override def mongoToNested(mo:MongoObject): Option[Address] = {
@@ -99,8 +99,8 @@ trait AllPossibleFieldsDomainObject {
     override def nestedToMongoObject(domain:Course): MongoObject = {
       mongo.putAnything(domain.name).
             putAnything(domain.reading).
-            putNested(locationField, domain.location).
-            putNestedArray(commentsField, domain.comments)
+            putNested(domain.location).
+            putNestedArray(domain.comments)
     }
 
     override def mongoToNested(mo:MongoObject): Option[Course] = {
