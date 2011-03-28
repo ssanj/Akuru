@@ -32,17 +32,21 @@ trait MongoObjectBehaviour { this:Tools =>
     })
   }
 
-  def getPrimitiveObject[T : ClassManifest](key:String): Option[T] = {
+  def getPrimitiveObject[T : Primitive : ClassManifest](key:String): Option[T] = {
     getTypeSafeObject[T](key, { case x:AnyRef => getElement[T](x) })
   }
 
-  def getPrimitiveObject[O <: DomainObject, T : ClassManifest](f:FieldType[O, T]): Option[T] = getPrimitiveObject[T](f.name)
+  def getEnumObject[O <: DomainObject, T <: Enumeration#Value : ClassManifest](f:FieldType[O, T], toEnum: String => Option[T]): Option[T] = {
+    getPrimitiveObject[String](f.name) fold (None, value => toEnum(value))
+  }
 
-  def getPrimitiveObjects[T : ClassManifest](key:String): Option[Seq[T]] = {
+  def getPrimitiveObject[O <: DomainObject, T : Primitive : ClassManifest](f:FieldType[O, T]): Option[T] = getPrimitiveObject[T](f.name)
+
+  def getPrimitiveObjects[T : Primitive : ClassManifest](key:String): Option[Seq[T]] = {
     getTypeSafeObject[Seq[T]](key, { case o:BasicDBList => Some(MongoObject.fromPrimitiveList[T](o)) })
   }
 
-  def getPrimitiveObjects[O <: DomainObject, T : ClassManifest](f:FieldType[O, Seq[T]]): Option[Seq[T]] = getPrimitiveObjects[T](f.name)
+  def getPrimitiveObjects[O <: DomainObject, T : Primitive : ClassManifest](f:FieldType[O, Seq[T]]): Option[Seq[T]] = getPrimitiveObjects[T](f.name)
 
   def getId: Option[MongoObjectId] = getPrimitiveObject[ObjectId]("_id") map (MongoObjectId(_))
 
@@ -138,6 +142,7 @@ trait MongoObjectBehaviour { this:Tools =>
         case seq:Seq[_] => merge(putPrimitiveObjects2[O](new Field[O, Seq[Any]](pp(fv)) === seq))
         case mo:MongoObject => merge(putMongo(pp(fv), mo))
         case id:MongoObjectId =>   merge(putId(id))
+        case en:Enumeration#Value =>   MongoObject(dbo + (pp(fv) ->  en.toString.asInstanceOf[AnyRef]))
         case _:Any => MongoObject(dbo + (pp(fv) -> fv.value.asInstanceOf[AnyRef]))
       }
       case None => copyMongoObject

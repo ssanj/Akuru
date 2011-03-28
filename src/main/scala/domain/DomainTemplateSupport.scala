@@ -47,6 +47,8 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
 
     def field[T : Primitive](name:String): Field[O, T] = new Owner[O].field[T](name)
 
+    def enumField[T <: Enumeration#Value](name:String): Field[O, T] = new Owner[O].field[T](name)
+
     def embeddedField[T <: NestedObject](name:String): EmbeddedField[O, T] = new Owner[O].embeddedField[T](name)
 
     def arrayField[T : Primitive](name:String): ArrayField[O, T] = new Owner[O].arrayField[T](name)

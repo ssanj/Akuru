@@ -118,4 +118,27 @@ trait TestDomainObjects extends NestedDomainObjects {
       id <- mo.getIdObject
      } yield Task(nameField === name, priorityField === priority, ownerField === owner, idField === id)
   }
+
+  case class User(username:User.usernameField.Value, role:User.roleField.Value, id:User.idField.Value = User.defaultId) extends DomainObject
+
+  object Role extends Enumeration(0, "Administrator", "User", "Developer") {
+    type Role = Value
+    val ADMIN, USER, DEV = Value
+  }
+
+  import Role._
+  object User extends DomainTemplate[User] {
+    val usernameField = field[String]("username")
+    val roleField = enumField[Role]("role")
+
+    override def domainToMongoObject(user:User): MongoObject =  putId(user.id).putAnything(user.username).putAnything(user.role)
+
+    override def mongoToDomain(mo:MongoObject): Option[User] = {
+      for {
+        username <- mo.getPrimitiveObject(usernameField)
+        role <- mo.getEnumObject(roleField, s => values.filter(_.toString == s).headOption)   //TODO: Make this better.
+        id <- mo.getIdObject
+      } yield User(usernameField === username, roleField === role, idField === id)
+    }
+  }
 }

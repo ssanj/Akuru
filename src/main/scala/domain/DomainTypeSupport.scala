@@ -8,6 +8,8 @@ package domain
 
 trait DomainTypeSupport {
 
+  import org.bson.types.ObjectId
+
   type MID = Option[MongoObjectId]
 
   type MongoToDomain[T <: DomainObject] = MongoObject => Option[T]
@@ -43,6 +45,8 @@ trait DomainTypeSupport {
   implicit object FloatP extends Primitive[Float]
 
   implicit object CharP extends Primitive[Char]
+
+  implicit object ObjectIdP extends Primitive[ObjectId]
 
   trait CollectionName[T <: DomainObject] {
     val name:String
