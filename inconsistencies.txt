@@ -45,6 +45,7 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 27. Automated serialize/deserialize
 28. Embbedded object need to be defined in a cleaner way
 29. collection names should use classOf[M] to find collection name.
+30. Support for Enumerations
 
 Done -------------------------------------------------------------------------------------------------------------------
 
