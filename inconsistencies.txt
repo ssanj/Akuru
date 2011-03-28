@@ -41,6 +41,11 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
     $all
     $slice
 
+26. Reuse embedded objects
+27. Automated serialize/deserialize
+28. Embbedded object need to be defined in a cleaner way
+29. collection names should use classOf[M] to find collection name.
+
 Done -------------------------------------------------------------------------------------------------------------------
 
 1. find one has an onError clause while find many does not (done  by unifying findOne and findMany)
