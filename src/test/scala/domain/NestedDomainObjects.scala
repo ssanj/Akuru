@@ -34,7 +34,8 @@ trait NestedDomainObjects {
 
   case class Spend(cost: Spend.costField.Value, description: Spend.descriptionField.Value, tags: Spend.tagsField.Value) extends NestedObject
 
-  object Spend extends NestedTemplate[DailySpend, Spend](DailySpend.spendsField){
+  object Spend extends NestedTemplate[DailySpend, Spend]{
+    override val parentField = DailySpend.spendsField
     val costField = field[Double]("cost")
     val descriptionField = field[String]( "description")
     val tagsField = embeddedArrayField[Tag]("tags")
@@ -54,7 +55,8 @@ trait NestedDomainObjects {
 
   case class Tag(name: Tag.nameField.Value) extends NestedObject
 
-  object Tag extends NestedTemplate[DailySpend, Tag](Spend.tagsField) {
+  object Tag extends NestedTemplate[DailySpend, Tag] {
+    override val parentField = fromType(Spend.tagsField)
     val nameField = field[String]("name")
 
     override def nestedToMongoObject(tag: Tag): MongoObject =  empty.putAnything(tag.name)

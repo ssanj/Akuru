@@ -46,7 +46,8 @@ trait AllPossibleFieldsDomainObject {
                      state:Address.stateField.Value,
                      country:Address.countryField.Value)  extends NestedObject
 
-  object Address extends NestedTemplate[Student, Address](Student.addressField) {
+  object Address extends NestedTemplate[Student, Address] {
+    override val parentField = Student.addressField
     val addressField = field[String]("address")
     val postCodeField = embeddedField[PostCode]("postCode")
     val stateField = field[String]("state")
@@ -71,7 +72,8 @@ trait AllPossibleFieldsDomainObject {
 //  case object Brisbane extends PostCode(PostCode.codeField === "4000", PostCode.codeField === "Brisbane")
 //  case object ForestLake extends PostCode(PostCode.codeField === "4078", PostCode.codeField === "ForestLake")
 
-  object PostCode extends NestedTemplate[Student, PostCode](Address.postCodeField) {
+  object PostCode extends NestedTemplate[Student, PostCode] {
+    override val parentField = Address.postCodeField
     val codeField = field[String]("code")
     val nameField = field[String]("name")
 
@@ -90,8 +92,10 @@ trait AllPossibleFieldsDomainObject {
                     location:Course.locationField.Value,
                     comments:Course.commentsField.Value) extends NestedObject
 
-  object Course extends NestedTemplate[Student, Course](Student.coursesField) {
+  object Course extends NestedTemplate[Student, Course] {
+    override val parentField = fromType(Student.coursesField)
     val nameField = field[String]("name")
+    val addressField = embeddedField[Address]("address")
     val readingField = arrayField[String]("reading")
     val locationField = embeddedField[Room]("location")
     val commentsField = embeddedArrayField[Comment]("comments")
@@ -115,7 +119,8 @@ trait AllPossibleFieldsDomainObject {
 
   case class Room(size:Room.sizeField.Value) extends NestedObject
 
-  object Room extends NestedTemplate[Student, Room](Course.locationField) {
+  object Room extends NestedTemplate[Student, Room] {
+    override val parentField = Course.locationField
     val sizeField = field[Int]("size")
 
     override def nestedToMongoObject(domain:Room): MongoObject = mongo.putAnything(domain.size)
@@ -129,7 +134,8 @@ trait AllPossibleFieldsDomainObject {
 
   case class Comment(comment:Comment.commentField.Value, author:Comment.authorField.Value) extends NestedObject
 
-  object Comment extends NestedTemplate[Student, Comment](Course.commentsField) {
+  object Comment extends NestedTemplate[Student, Comment] {
+    override val parentField = fromType(Course.commentsField)
     val commentField = field[String]("comment")
     val authorField = field[String]("author")
 

@@ -10,17 +10,18 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
 
   sealed abstract class Template[O <: DomainObject]
 
-  abstract class NestedTemplate[O <: DomainObject, N <: NestedObject](parentField:FieldType[O, N]) extends Template[O] {
+  abstract class NestedTemplate[O <: DomainObject, N <: NestedObject] extends Template[O] {
 
-    def this(parentField:EmbeddedField[O, N]) = this(parentField.asInstanceOf[FieldType[O, N]])
+    val parentField:FieldType[O, N]
 
-    def this(parentField:EmbeddedArrayField[O, N]) = this(EmbeddedField[O, N](parentField.name).asInstanceOf[FieldType[O, N]])
+    def fromType(pf:EmbeddedField[O, N]) = Field[O, N](pf.name).asInstanceOf[FieldType[O, N]]
 
-    def this(parentField:NestedEmbeddedField[O, N]) = this(NestedEmbeddedField[O, N](parentField.parentField, parentField.name).
-            asInstanceOf[FieldType[O, N]])
+    def fromType(pf:EmbeddedArrayField[O, N]) = EmbeddedField[O, N](pf.name).asInstanceOf[FieldType[O, N]]
 
-    def this(parentField:NestedEmbeddedArrayField[O, N]) = this(NestedEmbeddedField[O, N](parentField.parentField, parentField.name).
-            asInstanceOf[FieldType[O, N]])
+    def fromType(pf:NestedEmbeddedField[O, N]) = NestedEmbeddedField[O, N](pf.parentField, pf.name).asInstanceOf[FieldType[O, N]]
+
+    def fromType(pf:NestedEmbeddedArrayField[O, N]) = NestedEmbeddedField[O, N](pf.parentField, pf.name).
+            asInstanceOf[FieldType[O, N]]
 
     def field[T : Primitive](name:String): NestedField[O, T] = new Owner[O].nestedField[T](parentField, name)
 
