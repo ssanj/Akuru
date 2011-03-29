@@ -62,4 +62,8 @@ trait AkuruGlobalTypes {
   type CollectionName[T <: DomainObject] = akuru.MongoTypes.CollectionName[T]
 
   type UserFunction = akuru.MongoTypes.UserFunction
+
+  type ToMongo[T] = akuru.domain.serial.ToMongo[T]
+  type FromMongo[T] = akuru.domain.serial.FromMongo[T]
+
  }
