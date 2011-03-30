@@ -6,6 +6,8 @@
 package akuru
 package domain
 
+import MongoTypes.{DomainObject => DO}
+
 trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
 
   sealed abstract class FieldType[O <: DomainObject, T] {
@@ -17,10 +19,13 @@ trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
 
     def === (value:T) : Value = apply(value)
 
+    val toMongo: ToMongo[T] = null //TODO: Remove once we have all classes using ToMongo
+
     final case class Value(value:T) {
       val name = field.name
       val path = field.path
       lazy val field = FieldType.this  //we need this lazy as it should be accessed only after Field instantiation.
+      val mongo: MongoObject = field.toMongo.convert(this.asInstanceOf[FieldValue[DO, T]])
     }
   }
 
@@ -32,11 +37,11 @@ trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
   }
 
   //tood: Rename to PrimitiveField
-  final case class Field[O <: DomainObject, T](override val name:String) extends DomainTemplateField[O, T]
+  final case class Field[O <: DomainObject, T](override val name:String)(implicit override val toMongo:ToMongo[T]) extends DomainTemplateField[O, T]
+
+  final case class ArrayField[O <: DomainObject, T](override val name:String)(implicit override val toMongo:ToMongo[Seq[T]]) extends DomainTemplateField[O, Seq[T]]
 
   final case class EmbeddedField[O <: DomainObject, T <: NestedObject](override val name:String) extends DomainTemplateField[O, T]
-
-  final case class ArrayField[O <: DomainObject, T](override val name:String) extends DomainTemplateField[O, Seq[T]]
 
   final case class EmbeddedArrayField[O <: DomainObject, T <: NestedObject](override val name:String) extends DomainTemplateField[O, Seq[T]]
 

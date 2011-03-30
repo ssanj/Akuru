@@ -7,8 +7,10 @@ package akuru
 package domain
 package serial
 
+import MongoTypes.{ DomainObject => DO }
+
 trait ToMongo[T] {
-  def convert[O <: DomainObject](fv:FieldValue[O, T]): MongoObject
+  def convert[O <: DO](fv:FieldValue[O, T]): MongoObject
 }
 
 

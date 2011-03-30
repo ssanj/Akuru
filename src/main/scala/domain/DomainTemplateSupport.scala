@@ -6,6 +6,8 @@
 package akuru
 package domain
 
+import MongoObject.empty
+
 trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSupport with OwnerFieldSupport =>
 
   sealed abstract class Template[O <: DomainObject]
@@ -14,15 +16,15 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
 
     val parentField:FieldType[O, N]
 
-    def fromType(pf:EmbeddedField[O, N]) = Field[O, N](pf.name).asInstanceOf[FieldType[O, N]]
-
-    def fromType(pf:EmbeddedArrayField[O, N]) = EmbeddedField[O, N](pf.name).asInstanceOf[FieldType[O, N]]
-
-    def fromType(pf:NestedEmbeddedField[O, N]) = NestedEmbeddedField[O, N](pf.parentField, pf.name).asInstanceOf[FieldType[O, N]]
-
-    def fromType(pf:NestedEmbeddedArrayField[O, N]) = NestedEmbeddedField[O, N](pf.parentField, pf.name).
-            asInstanceOf[FieldType[O, N]]
-
+//    def fromType(pf:EmbeddedField[O, N]) = Field[O, N](pf.name).asInstanceOf[FieldType[O, N]]
+//
+//    def fromType(pf:EmbeddedArrayField[O, N]) = EmbeddedField[O, N](pf.name).asInstanceOf[FieldType[O, N]]
+//
+//    def fromType(pf:NestedEmbeddedField[O, N]) = NestedEmbeddedField[O, N](pf.parentField, pf.name).asInstanceOf[FieldType[O, N]]
+//
+//    def fromType(pf:NestedEmbeddedArrayField[O, N]) = NestedEmbeddedField[O, N](pf.parentField, pf.name).
+//            asInstanceOf[FieldType[O, N]]
+//
     def field[T : Primitive](name:String): NestedField[O, T] = new Owner[O].nestedField[T](parentField, name)
 
     def arrayField[T : Primitive](name:String): NestedArrayField[O, T] = new Owner[O].nestedArrayField[T](parentField, name)
@@ -45,21 +47,24 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
     val idField: Field[O, MID] = new Owner[O].field[MID](idKey)
     val defaultId: idField.Value = idField === None
 
-    def field[T : Primitive](name:String): Field[O, T] = new Owner[O].field[T](name)
-
-    def enumField[T <: Enumeration#Value](name:String): Field[O, T] = new Owner[O].field[T](name)
+    def field[T : Primitive : ToMongo](name:String): Field[O, T] = new Owner[O].field[T](name)
 
     def embeddedField[T <: NestedObject](name:String): EmbeddedField[O, T] = new Owner[O].embeddedField[T](name)
 
-    def arrayField[T : Primitive](name:String): ArrayField[O, T] = new Owner[O].arrayField[T](name)
+    def arrayField[T](name:String)(implicit p:Primitive[T], tm:ToMongo[Seq[T]]): ArrayField[O, T] = new Owner[O].arrayField[T](name)
 
     def embeddedArrayField[T <: NestedObject](name:String): EmbeddedArrayField[O, T] = new Owner[O].embeddedArrayField[T](name)
 
-    def domainToMongoObject(domain: O): MongoObject
+//    def domainToMongoObject(domain: O): MongoObject = {
+//
+//    }
 
     def mongoToDomain(mo:MongoObject): Option[O]
 
-    implicit def _domainToMongoObject(domain: O): MongoObject = domainToMongoObject(domain)
+    //implicit def _domainToMongoObject(domain: O): MongoObject = domainToMongoObject(domain)
+    implicit def _domainToMongoObject(domain: O): MongoObject = {
+      domain.productIterator.collect { case fv:FieldValue[_, _] => fv.mongo }.foldLeft(empty)(_.merge(_))
+    }
 
     implicit def _mongoToDomain(mo:MongoObject): Option[O] = mongoToDomain(mo)
 

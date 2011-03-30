@@ -22,7 +22,7 @@ trait DomainTypeSupport {
 
   sealed trait AkuruObject
 
-  abstract class DomainObject extends AkuruObject
+  abstract class DomainObject extends AkuruObject with Product
 
   abstract class NestedObject extends AkuruObject
 

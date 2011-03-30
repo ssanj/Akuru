@@ -99,6 +99,10 @@ trait MongoObjectBehaviour { this:Tools =>
      merge(fv.name -> convertToJavaList(fv.value map (_.asInstanceOf[AnyRef])))
   }
 
+  def putPrimitiveObjects3[O <: DomainObject](fv:FieldValue[O, Seq[Any]]): MongoObject = {
+     merge(fv.name -> convertToJavaList(fv.value map (_.asInstanceOf[AnyRef])))
+  }
+
   def putMongo(key:String, mongo:MongoObject): MongoObject = putAnyArray(asJavaObject)(key, Seq(mongo.toDBObject))
 
   def putMongoArray(key:String, mongos:Seq[MongoObject]): MongoObject = putAnyArray(convertToJavaList)(key, mongos map (_.toDBObject))
@@ -139,7 +143,7 @@ trait MongoObjectBehaviour { this:Tools =>
                                                         pp: PathProvider[O, T] = namePath[O, T]): MongoObject = {
     getElement[T](fv.value.asInstanceOf[AnyRef]) match {
       case Some(element) => element match {
-        case seq:Seq[_] => merge(putPrimitiveObjects2[O](new Field[O, Seq[Any]](pp(fv)) === seq))
+        case seq:Seq[_] =>   merge(fv.mongo) //merge(putPrimitiveObjects2[O](new Field[O, Seq[Any]](pp(fv)) === seq))
         case mo:MongoObject => merge(putMongo(pp(fv), mo))
         case id:MongoObjectId =>   merge(putId(id))
         case en:Enumeration#Value =>   MongoObject(dbo + (pp(fv) ->  en.toString.asInstanceOf[AnyRef]))
