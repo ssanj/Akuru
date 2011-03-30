@@ -25,8 +25,8 @@ trait PushFuncs  { this:Funcs =>
    * Allows pushing primitive objects into an Array.
    * Used for ArrayField and NestedArrayField.
    */
-  def $push[O <: DomainObject, T : ClassManifest : Primitive](af:FieldType[O, Seq[T]], value: => T): MongoUpdateObject[O] =
-    toMongoUpdateObject[O](anyFunction1[O, T](functionName, new Field[O, T](af.path)(null) === value))
+  def $push[O <: DomainObject, T : ClassManifest : Primitive : ToMongo](af:FieldType[O, Seq[T]], value: => T): MongoUpdateObject[O] =
+    toMongoUpdateObject[O](anyFunction1[O, T](functionName, new Field[O, T](af.path) === value))
 
   private def pushNested[O <: DomainObject, T <: NestedObject : ClassManifest](path:String, value: => MongoObject): MongoUpdateObject[O] = {
     toMongoUpdateObject[O]($funcMongo(functionName, mongo.putMongo(path, value)))
