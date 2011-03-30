@@ -9,9 +9,9 @@ import MongoTypes.Query
 import MongoTypes.FieldValueQueryJoiner
 import MongoObject.fieldToMongo1
 import MongoObject.nestedPath
+import akuru.domain.serial.PrimitiveConversions
 
-
-trait AkuruImplicits {
+trait AkuruImplicits extends PrimitiveConversions {
 
   import com.mongodb.DBObject
 

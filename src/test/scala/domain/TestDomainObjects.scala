@@ -27,10 +27,6 @@ trait TestDomainObjects extends NestedDomainObjects {
         id <- mo.getIdObject
       } yield (Blog(titleField === title, labelsField === labels, idField === id))
     }
-
-    override def domainToMongoObject(domain:Blog): MongoObject = {
-      putId(domain.id).putAnything(domain.title).putAnything(domain.labels)
-    }
   }
 
   case class Label(value:Label.valueField.Value, id:Label.idField.Value = Label.defaultId) extends DomainObject
@@ -44,8 +40,6 @@ trait TestDomainObjects extends NestedDomainObjects {
         value <- mo.getPrimitiveObject(valueField)
         id <- mo.getIdObject
       } yield Label(valueField === value, idField === id)
-
-    override def domainToMongoObject(domain:Label): MongoObject = putId(domain.id).putAnything(domain.value)
   }
 
   lazy val mongoCreationException = "Exceptional MongoObject"
@@ -57,8 +51,6 @@ trait TestDomainObjects extends NestedDomainObjects {
   object Person extends DomainTemplate[Person] {
 
     val nameField = field[String]("name")
-
-    override def domainToMongoObject(p:Person): MongoObject = empty
 
     override def mongoToDomain(mo:MongoObject): Option[Person] = Some(Person(name = nameField === "testing"))
 
@@ -80,9 +72,6 @@ trait TestDomainObjects extends NestedDomainObjects {
     val publisherField = field[String]("pub")
     val printVersionField = field[Int]("version")
     val priceField = field[Double]("price")
-
-    override def domainToMongoObject(b:Book): MongoObject = putId(b.id).
-            putAnything(b.name).putAnything(b.authors).putAnything(b.publisher).putAnything(b.printVersion).putAnything(b.price)
 
     override def mongoToDomain(mo:MongoObject): Option[Book] =
     for {
@@ -107,9 +96,6 @@ trait TestDomainObjects extends NestedDomainObjects {
     val priorityField = field[Int]("priority")
     val ownerField = field[String]("owner")
 
-    override def domainToMongoObject(task:Task): MongoObject =
-      putId(task.id).putAnything(task.name).putAnything(task.priority).putAnything(task.owner)
-
     override def mongoToDomain(mo:MongoObject): Option[Task] =
      for {
       name <- mo.getPrimitiveObject(nameField)
@@ -117,28 +103,5 @@ trait TestDomainObjects extends NestedDomainObjects {
       owner <-mo.getPrimitiveObject(ownerField)
       id <- mo.getIdObject
      } yield Task(nameField === name, priorityField === priority, ownerField === owner, idField === id)
-  }
-
-  case class User(username:User.usernameField.Value, role:User.roleField.Value, id:User.idField.Value = User.defaultId) extends DomainObject
-
-  object Role extends Enumeration(0, "Administrator", "User", "Developer") {
-    type Role = Value
-    val ADMIN, USER, DEV = Value
-  }
-
-  import Role._
-  object User extends DomainTemplate[User] {
-    val usernameField = field[String]("username")
-    val roleField = enumField[Role]("role")
-
-    override def domainToMongoObject(user:User): MongoObject =  putId(user.id).putAnything(user.username).putAnything(user.role)
-
-    override def mongoToDomain(mo:MongoObject): Option[User] = {
-      for {
-        username <- mo.getPrimitiveObject(usernameField)
-        role <- mo.getEnumObject(roleField, s => values.filter(_.toString == s).headOption)   //TODO: Make this better.
-        id <- mo.getIdObject
-      } yield User(usernameField === username, roleField === role, idField === id)
-    }
   }
 }

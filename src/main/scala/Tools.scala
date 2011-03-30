@@ -128,3 +128,5 @@ trait Tools {
     def getElement[T : ClassManifest](value:AnyRef) : Option[T] = getMatchedElement[T](value)(Some(_))
 
 }
+
+object Tools extends Tools
