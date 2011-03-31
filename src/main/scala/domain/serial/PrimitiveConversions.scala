@@ -56,8 +56,7 @@ trait PrimitiveConversions {
   implicit object OptionalMongoObjectIdToMongo extends MakeItMongoId
 
   abstract class MakeItMongo[T : ClassManifest] extends ToMongo[T] {
-    def convert[O <: DO](fv:FieldValue[O, T]): MongoObject = empty.putAnything[O, T](fv) //TODO: We should just add a Primtive object here.
-    //def convert[O <: DO](fv:FieldValue[O, T]): MongoObject = MongoObject(Map(fv.name -> fv.value.asInstanceOf[AnyRef])
+    def convert[O <: DO](fv:FieldValue[O, T]): MongoObject = MongoObject(Map(fv.name -> fv.value.asInstanceOf[AnyRef]))
   }
 
   abstract class MakeItMongoArray[T : ClassManifest] extends ToMongo[Seq[T]] {
