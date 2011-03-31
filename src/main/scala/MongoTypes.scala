@@ -19,6 +19,7 @@ object MongoTypes extends MongoServerTrait with
                             MongoCursorTrait with
                             MongoWriteResultTrait with
                             MongoErrorTrait with
+                            MongoFunctions with
                             WrapWithTrait with
                             MongoTools with
                             MongoRegEx with
@@ -29,6 +30,5 @@ object MongoTypes extends MongoServerTrait with
                             OperatorTypes with
                             DomainTypeSupport with
                             NestedConversions with
-                            Tools with
                             SideEffects
 }

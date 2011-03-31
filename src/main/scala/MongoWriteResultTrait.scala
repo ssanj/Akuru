@@ -4,7 +4,9 @@
  */
 package akuru
 
-trait MongoWriteResultTrait extends WrapWithTrait { this:Tools with SideEffects =>
+import Tools._
+
+trait MongoWriteResultTrait extends WrapWithTrait {
 
   import MongoTypes.MongoError
   import MongoTypes.mongoErrorToOptionString

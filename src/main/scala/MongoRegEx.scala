@@ -5,8 +5,10 @@
 
 package akuru
 
-import MongoTypes._
-import MongoTypes.MongoObject.mongo
+import MongoObject.mongo
+import MongoTypes.Query
+import MongoTypes.MongoQueryJoiner
+import Tools._
 
 trait MongoRegEx {
 

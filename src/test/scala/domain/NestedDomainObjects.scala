@@ -6,9 +6,6 @@
 package akuru
 package domain
 
-import MongoTypes.putId
-import MongoTypes.MongoObject.empty
-
 trait NestedDomainObjects {
 
   case class DailySpend(date: DailySpend.dateField.Value,
@@ -18,10 +15,6 @@ trait NestedDomainObjects {
   object DailySpend extends DomainTemplate[DailySpend] {
     val dateField = field[Long]("currentDate")
     val spendsField = embeddedField[Spend]("spends")
-
-//    override def domainToMongoObject(ds: DailySpend): MongoObject = {
-//      putId(ds.id).putAnything(ds.date).putNested(ds.spends)
-//    }
 
     override def mongoToDomain(mo:MongoObject): Option[DailySpend] = {
       for {
@@ -40,10 +33,6 @@ trait NestedDomainObjects {
     val descriptionField = field[String]( "description")
 //    val tagsField = embeddedArrayField[Tag]("tags")
     val tagsField = arrayField[String]("tags")
-
-//    override def nestedToMongoObject(spend:Spend): MongoObject = {
-//      empty.putAnything(spend.cost).putAnything(spend.description).putNestedArray(spend.tags)
-//    }
 
     override def mongoToNested(mo:MongoObject): Option[Spend] = {
       for {

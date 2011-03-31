@@ -6,7 +6,7 @@
 package akuru
 
 import MongoTypes.MongoUpdateObject
-import MongoTypes.getElement
+import Tools.getElement
 
 trait Funcs {
 

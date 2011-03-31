@@ -12,4 +12,4 @@ trait DomainSupport extends
           DomainTemplateFieldSupport with
           DomainTemplateSupport with
           OwnerFieldSupport with
-          DomainFuncsSupport { this: Tools => }
+          DomainFuncsSupport
