@@ -6,9 +6,7 @@
 package akuru
 package domain
 
-import MongoTypes.{DomainObject => DO}
-
-trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
+trait DomainTemplateFieldSupport {
 
   sealed abstract class FieldType[O <: DomainObject, T] {
     val name:String
@@ -25,7 +23,7 @@ trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
       lazy val name = field.name
       lazy val path = field.path
       lazy val field = FieldType.this  //we need this lazy as it should be accessed only after Field instantiation.
-      lazy val mongo: MongoObject = field.toMongo.convert(this.asInstanceOf[FieldValue[DO, T]])
+      lazy val mongo: MongoObject = field.toMongo.convert(this.asInstanceOf[FieldValue[DomainObject, T]])
     }
   }
 
@@ -36,14 +34,19 @@ trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
     override val path:String = name
   }
 
+  import NestedObject._
   //tood: Rename to PrimitiveField
   final case class Field[O <: DomainObject, T](override val name:String)(implicit override val toMongo:ToMongo[T]) extends DomainTemplateField[O, T]
 
   final case class ArrayField[O <: DomainObject, T](override val name:String)(implicit override val toMongo:ToMongo[Seq[T]]) extends DomainTemplateField[O, Seq[T]]
 
-  final case class EmbeddedField[O <: DomainObject, T <: NestedObject](override val name:String) extends DomainTemplateField[O, T]
+  final case class EmbeddedField[O <: DomainObject, T <: NestedObject](override val name:String) extends DomainTemplateField[O, T] {
+    override val toMongo:ToMongo[T] = new NestedObjectToMongo[T]
+  }
 
-  final case class EmbeddedArrayField[O <: DomainObject, T <: NestedObject](override val name:String) extends DomainTemplateField[O, Seq[T]]
+  final case class EmbeddedArrayField[O <: DomainObject, T <: NestedObject](override val name:String) extends DomainTemplateField[O, Seq[T]] {
+    override val toMongo:ToMongo[Seq[T]] = new NestedObjectArrayToMongo[T]
+  }
 
   sealed abstract class NestedTemplateField[O <: DomainObject, T] extends FieldType[O, T] {
     val parentField:FieldType[O, _ <: NestedObject]
@@ -63,16 +66,20 @@ trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
   }
 
   final case class NestedField[O <: DomainObject, T](override val parentField:FieldType[O, _ <: NestedObject], override val name:String)(
-          implicit override val toMongo:ToMongo[T]) extends NestedTemplateField[O, T]
+    implicit override val toMongo:ToMongo[T]) extends NestedTemplateField[O, T]
 
   final case class NestedArrayField[O <: DomainObject, T](override val parentField:FieldType[O, _ <: NestedObject], override val name:String)(
-          implicit override val toMongo:ToMongo[Seq[T]]) extends NestedTemplateField[O, Seq[T]]
+    implicit override val toMongo:ToMongo[Seq[T]]) extends NestedTemplateField[O, Seq[T]]
 
-  final case class NestedEmbeddedField[O <: DomainObject, T <: NestedObject](
-  override val parentField:FieldType[O, _ <: NestedObject], override val name:String) extends NestedTemplateField[O, T]
+  final case class NestedEmbeddedField[O <: DomainObject, T <: NestedObject](override val parentField:FieldType[O, _ <: NestedObject],
+                                                                             override val name:String) extends NestedTemplateField[O, T] {
+    override val toMongo:ToMongo[T] = new NestedObjectToMongo[T]
+  }
 
 
-  final case class NestedEmbeddedArrayField[O <: DomainObject, T <: NestedObject](
-    override val parentField:FieldType[O, _ <: NestedObject], override val name:String) extends NestedTemplateField[O, Seq[T]]
+  final case class NestedEmbeddedArrayField[O <: DomainObject, T <: NestedObject](override val parentField:FieldType[O, _ <: NestedObject],
+                                                                                  override val name:String) extends NestedTemplateField[O, Seq[T]] {
+    override val toMongo:ToMongo[Seq[T]] = new NestedObjectArrayToMongo[T]
+  }
 
 }

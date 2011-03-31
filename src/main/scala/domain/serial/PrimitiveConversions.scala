@@ -7,70 +7,70 @@ package domain
 package serial
 
 import MongoObject.empty
-import MongoTypes.{DomainObject => DO}
-import Tools._
 
 /**
  * Type classes for converting any primitive object or an array of, into a corresponding MongoObject.
  */
 trait PrimitiveConversions {
 
-  implicit object StringToMongo extends MakeItMongo[String]
+  implicit object StringToMongo extends PrimitiveMongo[String]
 
-  implicit object IntToMongo extends MakeItMongo[Int]
+  implicit object IntToMongo extends PrimitiveMongo[Int]
 
-  implicit object LongToMongo extends MakeItMongo[Long]
+  implicit object LongToMongo extends PrimitiveMongo[Long]
 
-  implicit object CharToMongo extends MakeItMongo[Char]
+  implicit object CharToMongo extends PrimitiveMongo[Char]
 
-  implicit object ShortToMongo extends MakeItMongo[Short]
+  implicit object ShortToMongo extends PrimitiveMongo[Short]
 
-  implicit object ByteToMongo extends MakeItMongo[Byte]
+  implicit object ByteToMongo extends PrimitiveMongo[Byte]
 
-  implicit object FloatToMongo extends MakeItMongo[Float]
+  implicit object FloatToMongo extends PrimitiveMongo[Float]
 
-  implicit object DoubleToMongo extends MakeItMongo[Double]
+  implicit object DoubleToMongo extends PrimitiveMongo[Double]
 
-  implicit object BooleanToMongo extends MakeItMongo[Boolean]
+  implicit object BooleanToMongo extends PrimitiveMongo[Boolean]
 
-  implicit object MongoObjectIdToMongo extends MakeItMongo[MongoObjectId]
+  implicit object MongoObjectIdToMongo extends PrimitiveMongo[MongoObjectId]
 
-  implicit object StringArrayToMongo extends MakeItMongoArray[String]
+  implicit object StringArrayToMongo extends PrimitiveArray[String]
 
-  implicit object IntArrayToMongo extends MakeItMongoArray[Int]
+  implicit object IntArrayToMongo extends PrimitiveArray[Int]
 
-  implicit object LongArrayToMongo extends MakeItMongoArray[Long]
+  implicit object LongArrayToMongo extends PrimitiveArray[Long]
 
-  implicit object CharArrayToMongo extends MakeItMongoArray[Char]
+  implicit object CharArrayToMongo extends PrimitiveArray[Char]
 
-  implicit object ShortArrayToMongo extends MakeItMongoArray[Short]
+  implicit object ShortArrayToMongo extends PrimitiveArray[Short]
 
-  implicit object ByteArrayToMongo extends MakeItMongoArray[Byte]
+  implicit object ByteArrayToMongo extends PrimitiveArray[Byte]
 
-  implicit object FloatArrayToMongo extends MakeItMongoArray[Float]
+  implicit object FloatArrayToMongo extends PrimitiveArray[Float]
 
-  implicit object DoubleArrayToMongo extends MakeItMongoArray[Double]
+  implicit object DoubleArrayToMongo extends PrimitiveArray[Double]
 
-  implicit object BooleanArrayToMongo extends MakeItMongoArray[Boolean]
+  implicit object BooleanArrayToMongo extends PrimitiveArray[Boolean]
 
   implicit object OptionalMongoObjectIdToMongo extends MakeItMongoId
 
-  abstract class MakeItMongo[T : ClassManifest] extends ToMongo[T] {
-    def convert[O <: DO](fv:FieldValue[O, T]): MongoObject = MongoObject(Map(fv.name -> fv.value.asInstanceOf[AnyRef]))
+  abstract class PrimitiveMongo[T : ClassManifest] extends ToMongo[T] {
+    def convert[O <: DomainObject](fv:FieldValue[O, T]): MongoObject = MongoObject(Map(fv.name -> fv.value.asInstanceOf[AnyRef]))
   }
 
-  abstract class MakeItMongoArray[T : ClassManifest] extends ToMongo[Seq[T]] {
-    def convert[O <: DO](fv:FieldValue[O, Seq[T]]): MongoObject = MongoObject(Map(fv.name -> convertToJavaList[T](fv.value)))
+  abstract class PrimitiveArray[T : ClassManifest] extends ToMongo[Seq[T]] {
+    def convert[O <: DomainObject](fv:FieldValue[O, Seq[T]]): MongoObject = MongoObject(Map(fv.name -> convertToJavaList[T](fv.value)))
   }
 
   class MakeItMongoId extends ToMongo[Option[MongoObjectId]] {
-    def convert[O <: DO](fv:FieldValue[O, Option[MongoObjectId]]): MongoObject =  fv.value fold(empty, v => MongoObject(Map(fv.name -> v.toObjectId)))
+    import Tools._
+    def convert[O <: DomainObject](fv:FieldValue[O, Option[MongoObjectId]]): MongoObject =
+      fv.value fold(empty, v => MongoObject(Map(fv.name -> v.toObjectId)))
   }
 
  private def convertToJavaList[T](values: Seq[T]): AnyRef = {
-   import scala.collection.JavaConversions.asJavaList
-   import com.mongodb.BasicDBList
-   val list:java.util.List[AnyRef] = values.toList.map(_.asInstanceOf[AnyRef])
+    import com.mongodb.BasicDBList
+    import scala.collection.JavaConversions._
+    val list:java.util.List[AnyRef] = values.toList.map(_.asInstanceOf[AnyRef])
     val bslist:BasicDBList = new BasicDBList()
     bslist.addAll(list)
     bslist

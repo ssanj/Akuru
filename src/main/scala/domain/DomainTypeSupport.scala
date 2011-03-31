@@ -26,7 +26,7 @@ trait DomainTypeSupport {
 
   abstract class NestedObject extends AkuruObject with Product
 
-  sealed trait Primitive[T] extends AkuruObject
+  trait Primitive[T] extends AkuruObject
 
   implicit object StringP extends Primitive[String]
 

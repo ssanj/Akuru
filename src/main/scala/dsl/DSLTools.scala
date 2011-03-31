@@ -7,7 +7,7 @@ package akuru
 package dsl
 
 import MongoTypes.MongoSortObject
-import MongoTypes.MongoObject.mongo
+import MongoObject.mongo
 
 trait DSLTools {
 

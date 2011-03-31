@@ -4,11 +4,16 @@
  */
 
 package akuru
-import MongoTypes._
 import MongoTypes.MongoSortObject
 import MongoTypes.MongoObject.empty
+import MongoTypes.MongoServer
+import MongoTypes.MongoCursor
+import MongoTypes.UpdateObject
+import MongoTypes.MongoWriteResult
+import MongoTypes.MongoDatabase
+import MongoTypes.MongoCollection
 
-trait MongoFunctions { this:Tools  =>
+trait MongoFunctions { this:Tools with SideEffects  =>
 
   def withConnection(s:() => MongoServer)(dbName:String): FutureConnection =  FutureConnection(s, dbName)
 

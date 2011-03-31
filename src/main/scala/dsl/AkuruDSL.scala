@@ -12,4 +12,5 @@ trait AkuruDSL extends FindDSL with
                        RemoveDSL with
                        MongoFunctions with
                        DSLTools with
-                       Tools
+                       Tools with
+                       SideEffects

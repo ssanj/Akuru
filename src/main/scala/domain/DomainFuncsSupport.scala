@@ -9,7 +9,7 @@ package domain
 import akuru.MongoObject.empty
 import akuru.Tools
 
-trait DomainFuncsSupport { this: DomainTypeSupport with Tools =>
+trait DomainFuncsSupport { this:Tools =>
 
   def putId(id:FieldValue[_ <: DomainObject, MID]): MongoObject =  foldOption(id.value)(empty)(value => empty.putId(value))
 }

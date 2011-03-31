@@ -6,7 +6,10 @@ package object akuru extends akuru.AkuruImplicits with akuru.AkuruGlobalTypes
 
 package akuru {
 
+import domain.serial.NestedConversions
 import domain.DomainSupport
+import domain.DomainTypeSupport
+
 
 object MongoTypes extends MongoServerTrait with
                             MongoDatabaseTrait with
@@ -23,5 +26,9 @@ object MongoTypes extends MongoServerTrait with
                             QueryTypes with
                             SortTypes with
                             UpdateTypes with
-                            OperatorTypes
+                            OperatorTypes with
+                            DomainTypeSupport with
+                            NestedConversions with
+                            Tools with
+                            SideEffects
 }
