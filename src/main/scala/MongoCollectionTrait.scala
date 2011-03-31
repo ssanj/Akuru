@@ -5,10 +5,12 @@
 package akuru
 
 import com.mongodb.DBCollection
-import MongoTypes._
+import MongoTypes.MongoWriteResult
+import MongoTypes.MongoCursor
 import scala.Either
+import Tools._
 
-trait MongoCollectionTrait extends MongoFunctions { this:Tools with SideEffects =>
+trait MongoCollectionTrait { this:MongoFunctions =>
 
   //TODO:Once all methods ar tested remove dbc and replace with newdbc.
   case class MongoCollection(dbc:DBCollection, newdbc:DBCollectionTrait) {
@@ -20,6 +22,7 @@ trait MongoCollectionTrait extends MongoFunctions { this:Tools with SideEffects 
 
     def findOne[T <: DomainObject : MongoToDomain](mo:MongoObject): Either[String, Option[T]] = {
       val res = dbc.findOne(mo.toDBObject)
+
       runSafelyWithEither { nullToOption(res).flatMap(t => implicitly[MongoToDomain[T]].apply(t)) }
     }
 

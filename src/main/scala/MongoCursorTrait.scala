@@ -5,8 +5,8 @@
 package akuru
 
 import com.mongodb.{DBObject, DBCursor}
-import MongoTypes._
 import MongoTypes.MongoSortObject
+import Tools._
 
 trait MongoCursorTrait {
 

@@ -5,7 +5,10 @@
 
 package akuru
 
-trait SideEffects { this:Tools =>
+import Tools.getStringOrDefault
+import Tools.stringAdd
+
+trait SideEffects {
 
   val newLine = getStringOrDefault(System.getProperty("line.separator"))("\n")
 

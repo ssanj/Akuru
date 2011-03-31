@@ -12,8 +12,9 @@ import MongoTypes.UpdateObject
 import MongoTypes.MongoWriteResult
 import MongoTypes.MongoDatabase
 import MongoTypes.MongoCollection
+import Tools._
 
-trait MongoFunctions { this:Tools with SideEffects  =>
+trait MongoFunctions { this:SideEffects  =>
 
   def withConnection(s:() => MongoServer)(dbName:String): FutureConnection =  FutureConnection(s, dbName)
 

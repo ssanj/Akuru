@@ -13,7 +13,8 @@ trait CommonSpec extends FlatSpec with ShouldMatchers
         with TestDomainObjects
         with MongoFunctions
         with MongoSpecSupport
-        with Tools {
+        with Tools
+        with SideEffects {
 
   def initBlog: FutureConnection =  onTestDB ~~> drop[Blog]
 
