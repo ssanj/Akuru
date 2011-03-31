@@ -6,11 +6,22 @@
 package akuru
 package domain
 
+import akuru.{EmbeddedArrayField => _, Field => _, ArrayField => _, MongoObject => _, ToMongo => _, FieldValue => _, _}
 import MongoObject.empty
 
 trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSupport with OwnerFieldSupport =>
 
-  sealed abstract class Template[O <: DomainObject]
+  sealed abstract class Template[O <: DomainObject] {
+    def toMongo(product:Product): MongoObject = {
+        val mongos = product.productIterator.collect { case fv:FieldValue[_, _] => fv } map ((fv:FieldValue[_, _]) =>
+          fv.value match {
+             case n:NestedObject => empty.putMongo(fv.name, toMongo(n.asInstanceOf[Product]))
+             case _ => fv.mongo
+        })
+
+        mongos.foldLeft(empty)(_.merge(_))
+    }
+  }
 
   abstract class NestedTemplate[O <: DomainObject, N <: NestedObject] extends Template[O] {
 
@@ -25,19 +36,21 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
 //    def fromType(pf:NestedEmbeddedArrayField[O, N]) = NestedEmbeddedField[O, N](pf.parentField, pf.name).
 //            asInstanceOf[FieldType[O, N]]
 //
-    def field[T : Primitive](name:String): NestedField[O, T] = new Owner[O].nestedField[T](parentField, name)
+    def field[T : Primitive : ToMongo](name:String): NestedField[O, T] = new Owner[O].nestedField[T](parentField, name)
 
-    def arrayField[T : Primitive](name:String): NestedArrayField[O, T] = new Owner[O].nestedArrayField[T](parentField, name)
+    def arrayField[T](name:String)(implicit p:Primitive[T], tm:ToMongo[Seq[T]]): NestedArrayField[O, T] =
+      new Owner[O].nestedArrayField[T](parentField, name)
 
     def embeddedField[T <: NestedObject](name:String): NestedEmbeddedField[O, T] = NestedEmbeddedField[O, T](parentField, name)
 
     def embeddedArrayField[T <: NestedObject](name:String): NestedEmbeddedArrayField[O, T] = NestedEmbeddedArrayField[O, T](parentField, name)
 
-    def nestedToMongoObject(nested: N): MongoObject
+//    def nestedToMongoObject(nested: N): MongoObject
 
     def mongoToNested(mo:MongoObject): Option[N]
 
-    implicit def _nestedToMongoObject(nested: N): MongoObject = nestedToMongoObject(nested)
+    //implicit def _nestedToMongoObject(nested: N): MongoObject = nestedToMongoObject(nested)
+//    implicit def _nestedToMongoObject(nested: N): MongoObject = toMongo(empty, nested)
 
     implicit def _mongoToNested(mo:MongoObject): Option[N] = mongoToNested(mo)
   }
@@ -62,9 +75,7 @@ trait DomainTemplateSupport { this:DomainTypeSupport with DomainTemplateFieldSup
     def mongoToDomain(mo:MongoObject): Option[O]
 
     //implicit def _domainToMongoObject(domain: O): MongoObject = domainToMongoObject(domain)
-    implicit def _domainToMongoObject(domain: O): MongoObject = {
-      domain.productIterator.collect { case fv:FieldValue[_, _] => fv.mongo }.foldLeft(empty)(_.merge(_))
-    }
+    implicit def _domainToMongoObject(domain: O): MongoObject =  toMongo(domain)
 
     implicit def _mongoToDomain(mo:MongoObject): Option[O] = mongoToDomain(mo)
 

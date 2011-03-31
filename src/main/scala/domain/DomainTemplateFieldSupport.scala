@@ -22,10 +22,10 @@ trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
     val toMongo: ToMongo[T] = null //TODO: Remove once we have all classes using ToMongo
 
     final case class Value(value:T) {
-      val name = field.name
-      val path = field.path
+      lazy val name = field.name
+      lazy val path = field.path
       lazy val field = FieldType.this  //we need this lazy as it should be accessed only after Field instantiation.
-      val mongo: MongoObject = field.toMongo.convert(this.asInstanceOf[FieldValue[DO, T]])
+      lazy val mongo: MongoObject = field.toMongo.convert(this.asInstanceOf[FieldValue[DO, T]])
     }
   }
 
@@ -62,14 +62,15 @@ trait DomainTemplateFieldSupport { this:DomainTypeSupport =>
       }
   }
 
-  final case class NestedField[O <: DomainObject, T](override val parentField:FieldType[O, _ <: NestedObject], override val name:String)
-          extends NestedTemplateField[O, T]
+  final case class NestedField[O <: DomainObject, T](override val parentField:FieldType[O, _ <: NestedObject], override val name:String)(
+          implicit override val toMongo:ToMongo[T]) extends NestedTemplateField[O, T]
+
+  final case class NestedArrayField[O <: DomainObject, T](override val parentField:FieldType[O, _ <: NestedObject], override val name:String)(
+          implicit override val toMongo:ToMongo[Seq[T]]) extends NestedTemplateField[O, Seq[T]]
 
   final case class NestedEmbeddedField[O <: DomainObject, T <: NestedObject](
-        override val parentField:FieldType[O, _ <: NestedObject], override val name:String) extends NestedTemplateField[O, T]
+  override val parentField:FieldType[O, _ <: NestedObject], override val name:String) extends NestedTemplateField[O, T]
 
-  final case class NestedArrayField[O <: DomainObject, T](override val parentField:FieldType[O, _ <: NestedObject], override val name:String)
-          extends NestedTemplateField[O, Seq[T]]
 
   final case class NestedEmbeddedArrayField[O <: DomainObject, T <: NestedObject](
     override val parentField:FieldType[O, _ <: NestedObject], override val name:String) extends NestedTemplateField[O, Seq[T]]

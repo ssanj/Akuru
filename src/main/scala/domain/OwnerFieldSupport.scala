@@ -17,10 +17,10 @@ trait OwnerFieldSupport { this:DomainTypeSupport with DomainTemplateFieldSupport
 
     def embeddedArrayField[T <: NestedObject](name:String): EmbeddedArrayField[O, T] = EmbeddedArrayField[O, T](name)
 
-    def nestedField[T](parentField:FieldType[O, _ <: NestedObject], name:String): NestedField[O, T] =
+    def nestedField[T : ToMongo](parentField:FieldType[O, _ <: NestedObject], name:String): NestedField[O, T] =
       NestedField[O, T](parentField, name)
 
-    def nestedArrayField[T](parentField:FieldType[O, _ <: NestedObject], name:String): NestedArrayField[O, T] =
+    def nestedArrayField[T](parentField:FieldType[O, _ <: NestedObject], name:String)(implicit tm:ToMongo[Seq[T]]): NestedArrayField[O, T] =
       NestedArrayField[O, T](parentField, name)
 
     def nestedEmbeddedField[T <: NestedObject](parentField:FieldType[O, _ <: NestedObject], name:String): NestedEmbeddedField[O, T] =
