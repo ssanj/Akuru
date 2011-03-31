@@ -8,7 +8,7 @@ import com.mongodb.DBCollection
 import MongoTypes._
 import scala.Either
 
-trait MongoCollectionTrait extends MongoFunctions { this:Tools =>
+trait MongoCollectionTrait extends MongoFunctions { this:Tools with SideEffects =>
 
   //TODO:Once all methods ar tested remove dbc and replace with newdbc.
   case class MongoCollection(dbc:DBCollection, newdbc:DBCollectionTrait) {

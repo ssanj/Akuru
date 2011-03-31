@@ -6,7 +6,7 @@
 package akuru
 package domain
 
-trait OwnerFieldSupport { this:DomainTypeSupport with DomainTemplateFieldSupport =>
+trait OwnerFieldSupport { this:DomainTemplateFieldSupport =>
 
   class Owner[O <: DomainObject] {
     def field[T : ToMongo](name:String): Field[O, T] = new Field[O, T](name)

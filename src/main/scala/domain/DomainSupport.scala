@@ -9,9 +9,7 @@ package domain
 import akuru.Tools
 
 trait DomainSupport extends
-          DomainTypeSupport with
           DomainTemplateFieldSupport with
           DomainTemplateSupport with
           OwnerFieldSupport with
-          DomainFuncsSupport with
-          Tools
+          DomainFuncsSupport { this: Tools => }
