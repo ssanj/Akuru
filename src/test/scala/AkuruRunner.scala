@@ -15,18 +15,14 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
   def main(args: Array[String]) {
     import Blog._
     import Label._
-//    import DailySpend._
-//    import Spend._
+    import DailySpend._
+    import Spend._
 //    import Tag._
 
     val b1 = Blog(titleField === "lessons learned", labelsField === Seq("jobs", "lessons", "work"))
     val b2 = Blog(titleField === "lessons learned", labelsField === Seq("jobs", "work"))
     val b3 = Blog(titleField === "Semigroup", labelsField === Seq("functional", "scala", "concepts", "semigroup"))
     val l1 = Label(Label.valueField === "blah")
-
-////    println(l1.value.mongo)
-////    println(l1.id.mongo)
-//      println(Blog._domainToMongoObject(b1))
 
     val blogs = List(b1,
                      Blog(titleField === "Hello World Lift", labelsField === Seq("lift", "scala", "sbt")),
@@ -48,12 +44,14 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
                     ( upsert a Blog where titleField === "Semigroup" withValues b3 returnErrors ) ~~>
                     ( find * Blog where labelsField === {"functional"/} withResults printBlogs withoutResults  noOp ) ~~>
                     ( find * Blog where labelsField === {".*"/} constrainedBy (Limit(1) and Order(titleField -> ASC)) withResults printBlogs
-                            withoutResults noOp)
-//                    drop[DailySpend] ~~>
-//                    save(DailySpend(dateField === 123456L,
-//                                      spendsField === Spend(costField === 12.23D, descriptionField === "blah",
+                            withoutResults noOp) ~~>
+                    drop[DailySpend] ~~>
+                    save(DailySpend(dateField === 123456L,
+                                      spendsField === Spend(costField === 12.23D, descriptionField === "blah",
+                                        tagsField === Seq("tag1", "tag2")))) ~~>
 //                                        tagsField === Seq(Tag(nameField === "tag1"), Tag(nameField ==="tag2"))))) ~~>
 //                    ( find * DailySpend where (nameField === ("tag"/i)) withResults (printDS) withoutResults showError("got nothing") )
+                    ( find * DailySpend where (tagsField === ("tag"/i)) withResults (printDS) withoutResults showError("got nothing") )
                  } ~~>() getOrElse("success >>")
     println(result)
   }
@@ -63,18 +61,18 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
     None
   }
 
-//  def printDS(dses:Seq[DailySpend]): Option[String] = {
-//
+  def printDS(dses:Seq[DailySpend]): Option[String] = {
+
 //    def tagString(tag:Tag): String = tag.name.value
-//
-//    def spendString(spend:Spend): String = {
-//      "cost -> " + spend.cost.value + ", description -> " + spend.description.value + ", tags: " +
-//              spend.tags.value.map(tag => tagString(tag)).mkString("[", ",", "]")
-//    }
-//
-//    dses foreach (ds => println("DailySpend { date -> " + ds.date.value + ", spend { " + spendString(ds.spends.value) + " } }"))
-//    None
-//  }
+
+    def spendString(spend:Spend): String = {
+      "cost -> " + spend.cost.value + ", description -> " + spend.description.value + ", tags: " +
+              spend.tags.value.mkString("[", ",", "]")
+    }
+
+    dses foreach (ds => println("DailySpend { date -> " + ds.date.value + ", spend { " + spendString(ds.spends.value) + " } }"))
+    None
+  }
 
   def withAkuru: FutureConnection = onDatabase("akuru_test")
 
