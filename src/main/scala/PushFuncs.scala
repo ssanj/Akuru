@@ -29,9 +29,5 @@ trait PushFuncs  { this:Funcs =>
    */
   def $push[O <: DomainObject, T : ClassManifest : Primitive : ToMongo](af:FieldType[O, Seq[T]], value: => T): MongoUpdateObject[O] =
     toMongoUpdateObject[O](anyFunction1[O, T](functionName, new Field[O, T](af.path) === value))
-
-//  private def pushNested[O <: DomainObject, T <: NestedObject : ClassManifest](path:String, value: => MongoObject): MongoUpdateObject[O] = {
-//    toMongoUpdateObject[O]($funcMongo(functionName, mongo.putMongo(path, value)))
-//  }
 }
 

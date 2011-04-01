@@ -10,7 +10,6 @@ import Tools._
 
 trait MongoCursorTrait {
 
-  //TODO: Should this be typed? MongoCursor[T]
   case class MongoCursor(private val dbc:DBCursor) {
 
     def asSeq[T <: DomainObject : MongoToDomain]: Seq[T] = {

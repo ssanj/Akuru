@@ -6,6 +6,8 @@
 package akuru
 package domain
 
+import MongoObject.empty
+
 trait DomainTemplateFieldSupport {
 
   sealed abstract class FieldType[O <: DomainObject, T] {
@@ -17,7 +19,7 @@ trait DomainTemplateFieldSupport {
 
     def === (value:T) : Value = apply(value)
 
-    val toMongo: ToMongo[T] = null //TODO: Remove once we have all classes using ToMongo
+    val toMongo: ToMongo[T] = new ToMongo[T] { def convert[R <: DomainObject](fv:FieldValue[R, T]): MongoObject = empty }
 
     final case class Value(value:T) {
       lazy val name = field.name

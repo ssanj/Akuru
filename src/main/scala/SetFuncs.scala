@@ -60,7 +60,6 @@ trait SetFuncs { this:Funcs =>
    */
   def $set[O <: DomainObject, T <: NestedObject : ClassManifest](fv: NestedEmbeddedField[O, T], value: => T):
   MongoUpdateObject[O] = setObject[O, T](fv.path, nestedObjectToMongo[O, T](value))
-//    toMongoUpdateObject[O](($funcMongo(functionName, mongo.putMongo(fv.path, implicitly[NestedToMongo[T]].apply(value) ))))
 
   /**
    * Used when you want to replace a NestedEmbeddedArrayField.
