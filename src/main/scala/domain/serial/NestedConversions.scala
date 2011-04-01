@@ -13,7 +13,7 @@ trait NestedConversions {
   object NestedObject {
 
     class NestedObjectToMongo[T <: NestedObject] extends ToMongo[T] {
-      def convert[O <: DomainObject](fv:FieldValue[O, T]): MongoObject =  toMongo(fv.value)
+      def convert[O <: DomainObject](fv:FieldValue[O, T]): MongoObject =  empty.putMongo(fv.name, toMongo(fv.value))
     }
 
     class NestedObjectArrayToMongo[T <: NestedObject] extends ToMongo[Seq[T]] {
