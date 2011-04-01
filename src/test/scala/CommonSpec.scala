@@ -18,7 +18,7 @@ trait CommonSpec extends FlatSpec with ShouldMatchers
 
   def initBlog: FutureConnection =  onTestDB ~~> drop[Blog]
 
-//  def initDailySpend: FutureConnection =  onTestDB ~~> drop[DailySpend]
+  def initDailySpend: FutureConnection =  onTestDB ~~> drop[DailySpend]
 
   def initBook: FutureConnection =  onTestDB ~~> drop[Book]
 

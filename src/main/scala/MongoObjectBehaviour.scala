@@ -131,13 +131,13 @@ trait MongoObjectBehaviour { this:Tools =>
     mo
   }
 
-  def putNested[O <: DomainObject, T <: NestedObject : NestedToMongo](nested: FieldValue[O, T]): MongoObject = {
-      putMongo(nested.name, implicitly[NestedToMongo[T]].apply(nested.value))
-  }
-
-  def putNestedArray[O <: DomainObject, T <: NestedObject : NestedToMongo](nested: FieldValue[O, Seq[T]]): MongoObject = {
-      putMongoArray(nested.name, nested.value map (implicitly[NestedToMongo[T]].apply(_)))
-  }
+//  def putNested[O <: DomainObject, T <: NestedObject : NestedToMongo](nested: FieldValue[O, T]): MongoObject = {
+//      putMongo(nested.name, implicitly[NestedToMongo[T]].apply(nested.value))
+//  }
+//
+//  def putNestedArray[O <: DomainObject, T <: NestedObject : NestedToMongo](nested: FieldValue[O, Seq[T]]): MongoObject = {
+//      putMongoArray(nested.name, nested.value map (implicitly[NestedToMongo[T]].apply(_)))
+//  }
 
   def putAnything[O <: DomainObject, T : ClassManifest](fv:FieldValue[O, T],
                                                         pp: PathProvider[O, T] = namePath[O, T]): MongoObject = {
