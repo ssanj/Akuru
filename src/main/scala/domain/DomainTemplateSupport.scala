@@ -25,6 +25,10 @@ trait DomainTemplateSupport { this:DomainTemplateFieldSupport with OwnerFieldSup
 
     def flatten(f:NestedEmbeddedArrayField[O, N]): FieldType[O, N] = NestedEmbeddedField[O, N](f.parentField, f.name)
 
+    implicit def flattenEmbeddedArray(f:EmbeddedArrayField[O, N]): FieldType[O, N] = flatten(f)
+
+    implicit def flattenNestedEmbeddedArrayField(f:NestedEmbeddedArrayField[O, N]): FieldType[O, N] = flatten(f)
+
     def field[T : Primitive : ToMongo](name:String): NestedField[O, T] = new Owner[O].nestedField[T](parentField, name)
 
     def arrayField[T](name:String)(implicit p:Primitive[T], tm:ToMongo[Seq[T]]): NestedArrayField[O, T] =
