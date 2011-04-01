@@ -31,7 +31,7 @@ trait PrimitiveConversions {
 
   implicit object BooleanToMongo extends PrimitiveMongo[Boolean]
 
-  implicit object MongoObjectIdToMongo extends PrimitiveMongo[MongoObjectId]
+  implicit object MongoObjectIdToMongo extends PrimitiveId
 
   implicit object StringArrayToMongo extends PrimitiveArray[String]
 
@@ -51,7 +51,7 @@ trait PrimitiveConversions {
 
   implicit object BooleanArrayToMongo extends PrimitiveArray[Boolean]
 
-  implicit object OptionalMongoObjectIdToMongo extends MakeItMongoId
+  implicit object OptionalMongoObjectIdToMongo extends PrimitiveOptionId
 
   abstract class PrimitiveMongo[T : ClassManifest] extends ToMongo[T] {
     def convert[O <: DomainObject](fv:FieldValue[O, T]): MongoObject = MongoObject(Map(fv.name -> fv.value.asInstanceOf[AnyRef]))
@@ -61,10 +61,14 @@ trait PrimitiveConversions {
     def convert[O <: DomainObject](fv:FieldValue[O, Seq[T]]): MongoObject = MongoObject(Map(fv.name -> convertToJavaList[T](fv.value)))
   }
 
-  class MakeItMongoId extends ToMongo[Option[MongoObjectId]] {
+  class PrimitiveOptionId extends ToMongo[Option[MongoObjectId]] {
     import Tools._
     def convert[O <: DomainObject](fv:FieldValue[O, Option[MongoObjectId]]): MongoObject =
       fv.value fold(empty, v => MongoObject(Map(fv.name -> v.toObjectId)))
+  }
+
+  class PrimitiveId extends ToMongo[MongoObjectId] {
+    def convert[O <: DomainObject](fv:FieldValue[O, MongoObjectId]): MongoObject = MongoObject(Map(fv.name -> fv.value.toObjectId))
   }
 
  private def convertToJavaList[T](values: Seq[T]): AnyRef = {

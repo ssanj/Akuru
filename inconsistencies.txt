@@ -49,6 +49,7 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 31. Add date functions (<,>, >=, <=, |<>|)
 32. Add ObjectId as a possible field.
 33. Add a timeout for connects.
+34. Add Optional converters for primitives.
 
 Done -------------------------------------------------------------------------------------------------------------------
 
