@@ -28,7 +28,7 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
     skip()
     snapshot()
 21. Test $set which updates an array of NestedObjects.
-22. Implement MongoRef
+22. Add DBRef/MongoRef as a possible field.
 23. Create separate tests for:
     1. $set
     2. $push
@@ -42,12 +42,13 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
     $slice
 
 26. Reuse embedded objects
-27. Automated serialize/deserialize
-28. Embbedded object need to be defined in a cleaner way
-29. collection names should use classOf[M] to find collection name.
-30. Support for  (this can be done via case classes....)
-31. add type classes to fields. One for serialization. One for deserialization.
-32. Consider separating id from the object and using a Tuple2[Id, T]
+27. Embbedded object need to be defined in a cleaner way
+28. collection names should use classOf[M] to find collection name.
+29. add type classes to fields. One for deserialization.
+30. Consider separating id from the object and using a Tuple2[Id, T]
+31. Add date functions (<,>, >=, <=, |<>|)
+32. Add ObjectId as a possible field.
+33. Add a timeout for connects.
 
 Done -------------------------------------------------------------------------------------------------------------------
 
@@ -83,6 +84,7 @@ Done ---------------------------------------------------------------------------
 28. Automate collection name from supplied Types. (done)
 29. putId(domain.id.value) should be putId(domain.id) to be consistent. (done)
 30. Created NestedFields for nested objects (done)
+31. add type classes to fields. One for serialization (done!)
 
 Not doing --------------------------------------------------------------------------------------------------------------
 
