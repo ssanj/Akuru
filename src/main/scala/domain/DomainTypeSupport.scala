@@ -16,8 +16,6 @@ trait DomainTypeSupport {
 
   type DomainToMongo[T <: DomainObject] = T => MongoObject
 
-//  type NestedToMongo[T <: NestedObject] = T => MongoObject
-
   type MongoToNested[T <: NestedObject] = MongoObject => Option[T]
 
   sealed trait AkuruObject

@@ -58,7 +58,6 @@ trait DomainTemplateSupport { this:DomainTemplateFieldSupport with OwnerFieldSup
 
     def mongoToDomain(mo:MongoObject): Option[O]
 
-    //implicit def _domainToMongoObject(domain: O): MongoObject = domainToMongoObject(domain)
     implicit def _domainToMongoObject(domain: O): MongoObject =  toMongo(domain)
 
     implicit def _mongoToDomain(mo:MongoObject): Option[O] = mongoToDomain(mo)
