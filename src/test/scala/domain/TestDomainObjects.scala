@@ -10,7 +10,7 @@ import MongoTypes.putId
 import MongoTypes.Query
 import MongoTypes.MongoObject.empty
 
-trait TestDomainObjects extends NestedDomainObjects {
+trait TestDomainObjects extends NestedDomainObjects with AllPossibleFieldsDomainObject {
 
   case class Blog(title:Blog.titleField.Value,
                   labels:Blog.labelsField.Value = Blog.labelsField === Seq.empty[String],
