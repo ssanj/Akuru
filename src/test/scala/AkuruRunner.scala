@@ -63,11 +63,11 @@ object AkuruRunner extends TestDomainObjects with AkuruDSL {
 
   def printDS(dses:Seq[DailySpend]): Option[String] = {
 
-//    def tagString(tag:Tag): String = tag.name.value
+    def tagString(tag:Tag): String = tag.name.value
 
     def spendString(spend:Spend): String = {
       "cost -> " + spend.cost.value + ", description -> " + spend.description.value + ", tags: " +
-              spend.tags.value.mkString("[", ",", "]")
+              spend.tags.value.map(tagString).mkString("[",",","]")
     }
 
     dses foreach (ds => println("DailySpend { date -> " + ds.date.value + ", spend { " + spendString(ds.spends.value) + " } }"))
