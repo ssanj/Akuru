@@ -16,6 +16,8 @@ trait NestedConversions {
       def convert[O <: DomainObject](fv:FieldValue[O, T]): MongoObject =  empty.putMongo(fv.name, toMongo(fv.value))
     }
 
+    def nestedObjectToMongo[O <: DomainObject, T <: NestedObject](nested:T): MongoObject = toMongo(nested)
+
     class NestedObjectArrayToMongo[T <: NestedObject] extends ToMongo[Seq[T]] {
       def convert[O <: DomainObject](fv:FieldValue[O, Seq[T]]): MongoObject = {
         val mongos:Seq[MongoObject] = fv.value.map(n => toMongo(n.asInstanceOf[Product]))
