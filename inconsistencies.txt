@@ -47,9 +47,9 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 29. add type classes to fields. One for deserialization.
 30. Consider separating id from the object and using a Tuple2[Id, T]
 31. Add date functions (<,>, >=, <=, |<>|)
-32. Add ObjectId as a possible field.
-33. Add a timeout for connects.
-34. Add Optional converters for primitives.
+32. Add a timeout for connects.
+33. Add Optional converters for primitives.
+34. Get rid of putanything. It is currently used.
 
 Done -------------------------------------------------------------------------------------------------------------------
 
@@ -86,6 +86,7 @@ Done ---------------------------------------------------------------------------
 29. putId(domain.id.value) should be putId(domain.id) to be consistent. (done)
 30. Created NestedFields for nested objects (done)
 31. add type classes to fields. One for serialization (done!)
+32. Add ObjectId as a possible field. (done)
 
 Not doing --------------------------------------------------------------------------------------------------------------
 
