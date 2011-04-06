@@ -65,15 +65,27 @@ trait MongoFunctions { this:SideEffects  =>
     def ~~>(f:List[UserFunction]): FutureConnection = FutureConnection(fserver, dbName,  f ::: items)
 
     def ~~>() : Option[String] = {
-      runSafelyWithDefault{
-        getServer.right.flatMap(getDatabase(_).right.map(db => items.foldRight(None:Option[String]){(t, a) =>
-          if (!a.isDefined) t(db.getCollection(_)) else a})) match {
+      runSafelyWithDefault {
+        getServer.right.map{ server => addOption(processUserFunctions(server), closeServerConnection(server))(addWithNewLine) } match {
           case Right(e @ Some(error)) => e
           case Right(n @ None) => n
-          case Left(e @ error) => Some(e)
+          case Left(e) => Some(e)
         }
-      }(e => Some(addWithNewLine(e.getMessage + " --> ", e.getStackTraceString)))
+      }(e => Some(addWithNewLine(e.getMessage + " --> ", e.getStackTraceString))) //if an exception is thrown.
     }
+
+    private def processUserFunctions(server:MongoServer): Option[String] = {
+      runSafelyWithEither {
+        getDatabase(server).right.map(db => items.foldRight(None:Option[String]){(t, a) => if (!a.isDefined) t(db.getCollection(_)) else a})
+      } match {
+        case Right(Right(e @ Some(error))) => e
+        case Right(Right(None)) => None
+        case Right(Left(error)) => Some(error)
+        case Left(exception) => Some(exception) //if an exception was thrown.
+      }
+    }
+
+    private def closeServerConnection(server:MongoServer): Option[String] =  runSafelyWithOptionReturnError(server.close)
 
     def getServer: Either[String, MongoServer] = runSafelyWithEither(fserver.apply)
 

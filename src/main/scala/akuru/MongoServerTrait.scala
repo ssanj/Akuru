@@ -14,6 +14,8 @@ trait MongoServerTrait {
     def this() = this(new Mongo)
 
     def getDatabase(name:String): MongoDatabase = m.getDB(name)
+
+    def close = m.close
   }
 
   object MongoServer {
