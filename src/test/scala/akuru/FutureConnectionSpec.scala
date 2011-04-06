@@ -42,7 +42,7 @@ final class FutureConnectionSpec extends CommonSpec {
                       createExceptionalUserFunction("error1") ~~>
                       createExceptionalUserFunction("error2") ~~>
                       createUserFunction
-    ) ~~>() verifyError(_ should equal ("error1"))
+    ) ~~>() verifyError (_ should equal ("error1"))
   }
 
   it should "return the first error encountered" in {
@@ -51,11 +51,28 @@ final class FutureConnectionSpec extends CommonSpec {
                       createErroneousUserFunction("some error1") ~~>
                       createExceptionalUserFunction("some error2") ~~>
                       createUserFunction
-    ) ~~>() verifyError(_ should equal ("some error1"))
+    ) ~~>() verifyError (_ should equal ("some error1"))
+  }
+
+  it should "handle an error creating the server" in {
+    createFutureConnectionWithServerException ~~>() verifyError (_ should equal ("Server could not be created."))
+  }
+
+  it should "handle an error creating the database" in {
+    createFutureConnectionWithDBException ~~>() verifyError (_ should equal ("DB could not be created."))
+  }
+
+  it should "handle an error creating the collection" in {
+   createFutureConnectionWithColException ~~> createUserFunctionOnCollection ~~>() verifyError (_ should equal ("Could not connect to Collection"))
+  }
+
+  it should "close the server connection on completion" in {
 
   }
 
   private def createUserFunction: UserFunction = fc => None
+
+  private def createUserFunctionOnCollection: UserFunction = fc => {fc.apply("blah"); None}
 
   private def createExceptionalUserFunction(msg:String): UserFunction = fc => throw new RuntimeException(msg)
 
@@ -67,13 +84,27 @@ final class FutureConnectionSpec extends CommonSpec {
 
   private def createFutureConnection: FutureConnection = new FutureConnection(() => new TestMongoServer, "blah")
 
-  private class TestMongoServer extends MongoServer {
-    override def getDatabase(name:String): MongoDatabase = new TestMongoDatabase
+  private def createFutureConnectionWithServerException: FutureConnection = new FutureConnection(() =>
+    throw new RuntimeException("Server could not be created."), "blah")
+
+  private def createFutureConnectionWithDBException: FutureConnection = new FutureConnection(() => new TestMongoServerWithDBException, "blah")
+
+  private def createFutureConnectionWithColException: FutureConnection = new FutureConnection(() => new TestMongoServerWithColException, "blah")
+
+  private class TestMongoServer extends MongoServer { override def getDatabase(name:String): MongoDatabase = new TestMongoDatabase }
+
+  private class TestMongoServerWithDBException extends MongoServer {
+    override def getDatabase(name:String): MongoDatabase = throw new RuntimeException("DB could not be created.")
   }
 
-  private class TestMongoDatabase extends MongoDatabase(null) {
-    override def getCollection(key:String): MongoCollection = new TestMongoCollection
+  private class TestMongoServerWithColException extends MongoServer {
+    override def getDatabase(name:String): MongoDatabase = new TestMongoDatabaseWithException
   }
+
+  private class TestMongoDatabase extends MongoDatabase(null) { override def getCollection(key:String): MongoCollection = new TestMongoCollection }
+
+  private class TestMongoDatabaseWithException extends MongoDatabase(null) { override def getCollection(key:String): MongoCollection =
+    throw new RuntimeException("Could not connect to Collection") }
 
   private class TestMongoCollection extends MongoCollection(null, null)
 }
