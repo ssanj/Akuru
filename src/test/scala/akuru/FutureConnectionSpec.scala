@@ -8,7 +8,7 @@ import MongoTypes.MongoServer
 import MongoTypes.MongoDatabase
 import MongoTypes.MongoCollection
 
-final class FutureConnectionSpec extends CommonSpec {
+final class FutureConnectionSpec extends CommonSpec with SideEffects {
 
   "A FutureConnection" should "be immutable" in {
     val fc1 = createFutureConnection
@@ -63,11 +63,17 @@ final class FutureConnectionSpec extends CommonSpec {
   }
 
   it should "handle an error creating the collection" in {
-   createFutureConnectionWithColException ~~> createUserFunctionOnCollection ~~>() verifyError (_ should equal ("Could not connect to Collection"))
+    createFutureConnectionWithColException ~~> createUserFunctionOnCollection ~~>() verifyError (_ should equal ("Could not connect to Collection"))
   }
 
   it should "close the server connection on completion" in {
+    createFutureConnectionWithClose ~~> createUserFunction ~~> createUserFunction ~~>() verifyError (_ should equal ("Closing server connection"))
+  }
 
+  it should "close the server connection on completion even when there is an error" in {
+    (
+      createFutureConnectionWithClose ~~> createExceptionalUserFunction("User Error") ~~> createUserFunction
+    ) ~~>() verifyError (_ should equal (addWithNewLine("User Error", "Closing server connection")))
   }
 
   private def createUserFunction: UserFunction = fc => None
@@ -91,7 +97,14 @@ final class FutureConnectionSpec extends CommonSpec {
 
   private def createFutureConnectionWithColException: FutureConnection = new FutureConnection(() => new TestMongoServerWithColException, "blah")
 
+  private def createFutureConnectionWithClose: FutureConnection = new FutureConnection(() => new TestMongoServerWithClose, "blah")
+
   private class TestMongoServer extends MongoServer { override def getDatabase(name:String): MongoDatabase = new TestMongoDatabase }
+
+  private class TestMongoServerWithClose extends MongoServer {
+    override def getDatabase(name:String): MongoDatabase = new TestMongoDatabase
+    override def close { throw new RuntimeException("Closing server connection") }
+  }
 
   private class TestMongoServerWithDBException extends MongoServer {
     override def getDatabase(name:String): MongoDatabase = throw new RuntimeException("DB could not be created.")
