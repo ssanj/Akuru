@@ -1,8 +1,6 @@
 TO DO ------------------------------------------------------------------------------------------------------------------
-
-1. Pool connections and/or set timeouts to prevent running out of connections.
+1. Get rid of putanything. It is currently used.
 2. Handle nulls in getElement
-3.   Automate persistence of fields.
 4. allow equality between 2 Fields and 2 FieldValues
 5. Get rid of imports from MongoTypes.MongoObject._
 6. Convert regex to Scala RegEx.
@@ -18,38 +16,36 @@ TO DO --------------------------------------------------------------------------
 14. Make all DSL read consistently. See update/upsert and modify syntax
 15. Find a way to write arbitrary type safe json/bson.
 16. Regex does not work for Numbers. Eg. (dateField === (".*"/) yields nothing
-17. Remove the need for wrapWith.
-18. Update doco.
-19. You can currently do this: $set(costField === 60.00D) & descriptionField === "updated". This does not make sense. Use the type system to
+17. Update doco.
+18. You can currently do this: $set(costField === 60.00D) & descriptionField === "updated". This does not make sense. Use the type system to
 disallow this. $set(costField === 60.00D & descriptionField === "updated") is fine and so is
 $set(costField === 60.00D) & $set(descriptionField === "updated")
-20. Implement other MongoCursor methods:
+19. Implement other MongoCursor methods:
     count()
     skip()
     snapshot()
-21. Test $set which updates an array of NestedObjects.
-22. Add DBRef/MongoRef as a possible field.
-23. Create separate tests for:
+20. Test $set which updates an array of NestedObjects.
+21. Add DBRef/MongoRef as a possible field.
+22. Create separate tests for:
     1. $set
     2. $push
     3. $pull
-24. Use Primitives where needed.
-25. Add support for Array operations:
+23. Use Primitives where needed.
+24. Add support for Array operations:
     $in
     $nin
     $pop
     $all
     $slice
 
-26. Reuse embedded objects
-27. Embbedded object need to be defined in a cleaner way
-28. collection names should use classOf[M] to find collection name.
-29. add type classes to fields. One for deserialization.
-30. Consider separating id from the object and using a Tuple2[Id, T]
-31. Add date functions (<,>, >=, <=, |<>|)
-32. Add a timeout for connects.
-33. Add Optional converters for primitives.
-34. Get rid of putanything. It is currently used.
+25. Reuse embedded objects
+26. Embbedded object need to be defined in a cleaner way
+27. collection names should use classOf[M] to find collection name.
+28. add type classes to fields. One for deserialization.
+29. Consider separating id from the object and using a Tuple2[Id, T]
+30. Add date functions (<,>, >=, <=, |<>|)
+31. Add Optional converters for primitives.
+32. Add MongoServerOptions.
 
 Done -------------------------------------------------------------------------------------------------------------------
 
@@ -87,6 +83,9 @@ Done ---------------------------------------------------------------------------
 30. Created NestedFields for nested objects (done)
 31. add type classes to fields. One for serialization (done!)
 32. Add ObjectId as a possible field. (done)
+33. Add a timeout for connects. (done - connections are now closed!)
+34. Automate persistence of fields. (done)
+35. Remove WrapWith trait (done)
 
 Not doing --------------------------------------------------------------------------------------------------------------
 

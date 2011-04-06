@@ -6,7 +6,7 @@ package akuru
 
 import Tools._
 
-trait MongoWriteResultTrait extends WrapWithTrait {
+trait MongoWriteResultTrait {
 
   import MongoTypes.MongoError
   import MongoTypes.mongoErrorToOptionString
@@ -37,11 +37,8 @@ trait MongoWriteResultTrait extends WrapWithTrait {
   }
 
   case class MongoWriteResult(wr:WriteResultTrait) {
-    def getMongoError: Option[MongoError] = {
-      wrapWith[Option[MongoError]] {
-        wr.getError.flatMap(e => wr.getLastErrorTrace.map(t => MongoError(e, t)))
-      }.fold(Some(_), identity)
-    }
+    def getMongoError: Option[MongoError] =  runSafelyWithDefault { wr.getError.flatMap(e => wr.getLastErrorTrace.map(t => MongoError(e, t))) } { e =>
+        Some(MongoError(e.getMessage, e.getStackTraceString)) }
 
     def getStringError: Option[String] = mongoErrorToOptionString(getMongoError)
 

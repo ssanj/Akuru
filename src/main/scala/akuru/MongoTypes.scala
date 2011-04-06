@@ -20,7 +20,6 @@ object MongoTypes extends MongoServerTrait with
                             MongoWriteResultTrait with
                             MongoErrorTrait with
                             MongoFunctions with
-                            WrapWithTrait with
                             MongoTools with
                             MongoRegEx with
                             DomainSupport with
