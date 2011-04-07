@@ -38,28 +38,37 @@ trait Tools {
     foldOption(nullToOption(ex.getMessage))(stringAdd("\n")(defaultExceptionMessage, ex.getStackTraceString))(e => ex.getMessage)
   }
 
+  type ResultPair[S, T] = (S, T)
+
   /**
    * This function tries to safely run a resource than needs to be:
    * 1. Supplied
    * 2. Used
    * 3. Closed
    *
-   * If the open function fails then no attempt is made to run f or close. The error is returned as Some(_).
-   * If open succeeds and f fails then an attempt is made to run close. Whether close succeeds or fails, the error raised by f is returned as Some(_).
-   * If open and f succeed, but close fails then the close error is returned as Some(_).
-   * if open, f and close all succeed, None is returned.
+   * If the open function fails then no attempt is made to run f or close. The error is returned as Left(_).
+   * If open succeeds and f fails then an attempt is made to run close. Whether close succeeds or fails, the error raised by f is returned as Left(_).
+   * If open and f succeed, but close fails then the close error is returned as Left(_).
+   * if open, f and close all succeed, a Right(ResultPair) is returned. The Result pair consists of (Result of f, Result of close).
    *
    * note: Usually open and close (and possibly f) are side-effecting functions. Given that, a failed open/f/close combination would cause
-   * side-effects; although not through Exceptions, which will be transformed to Some(_).
+   * side-effects; although not through Exceptions - which will be transformed to Left(_).
    */
-  def runSafelyWithResource[R, S, T](f:R => S)(open: => R)(close: R => T): Option[String] = {
+  def runSafelyWithResource[R, S, T](f:R => S)(open: => R)(close: R => T): Either[String, ResultPair[S, T]] = {
 
-    def functionFailed(resource:R)(error:String): Either[String, T] = { runSafelyWithEither[T](close(resource)); Left(error) }
+    def functionFailed(resource:R)(error:String): Either[String, ResultPair[S, T]] = {
+      runSafelyWithEither[T](close(resource)).fold(ce => Left(accummulateErrors(error, ce)), _ => Left(error))
+    }
 
-    def functionPassed(resource:R)(result:S): Either[String, T] = runSafelyWithEither[T](close(resource))
+    def functionPassed(resource:R)(result:S): Either[String, ResultPair[S, T]] = runSafelyWithEither[ResultPair[S, T]]((result, close(resource)))
+
+    def accummulateErrors(primary:String, secondary:String): String = {
+      import SideEffects.addWithNewLine
+      addWithNewLine(addWithNewLine(primary, "Secondary Errors:"), secondary)
+    }
 
     runSafelyWithEither[R](open).right.flatMap(resource => runSafelyWithEither[S](f(resource)).
-            fold(functionFailed(resource), functionPassed(resource))).toLeftOption
+            fold(functionFailed(resource), functionPassed(resource)))
   }
 
   def addOption[T](op1:Option[T], op2:Option[T])(f:(T, T) => T): Option[T] = {

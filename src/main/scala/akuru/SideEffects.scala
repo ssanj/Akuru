@@ -15,3 +15,5 @@ trait SideEffects {
   implicit def addWithNewLine: (String, String) => String = stringAdd(newLine)
 
 }
+
+object SideEffects extends SideEffects

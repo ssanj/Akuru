@@ -73,7 +73,7 @@ final class FutureConnectionSpec extends CommonSpec with SideEffects {
   it should "close the server connection on completion even when there is an error" in {
     (
       createFutureConnectionWithClose ~~> createExceptionalUserFunction("User Error") ~~> createUserFunction
-    ) ~~>() verifyError (_ should equal (addWithNewLine("User Error", "Closing server connection")))
+    ) ~~>() verifyError (_ should equal (addWithNewLine(addWithNewLine("User Error", "Secondary Errors:"), "Closing server connection")))
   }
 
   private def createUserFunction: UserFunction = fc => None

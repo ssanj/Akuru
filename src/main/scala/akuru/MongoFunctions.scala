@@ -10,7 +10,6 @@ import MongoTypes.MongoServer
 import MongoTypes.MongoCursor
 import MongoTypes.UpdateObject
 import MongoTypes.MongoWriteResult
-import MongoTypes.MongoDatabase
 import MongoTypes.MongoCollection
 import Tools._
 
@@ -60,36 +59,16 @@ trait MongoFunctions { this:SideEffects  =>
 
   case class FutureConnection(fserver:() => MongoServer, dbName:String, items:List[UserFunction] = Nil) {
 
-    def ~~>(uf:UserFunction): FutureConnection = ~~>(List(uf))
+    def ~~>(uf:UserFunction): FutureConnection = FutureConnection(fserver, dbName,  uf :: items)
 
     def ~~>(f:List[UserFunction]): FutureConnection = FutureConnection(fserver, dbName,  f ::: items)
 
     def ~~>() : Option[String] = {
-      runSafelyWithDefault {
-        getServer.right.map{ server => addOption(processUserFunctions(server), closeServerConnection(server))(addWithNewLine) } match {
-          case Right(e @ Some(error)) => e
-          case Right(n @ None) => n
-          case Left(e) => Some(e)
-        }
-      }(e => Some(addWithNewLine(e.getMessage + " --> ", e.getStackTraceString))) //if an exception is thrown.
+      runSafelyWithResource[MongoServer, Option[String], Unit]{server =>
+        val db = server.getDatabase(dbName)
+        items.foldRight(None:Option[String]){(t, a) => if (!a.isDefined) t(db.getCollection(_)) else a}
+      }(fserver.apply)(_.close).fold(error => Some(error), (rp:ResultPair[Option[String], Unit]) => rp._1)
     }
-
-    private def processUserFunctions(server:MongoServer): Option[String] = {
-      runSafelyWithEither {
-        getDatabase(server).right.map(db => items.foldRight(None:Option[String]){(t, a) => if (!a.isDefined) t(db.getCollection(_)) else a})
-      } match {
-        case Right(Right(e @ Some(error))) => e
-        case Right(Right(None)) => None
-        case Right(Left(error)) => Some(error)
-        case Left(exception) => Some(exception) //if an exception is thrown.
-      }
-    }
-
-    private def closeServerConnection(server:MongoServer): Option[String] =  runSafelyWithOptionReturnError(server.close)
-
-    def getServer: Either[String, MongoServer] = runSafelyWithEither(fserver.apply)
-
-    def getDatabase(server:MongoServer): Either[String, MongoDatabase] = runSafelyWithEither(server.getDatabase(dbName))
   }
 
   def defaultHandler(wr:MongoWriteResult): Option[String] = wr.getStringError
