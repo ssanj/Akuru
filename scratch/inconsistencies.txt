@@ -7,6 +7,9 @@ TO DO --------------------------------------------------------------------------
 7. Add Command Objects to run any JSon command
 8. Allow saving of multiple DomainObjects at once. save (list) ~~>
 9. MongoWriteResult should only return Boolean. true if valid false if not. The users function should be safe (runWithEither[Option[String], Boolean]
+def expectResults(f: MongoWriteResult => Option[String]): UserFunction = msafeUpdate[T](q.splat)(u)(f)(multiple)(upsert)
+maybe rewrite as expectResults(f: MongoWriteResult => Any): UserFunction. expectResults wraps with runSafelyWithOptionReturnError(f).
+Add a check for option. If Some(error) return that instead.
 10. Find a way to not have to type in idField for each DomainObject
 11. Clean up unnecessary methods on MongoObjectBehaviour
 12. create example from Casbah
