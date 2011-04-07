@@ -81,7 +81,7 @@ trait MongoFunctions { this:SideEffects  =>
         case Right(Right(e @ Some(error))) => e
         case Right(Right(None)) => None
         case Right(Left(error)) => Some(error)
-        case Left(exception) => Some(exception) //if an exception was thrown.
+        case Left(exception) => Some(exception) //if an exception is thrown.
       }
     }
 

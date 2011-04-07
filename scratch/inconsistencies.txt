@@ -46,7 +46,6 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 30. Add date functions (<,>, >=, <=, |<>|)
 31. Add Optional converters for primitives.
 32. Add MongoServerOptions.
-33. Add test suites for FutureConnection.
 
 Done -------------------------------------------------------------------------------------------------------------------
 
@@ -87,6 +86,7 @@ Done ---------------------------------------------------------------------------
 33. Add a timeout for connects. (done - connections are now closed!)
 34. Automate persistence of fields. (done)
 35. Remove WrapWith trait (done)
+36. Add test suites for FutureConnection. (done)
 
 Not doing --------------------------------------------------------------------------------------------------------------
 
