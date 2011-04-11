@@ -29,5 +29,7 @@ object MongoTypes extends MongoServerTrait with
                             OperatorTypes with
                             DomainTypeSupport with
                             NestedConversions with
+                            AkuruFunctions with
+                            AkuruMongoWrapper with
                             SideEffects
 }
