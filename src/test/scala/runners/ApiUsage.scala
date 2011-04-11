@@ -9,11 +9,11 @@ import akuru.domain.TestDomainObjects
 import MongoTypes.Executor
 import MongoTypes.afind
 import MongoTypes.DBName
-import akuru.dsl.AkuruDSL
 import Tools._
 import MongoTypes.MongoServer
+import akuru.dsl.{DSLTools, AkuruDSL}
 
-object ApiUsage extends TestDomainObjects {
+object ApiUsage extends TestDomainObjects with AkuruFinder with AkuruMongoWrapper with AkuruFunctions with Tools with DSLTools {
 
   import Blog._
   import Book._
@@ -23,6 +23,11 @@ object ApiUsage extends TestDomainObjects {
     val ex2 = (ver:Int) => new Executor[Book, Book](afind((Book.printVersionField === ver).splat)(c => c)((books:Seq[Book]) => Right(books(0)))(Left("Got 0 Books")))
 
     ex1.flatMap(ex2).execute.fold(l => println(l), (r:Book) => println(r))
+
+
+    new Executor[Blog, String]((find * Blog where Blog.titleField === ("d.*"/) withResults (blogs =>
+      Right(blogs(0).title.value)) withoutResults (Right("No dice!")))).execute.
+            fold(l => println(l), r => println("The title is -> " + r))
   }
 
   object Config {
