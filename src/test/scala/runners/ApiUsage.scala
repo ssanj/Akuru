@@ -25,12 +25,13 @@ object ApiUsage extends TestDomainObjects with AkuruFinder with AkuruMongoWrappe
     ex1.flatMap(ex2).execute.fold(l => println(l), (r:Book) => println(r))
 
 
-    new Executor[Blog, String]((find * Blog where Blog.titleField === ("d.*"/) withResults (blogs =>
-      Right(blogs(0).title.value)) withoutResults (Right("No dice!")))).execute.
-            fold(l => println(l), r => println("The title is -> " + r))
+    (find * Blog where Blog.titleField === (".*"/) withResults (blogs =>Right(blogs(0).title.value)) withoutResults (Right("No dice!"))).
+            execute.fold(l => println(l), r => println("The title is -> " + r))
   }
 
   object Config {
+
+    implicit def WorkUnitToExecutor[T <: DomainObject, R](wu:WorkUnit[T, R]): Executor[T, R] = new Executor[T, R](wu)
 
     //set a default on DomainTemplate and allow the user to override as necessary.
     implicit val blogCT:DBName[Blog] = new DBName[Blog] { val name = "akuru_test" }
