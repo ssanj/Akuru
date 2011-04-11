@@ -120,22 +120,21 @@ trait Tools {
       case None => false
     }
 
-    def getMatchedElement[T : ClassManifest](value:AnyRef)(f: T => Option[T]): Option[T] = {
-      value.asInstanceOf[Any]  match {
-        case n:Int => if (sameType[T, Int]) f(n.asInstanceOf[T]) else None
-        case l:Long => if (sameType[T, Long]) f(l.asInstanceOf[T]) else None
-        case s:Short => if (sameType[T, Short]) f(s.asInstanceOf[T]) else None
-        case by:Byte => if (sameType[T, Byte]) f(by.asInstanceOf[T]) else None
-        case b:Boolean => if (sameType[T, Boolean]) f(b.asInstanceOf[T]) else None
-        case c:Char => if (sameType[T, Char]) f(c.asInstanceOf[T]) else None
-        case fl:Float => if (sameType[T, Float]) f(fl.asInstanceOf[T]) else None
-        case d:Double => if (sameType[T, Double]) f(d.asInstanceOf[T]) else None
-        case x:Any => if (implicitly[ClassManifest[T]].erasure.isAssignableFrom(x.asInstanceOf[AnyRef].getClass)) f(x.asInstanceOf[T]) else None
-      }
+  def getMatchedElement[T : ClassManifest](value:AnyRef)(f: T => Option[T]): Option[T] = {
+    value.asInstanceOf[Any]  match {
+      case n:Int => if (sameType[T, Int]) f(n.asInstanceOf[T]) else None
+      case l:Long => if (sameType[T, Long]) f(l.asInstanceOf[T]) else None
+      case s:Short => if (sameType[T, Short]) f(s.asInstanceOf[T]) else None
+      case by:Byte => if (sameType[T, Byte]) f(by.asInstanceOf[T]) else None
+      case b:Boolean => if (sameType[T, Boolean]) f(b.asInstanceOf[T]) else None
+      case c:Char => if (sameType[T, Char]) f(c.asInstanceOf[T]) else None
+      case fl:Float => if (sameType[T, Float]) f(fl.asInstanceOf[T]) else None
+      case d:Double => if (sameType[T, Double]) f(d.asInstanceOf[T]) else None
+      case x:Any => if (implicitly[ClassManifest[T]].erasure.isAssignableFrom(x.asInstanceOf[AnyRef].getClass)) f(x.asInstanceOf[T]) else None
     }
+  }
 
-    def getElement[T : ClassManifest](value:AnyRef) : Option[T] = getMatchedElement[T](value)(Some(_))
-
+  def getElement[T : ClassManifest](value:AnyRef) : Option[T] = getMatchedElement[T](value)(Some(_))
 }
 
 object Tools extends Tools
