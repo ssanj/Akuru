@@ -49,6 +49,7 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 30. Add date functions (<,>, >=, <=, |<>|)
 31. Add Optional converters for primitives.
 32. Add MongoServerOptions.
+33. Add Server configuration options (Eg. default database, etc)
 
 Done -------------------------------------------------------------------------------------------------------------------
 
