@@ -27,32 +27,6 @@ object ApiUsage extends TestDomainObjects with AkuruFinder with AkuruMongoWrappe
     } withoutResults (Failure("Could not find blogs!"))).execute withSuccess(r => println("The title2 is -> " + r)) withFailure (l => println(l))
   }
 
-  trait AkuruConfig {
-    val dbName:String
-
-    implicit def defaultDBName[T <: DomainObject](dt:DomainTemplate[T]): DBName[T] = new DBName[T] { val name = dbName }
-
-    implicit lazy val server:Either[String, MongoServer] = Tools.runSafelyWithEither(new MongoServer())
-
-    //if you need to add additional databases to specific domain objects define an implicit conversion for each DomainObject:
-    //Eg.
-    // implicit def blogDBName(blog:DomainTemplate[Blog]): DBName[Blog] = new DBName[Blog] { val name = "meh" }
-
-    private def threaded(close: MongoServer => Unit): Option[Thread] = {
-      server.fold(l => None, s => Some(new Thread(new Runnable { def run() { close(s); err("Closed connection") }})))
-    }
-
-    private def registerShutdownHook(ot: => Option[Thread]) {
-      ot fold ({}, thread =>
-        runSafelyWithDefault(Runtime.getRuntime.addShutdownHook(thread))(e =>
-          err("Error Initializing Akuru Configuration. The Following error was received: " + e)))
-      }
-
-    private def err(message:String) { System.err.println(message) }
-
-    registerShutdownHook(threaded(s => s.close))
-  }
-
   object Config extends AkuruConfig {
     val dbName = "akuru_test"
     implicit def blogDBName(blog:DomainTemplate[Blog]): DBName[Blog] = new DBName[Blog] { val name = "akuru" }

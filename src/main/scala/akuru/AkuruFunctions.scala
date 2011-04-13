@@ -24,4 +24,28 @@ trait AkuruFunctions {
 
     def workResult: WorkResult[R] = wr
   }
+
+  trait AkuruConfig {
+    val dbName:String
+
+    implicit def defaultDBName[T <: DomainObject](dt:DomainTemplate[T]): DBName[T] = new DBName[T] { val name = dbName }
+
+    implicit lazy val server:Either[String, MongoServer] = Tools.runSafelyWithEither(new MongoServer())
+
+    //if you need to add additional databases to specific domain objects define an implicit conversion for each DomainObject:
+
+    private def threaded(close: MongoServer => Unit): Option[Thread] = {
+      server.fold(l => None, s => Some(new Thread(new Runnable { def run() { close(s); err("Closed connection") }})))
+    }
+
+    private def registerShutdownHook(ot: => Option[Thread]) {
+      ot fold ({}, thread =>
+        runSafelyWithDefault(Runtime.getRuntime.addShutdownHook(thread))(e =>
+          err("Error Initializing Akuru Configuration. The Following error was received: " + e)))
+      }
+
+    private def err(message:String) { System.err.println(message) }
+
+    registerShutdownHook(threaded(s => s.close))
+  }
 }

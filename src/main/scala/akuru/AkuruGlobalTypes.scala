@@ -91,4 +91,6 @@ trait AkuruGlobalTypes {
   type DomainTemplateToDBName[T <: DomainObject] = DomainTemplate[T] => DBName[T]
 
   type MongoServer = akuru.MongoTypes.MongoServer
+
+  type AkuruConfig = akuru.MongoTypes.AkuruConfig
  }
