@@ -46,4 +46,6 @@ trait CommonImplicits {
   implicit val server:Either[String, MongoServer] = Tools.runSafelyWithEither(new MongoServer())
 
   implicit def workUnitToExecutor[T <: DomainObject, R](wu:WorkUnit[T, R]): Executor[T, R] = new Executor[T, R](wu)
+
+  implicit def workResultToExecutionResult[R](wr:WorkResult[R]): ExecutionResult[R] = ExecutionResult[R](wr)
 }

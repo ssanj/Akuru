@@ -82,4 +82,7 @@ trait AkuruGlobalTypes {
   type ConnectionProvider = (String, String) => akuru.MongoTypes.MongoCollection
 
   type Executor[T <: DomainObject, R] = akuru.MongoTypes.Executor[T, R]
+
+  type ExecutionResult[R] = akuru.MongoTypes.ExecutionResult[R]
+  val ExecutionResult = akuru.MongoTypes.ExecutionResult
  }
