@@ -50,6 +50,7 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 31. Add Optional converters for primitives.
 32. Add MongoServerOptions.
 33. Add Server configuration options (Eg. default database, etc)
+34. Add a Config declaration.
 
 Done -------------------------------------------------------------------------------------------------------------------
 

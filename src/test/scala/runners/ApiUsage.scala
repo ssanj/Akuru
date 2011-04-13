@@ -13,18 +13,18 @@ object ApiUsage extends TestDomainObjects with AkuruFinder with AkuruMongoWrappe
   def main(args: Array[String]) {
     import Config._
     (find * Blog where Blog.titleField === (".*"/) withResults (blogs => Success(blogs(0).title.value)) withoutResults (Failure("No dice!"))).
-            execute.fold(l => println(l), r => println("The blog title is -> " + r))
+            execute withSuccess (r => println("The blog title is -> " + r)) withError (println(_))
 
     (find * Blog where Blog.titleField === ("d.*"/) withResults (blogs => Success(blogs(0).title.value)) withoutResults {
       +>(find * Book where Book.nameField === ("d.*"/) withResults (others => Success(others(0).name.value)) withoutResults {
         +>(find * Blog where Blog.titleField === (".*"/) withResults (blogs => Success(blogs(0).title.value)) withoutResults (
                 Failure("Could not find Blog starting with 'd' nor books starting with 'd' nor any blogs of any title")))})}).
-            execute.fold(l => println("failed => " + l), r => println("The other blog title is -> " + r))
+            execute withSuccess(r => println("The other blog title is -> " + r)) withError (e => println("failed => " + e))
 
     (find * Blog where Blog.titleField === (".*"/) withResults {blogs =>
-      join(find * Book where Book.nameField === ("pisc"/i) withResults (books => Success(blogs(0).title.value, books(0).name.value))
+      merge(find * Book where Book.nameField === ("pisc"/i) withResults (books => Success(blogs(0).title.value, books(0).name.value))
               withoutResults (Failure("Could not find matching blog and book")))
-    } withoutResults (Failure("Could not find blogs!"))).execute.fold(l => println(l), r => println("The title2 is -> " + r))
+    } withoutResults (Failure("Could not find blogs!"))).execute withSuccess(r => println("The title2 is -> " + r)) withError (l => println(l))
   }
 
   object Config {

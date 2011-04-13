@@ -13,7 +13,7 @@ trait AkuruFunctions {
     val name:String
   }
 
-  class Executor[T <: DomainObject, R](val wu: WorkUnit[T, R]) {
+  class Executor[T <: DomainObject, R] private[akuru] (val wu: WorkUnit[T, R]) {
     def execute(implicit server: Either[String, MongoServer]): WorkResult[R] = {
       runSafelyWithEither{ server.right.flatMap (s => wu((db,col) => s.getDatabase(db).getCollection(col)) ) } match {
         case Left(error) => Left(error)
@@ -21,4 +21,14 @@ trait AkuruFunctions {
       }
     }
   }
+
+  final case class ExecutionResult[R] private[akuru](private val wr:WorkResult[R]) {
+    def withSuccess[T](success:R => T) = new {
+      def withError(error:String => T): T = wr.fold(l => error(l), r => success(r))
+    }
+
+    def workResult: WorkResult[R] = wr
+  }
+
+  implicit def workResultToExecutionResult[R](wr:WorkResult[R]): ExecutionResult[R] = ExecutionResult[R](wr)
 }

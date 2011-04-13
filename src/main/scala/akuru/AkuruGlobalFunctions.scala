@@ -10,9 +10,9 @@ trait AkuruGlobalFunctions {
 
   def Success[R](wr:WorkResult[R]): WorkResult[R] = wr
 
-  def join[T <: DomainObject, R](wu:WorkUnit[T, R])(implicit server: Either[String, MongoServer]): WorkResult[R] = new Executor[T, R](wu).execute
+  def merge[T <: DomainObject, R](wu:WorkUnit[T, R])(implicit server: Either[String, MongoServer]): WorkResult[R] = new Executor[T, R](wu).execute
 
-  def +>[T <: DomainObject, R](wu:WorkUnit[T, R])(implicit server: Either[String, MongoServer]): WorkResult[R] = join[T, R](wu)
+  def +>[T <: DomainObject, R](wu:WorkUnit[T, R])(implicit server: Either[String, MongoServer]): WorkResult[R] = merge[T, R](wu)
 
   def Success[R](value:R): WorkResult[R] = Right(value)
 
