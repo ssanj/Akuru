@@ -11,6 +11,7 @@ import MongoTypes.FieldRegEx
 import MongoTypes.NumericOperations
 import MongoTypes.MongoUpdateObject
 import MongoTypes.Query
+import MongoTypes.MongoServer
 import MongoTypes.FieldValueQueryJoiner
 import MongoObject.fieldToMongo1
 import MongoObject.nestedPath
@@ -42,4 +43,7 @@ trait CommonImplicits {
 
   implicit def fieldToFieldRegEx[O <: DomainObject, T](f:FieldType[O, T]): FieldRegEx[O, T] = FieldRegEx[O, T](f)
 
+  implicit val server:Either[String, MongoServer] = Tools.runSafelyWithEither(new MongoServer())
+
+  implicit def workUnitToExecutor[T <: DomainObject, R](wu:WorkUnit[T, R]): Executor[T, R] = new Executor[T, R](wu)
 }

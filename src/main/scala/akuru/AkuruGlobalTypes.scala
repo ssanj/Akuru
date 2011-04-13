@@ -66,4 +66,20 @@ trait AkuruGlobalTypes {
   type ToMongo[T] = akuru.domain.serial.ToMongo[T]
   type FromMongo[T] = akuru.domain.serial.FromMongo[T]
 
+  /**
+   * A basic type that works on a DomainObject T and returns a result R. An instance of this type represents an unexcecuted Unit of Work.
+   */
+  type WorkUnit[T <: DomainObject, R] = ConnectionProvider => WorkResult[R]
+
+  /**
+   * The result of executing a Unit of Work.
+   */
+  type WorkResult[R] = Either[String, R]
+
+  /**
+   * A function that when supplied with a DatabaseName and a CollectionName return a MongoCollection.
+   */
+  type ConnectionProvider = (String, String) => akuru.MongoTypes.MongoCollection
+
+  type Executor[T <: DomainObject, R] = akuru.MongoTypes.Executor[T, R]
  }
