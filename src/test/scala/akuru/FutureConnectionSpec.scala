@@ -4,7 +4,6 @@
  */
 package akuru
 
-import MongoTypes.MongoServer
 import MongoTypes.MongoDatabase
 import MongoTypes.MongoCollection
 

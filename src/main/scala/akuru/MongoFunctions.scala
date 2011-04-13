@@ -6,7 +6,6 @@
 package akuru
 import MongoTypes.MongoSortObject
 import MongoTypes.MongoObject.empty
-import MongoTypes.MongoServer
 import MongoTypes.MongoCursor
 import MongoTypes.UpdateObject
 import MongoTypes.MongoWriteResult

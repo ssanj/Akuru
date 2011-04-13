@@ -4,8 +4,6 @@
  */
 package akuru
 
-import MongoTypes.MongoServer
-
 trait AkuruGlobalFunctions {
 
   def Success[R](wr:WorkResult[R]): WorkResult[R] = wr
