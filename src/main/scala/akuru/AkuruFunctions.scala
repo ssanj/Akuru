@@ -24,7 +24,7 @@ trait AkuruFunctions {
 
   final case class ExecutionResult[R] private[akuru](private val wr:WorkResult[R]) {
     def withSuccess[T](success:R => T) = new {
-      def withError(error:String => T): T = wr.fold(l => error(l), r => success(r))
+      def withFailure(error:String => T): T = wr.fold(l => error(l), r => success(r))
     }
 
     def workResult: WorkResult[R] = wr
