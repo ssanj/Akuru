@@ -85,4 +85,8 @@ trait AkuruGlobalTypes {
 
   type ExecutionResult[R] = akuru.MongoTypes.ExecutionResult[R]
   val ExecutionResult = akuru.MongoTypes.ExecutionResult
+
+  type DBName[T <: DomainObject] = akuru.MongoTypes.DBName[T]
+
+  type DomainTemplateToDBName[T <: DomainObject] = DomainTemplate[T] => DBName[T]
  }

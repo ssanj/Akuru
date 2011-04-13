@@ -49,4 +49,6 @@ trait DomainTypeSupport {
   trait CollectionName[T <: DomainObject] {
     val name:String
   }
+
+  trait DBName[T <: DomainObject] { val name:String }
 }

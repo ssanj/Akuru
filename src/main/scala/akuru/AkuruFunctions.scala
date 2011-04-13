@@ -9,10 +9,6 @@ import Tools._
 
 trait AkuruFunctions {
 
-  trait DBName[T <: DomainObject] {
-    val name:String
-  }
-
   class Executor[T <: DomainObject, R] private[akuru] (private val wu: WorkUnit[T, R]) {
     def execute(implicit server: Either[String, MongoServer]): WorkResult[R] = {
       runSafelyWithEither{ server.right.flatMap (s => wu((db,col) => s.getDatabase(db).getCollection(col)) ) } match {

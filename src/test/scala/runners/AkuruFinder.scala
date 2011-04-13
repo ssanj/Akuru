@@ -14,18 +14,18 @@ trait AkuruFinder { this:AkuruMongoWrapper with AkuruFunctions with Tools with D
   def find: AKuruFindMany = new AKuruFindMany
 
   final class AKuruFindMany {
-    def *[T <: DomainObject : CollectionName : MongoToDomain : DBName](template: => DomainTemplate[T]): QueryForMultipleResults[T]  =
-            new QueryForMultipleResults[T]
+    def *[T <: DomainObject : CollectionName : MongoToDomain : DomainTemplateToDBName](template: => DomainTemplate[T]): QueryForMultipleResults[T] = {
+      implicit val dbName:DBName[T] = implicitly[DomainTemplateToDBName[T]].apply(template)
+      new QueryForMultipleResults[T]
+    }
   }
 
   final class QueryForMultipleResults[T <: DomainObject : CollectionName : MongoToDomain : DBName] {
-
     def where(fvj: => Query[T]): ConstrainedBy[T] = new ConstrainedBy[T](fvj.splat)
   }
 
   final class ConstrainedBy[T <: DomainObject : CollectionName : MongoToDomain : DBName](query: => MongoObject) {
     def constrainedBy(bc: Constraint[T]): MultipleResults[T] = new MultipleResults[T](bc, query)
-
     def withResults[R](success: Seq[T] => WorkResult[R]): WithoutResults[T, R] = new WithoutResults[T, R](All(), query, success)
   }
 
@@ -34,8 +34,7 @@ trait AkuruFinder { this:AkuruMongoWrapper with AkuruFunctions with Tools with D
     def and(constraint: Constraint[T]): Constraint[T] = new StackedConstraint[T](this, constraint)
   }
 
-  final class StackedConstraint[T <: DomainObject](constraint1: Constraint[T], constraint2: Constraint[T])
-          extends Constraint[T] {
+  final class StackedConstraint[T <: DomainObject](constraint1: Constraint[T], constraint2: Constraint[T]) extends Constraint[T] {
     def apply(): MongoCursor => MongoCursor = mc => constraint2.apply()(constraint1.apply()(mc))
   }
 

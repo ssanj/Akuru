@@ -29,10 +29,12 @@ object ApiUsage extends TestDomainObjects with AkuruFinder with AkuruMongoWrappe
 
   object Config {
 
-    //set a default on DomainTemplate and allow the user to override as necessary.
-    implicit val blogCT:DBName[Blog] = new DBName[Blog] { val name = "akuru_test" }
+    implicit def blogDBName(blog:DomainTemplate[Blog]): DBName[Blog] = new DBName[Blog] { val name = "akuru" }
 
-    implicit val bookCT:DBName[Book] = new DBName[Book] { val name = "akuru_test" }
+    //set a default on DomainTemplate and allow the user to override as necessary.
+    implicit def defaultDBName[T <: DomainObject](dt:DomainTemplate[T]): DBName[T] = new DBName[T] { val name = "akuru_test" }
+
+    //implicit val bookCT:DBName[Book] = new DBName[Book] { val name = "akuru_test" }
     //add a JVM Hook to shutdown the mongo connection.
   }
 }
