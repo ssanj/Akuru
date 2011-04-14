@@ -28,7 +28,7 @@ object ApiUsage extends TestDomainObjects with AkuruFinder with AkuruMongoWrappe
   }
 
   object Config extends AkuruConfig {
-    val dbName = "akuru_test"
-    implicit def blogDBName(blog:DomainTemplate[Blog]): DBName[Blog] = new DBName[Blog] { val name = "akuru" }
+    val defaultDBName = "akuru_test"
+    implicit def blogDBName(blog:DomainTemplate[Blog]): DBName[Blog] = defineDBName[Blog]("akuru")
   }
 }
