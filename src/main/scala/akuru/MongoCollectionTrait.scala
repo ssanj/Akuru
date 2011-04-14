@@ -23,6 +23,8 @@ trait MongoCollectionTrait { this:MongoFunctions =>
      runSafelyWithEither { f(dbc.find(mo)).asSeq[T] }
    }
 
+  def aDrop: Either[String, Unit] = runSafelyWithEither(dbc.drop)
+
    //---------------------------------------------old ------------------------------------------------------------------------------------------------
 
    def save[T <: DomainObject : DomainToMongo](value: => T, handler: MongoWriteResult => Option[String]): Option[String] =

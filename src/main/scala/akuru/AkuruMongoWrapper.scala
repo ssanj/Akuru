@@ -19,4 +19,6 @@ trait AkuruMongoWrapper {
     cp(implicitly[DBName[T]].name, implicitly[CollectionName[T]].name).aSave[T](f).fold(l => Left(l), wr => if (wr.ok) success else failure(wr))
   }
 
+  def aDrop[T <: DomainObject : CollectionName : DBName, R](success: => WorkResult[R]): WorkUnit[T, R] = cp =>
+    cp(implicitly[DBName[T]].name, implicitly[CollectionName[T]].name).aDrop.fold(l => Left(l), r => success)
 }
