@@ -7,7 +7,6 @@ package akuru
 package dsl
 
 import MongoTypes.UpdateObject
-import MongoTypes.MongoWriteResult
 import MongoTypes.Query
 
 /**

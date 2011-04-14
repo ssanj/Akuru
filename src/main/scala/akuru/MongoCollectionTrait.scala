@@ -5,7 +5,6 @@
 package akuru
 
 import com.mongodb.DBCollection
-import MongoTypes.MongoWriteResult
 import MongoTypes.MongoCursor
 import scala.Either
 import Tools._
@@ -16,6 +15,15 @@ trait MongoCollectionTrait { this:MongoFunctions =>
   case class MongoCollection(dbc:DBCollection, newdbc:DBCollectionTrait) {
 
     import com.mongodb.WriteResult
+
+  def aSave[T <: DomainObject : DomainToMongo](value: => T): Either[String, MongoWriteResult] =
+    runSafelyWithEither(dbc.save(value.toDBObject))
+
+   def aFind[T <: DomainObject : MongoToDomain](mo:MongoObject)(f: MongoCursor => MongoCursor): Either[String, Seq[T]] = {
+     runSafelyWithEither { f(dbc.find(mo)).asSeq[T] }
+   }
+
+   //---------------------------------------------old ------------------------------------------------------------------------------------------------
 
    def save[T <: DomainObject : DomainToMongo](value: => T, handler: MongoWriteResult => Option[String]): Option[String] =
      writeResultToOption(() => dbc.save(value.toDBObject), handler)

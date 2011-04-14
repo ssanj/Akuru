@@ -49,9 +49,7 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 30. Add date functions (<,>, >=, <=, |<>|)
 31. Add Optional converters for primitives.
 32. Add MongoServerOptions.
-33. Clean up how additional database names are defined. Add a templat that can be reused.
-Eg. def defineDBName[T <: DomainObject](dt:DomainTemplate[T]): DBName[T]
-    implicit def blogDBName = defineDBName[Blog]
+33. Clean up MongoCollection (has redundant constructor parameters)
 
 Done -------------------------------------------------------------------------------------------------------------------
 
@@ -95,6 +93,9 @@ Done ---------------------------------------------------------------------------
 36. Add test suites for FutureConnection. (done)
 37. Add Server configuration options (Eg. default database, etc) (done)
 38. Add a Config declaration. (done)
+39. Clean up how additional database names are defined. Add a templat that can be reused. (done)
+Eg. def defineDBName[T <: DomainObject](dt:DomainTemplate[T]): DBName[T]
+    implicit def blogDBName = defineDBName[Blog]
 
 
 Not doing --------------------------------------------------------------------------------------------------------------

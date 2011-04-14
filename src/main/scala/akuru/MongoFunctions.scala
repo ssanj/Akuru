@@ -8,7 +8,6 @@ import MongoTypes.MongoSortObject
 import MongoTypes.MongoObject.empty
 import MongoTypes.MongoCursor
 import MongoTypes.UpdateObject
-import MongoTypes.MongoWriteResult
 import MongoTypes.MongoCollection
 import Tools._
 
@@ -27,6 +26,7 @@ trait MongoFunctions { this:SideEffects  =>
 
   def save[T <: DomainObject : DomainToMongo : CollectionName](f: => T): UserFunction = col => col(collectionName[T]).save[T](f, defaultHandler)
 
+  //completed
   def mfind[T <: DomainObject : CollectionName : MongoToDomain](f: => MongoObject)(c: MongoCursor => MongoCursor)(g: Seq[T] => Option[String])
                                                               (h: => Option[String]):
     UserFunction = col =>  col(collectionName[T]).find[T](f)(c).fold(l => Some(l), r => if (r.isEmpty) h else g(r))

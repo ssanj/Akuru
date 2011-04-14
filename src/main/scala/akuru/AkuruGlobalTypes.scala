@@ -93,4 +93,6 @@ trait AkuruGlobalTypes {
   type MongoServer = akuru.MongoTypes.MongoServer
 
   type AkuruConfig = akuru.MongoTypes.AkuruConfig
+
+  type MongoWriteResult = akuru.MongoTypes.MongoWriteResult
  }
