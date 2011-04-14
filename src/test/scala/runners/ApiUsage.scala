@@ -5,6 +5,7 @@
 package runners
 
 import akuru._
+import akuru.dsl._
 import akuru.domain.TestDomainObjects
 import akuru.dsl.DSLTools
 

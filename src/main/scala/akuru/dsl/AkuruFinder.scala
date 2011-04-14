@@ -2,14 +2,13 @@
  * Copyright (c) 2011 Sanjiv Sahayam
  * Licensed under the Apache License, Version 2.0
  */
-package runners
+package akuru
+package dsl
 
-import akuru._
 import MongoTypes.Query
 import MongoTypes.MongoCursor
-import akuru.dsl.DSLTools
 
-trait AkuruFinder { this:AkuruMongoWrapper with AkuruFunctions with Tools with DSLTools =>
+trait AkuruFinder { this:AkuruMongoWrapper with DSLTools =>
 
   def find: AKuruFindMany = new AKuruFindMany
 
