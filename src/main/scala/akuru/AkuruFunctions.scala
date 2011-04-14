@@ -86,7 +86,7 @@ trait AkuruFunctions {
     //define custom database names where required by calling this method in your config object.
     def defineDBName[T <: DomainObject](dbn:String): DBName[T] = new DBName[T] { val name = dbn }
 
-    implicit def commonDBName[T <: DomainObject](dt:DomainTemplate[T]): DBName[T] = defineDBName[T](defaultDBName)
+    implicit def commonDTDBName[T <: DomainObject](dt:DomainTemplate[T]): DBName[T] = defineDBName[T](defaultDBName)
 
     //If you need a different server configuration, override this method in your config object.
     implicit lazy val server:Either[String, MongoServer] = runSafelyWithEither(new MongoServer())
