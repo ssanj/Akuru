@@ -22,26 +22,26 @@ trait AkuruSave { this:AkuruMongoWrapper =>
   }
 
   class WithValues[T <: DomainObject : CollectionName : DBName : DomainToMongo] {
-    def withValues(dom:T): WithResults[T] = new WithResults[T](dom)
+    def withValues(dom: => T): WithResults[T] = new WithResults[T](dom)
   }
 
   class WithMultipleValues[T <: DomainObject : CollectionName : DBName : DomainToMongo] {
-    def withValues(doms:Seq[T]): WithMutipleResults[T] = new WithMutipleResults[T](doms)
+    def withValues(doms: => Seq[T]): WithMutipleResults[T] = new WithMutipleResults[T](doms)
   }
 
-  class WithResults[T <: DomainObject : CollectionName : DBName : DomainToMongo](dom:T) {
+  class WithResults[T <: DomainObject : CollectionName : DBName : DomainToMongo](dom: => T) {
     def withResults[R](success: => WorkResult[R]): WithoutResults[T, R] = new WithoutResults[T, R](dom, success)
   }
 
-  class WithMutipleResults[T <: DomainObject : CollectionName : DBName : DomainToMongo](doms:Seq[T]) {
+  class WithMutipleResults[T <: DomainObject : CollectionName : DBName : DomainToMongo](doms: => Seq[T]) {
     def withResults[R](success: => WorkResult[R]): WithoutMultipleResults[T, R] = new WithoutMultipleResults[T, R](doms, success)
   }
 
-  class WithoutResults[T <: DomainObject : CollectionName : DBName : DomainToMongo, R](dom:T, success: => WorkResult[R]) {
+  class WithoutResults[T <: DomainObject : CollectionName : DBName : DomainToMongo, R](dom: => T, success: => WorkResult[R]) {
     def withoutResults(failure: MongoWriteResult => WorkResult[R]): WorkUnit[T, R] = aSave[T, R](dom)(success)(failure)
   }
 
-  class WithoutMultipleResults[T <: DomainObject : CollectionName : DBName : DomainToMongo, R](doms:Seq[T], success: => WorkResult[R]) {
+  class WithoutMultipleResults[T <: DomainObject : CollectionName : DBName : DomainToMongo, R](doms: => Seq[T], success: => WorkResult[R]) {
     def withoutResults(failure: (T, MongoWriteResult) => WorkResult[R]): WorkUnit[T, R] =  aSaveMany[T, R](doms)(success)(failure)
   }
 }

@@ -45,4 +45,8 @@ trait AkuruSpecSupport extends FlatSpec
   }
 
   def ex(error:String): WorkResult[Nothing] = throw new RuntimeException(error)
+
+  val expectedError = "ExceptionalBlog threw an Exception on Blog creation!Whoops"
+
+  def exceptionBlog():Blog = throw new RuntimeException(expectedError)
 }
