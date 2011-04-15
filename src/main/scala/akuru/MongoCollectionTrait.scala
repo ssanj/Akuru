@@ -12,7 +12,7 @@ import Tools._
 trait MongoCollectionTrait { this:MongoFunctions =>
 
   //TODO:Once all methods ar tested remove dbc and replace with newdbc.
-  case class MongoCollection(dbc:DBCollection, newdbc:DBCollectionTrait) {
+  case class MongoCollection(dbc:DBCollection) {
 
     import com.mongodb.WriteResult
 
@@ -63,7 +63,6 @@ trait MongoCollectionTrait { this:MongoFunctions =>
   }
 
   object MongoCollection {
-    import DBCollectionTrait._
-    implicit def dbCollectionToMongoCollection(dbc:DBCollection): MongoCollection = MongoCollection(dbc, createDBCollectionTrait(dbc))
+    implicit def dbCollectionToMongoCollection(dbc:DBCollection): MongoCollection = MongoCollection(dbc)
   }
 }

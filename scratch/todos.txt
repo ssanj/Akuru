@@ -50,6 +50,7 @@ $set(costField === 60.00D) & $set(descriptionField === "updated")
 31. Add Optional converters for primitives.
 32. Add MongoServerOptions.
 33. Clean up MongoCollection (has redundant constructor parameters)
+34. Test AkuruMongoWrapper.
 
 Done -------------------------------------------------------------------------------------------------------------------
 
@@ -96,7 +97,7 @@ Done ---------------------------------------------------------------------------
 39. Clean up how additional database names are defined. Add a templat that can be reused. (done)
 Eg. def defineDBName[T <: DomainObject](dt:DomainTemplate[T]): DBName[T]
     implicit def blogDBName = defineDBName[Blog]
-
+40. Move Find, Drop and Save DSL tests over to new DSL structure. (done)
 
 Not doing --------------------------------------------------------------------------------------------------------------
 

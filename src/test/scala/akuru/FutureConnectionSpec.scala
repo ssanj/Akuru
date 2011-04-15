@@ -118,5 +118,5 @@ final class FutureConnectionSpec extends CommonSpec with SideEffects {
   private class TestMongoDatabaseWithException extends MongoDatabase(null) { override def getCollection(key:String): MongoCollection =
     throw new RuntimeException("Could not connect to Collection") }
 
-  private class TestMongoCollection extends MongoCollection(null, null)
+  private class TestMongoCollection extends MongoCollection(null)
 }

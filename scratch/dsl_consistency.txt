@@ -10,4 +10,5 @@ update a Blog where ()                             withValues ($set())          
 update a Blog where ()                             withValues ($set())  hasResults()   withResults()  withoutResults ()
 upsert * Blog where ()                             withValues ($set())                 withResults()  withoutResults ()
 drop collection Blog                                                                   withResults()
-save a Blog                                        withValues (Blog(..))               withResults
+save a Blog                                        withValues (Blog(..))               withResults()
+save * Blog                                        withValues (Seq[Blog])              withResults()  withoutResults()
