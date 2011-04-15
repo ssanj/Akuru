@@ -8,6 +8,7 @@ package dsl
 class FindDSLWithManySpec extends AkuruSpecSupport {
   import Config._
   import Blog._
+
   "A FindDSL" should "find all saved objects matching a query" in {
     val blogs = Seq(Blog(titleField === "sample1", labelsField === Seq("sample")),
                     Blog(titleField === "sample2", labelsField === Seq("sample")),
@@ -21,7 +22,7 @@ class FindDSLWithManySpec extends AkuruSpecSupport {
               blogs(1).title.value should equal ("sample2")
               blogs(2).title.value should equal ("sample3")
               Success({})
-            } withoutResults (Failure("Expected 3 got 0")))} withoutResults ((blog, wr) => Failure("Could not save Blog: " + blog.title.value)))}).
+            } withoutResults Failure("Expected 3 got 0"))} withoutResults ((blog, wr) => Failure("Could not save Blog: " + blog.title.value)))}).
     execute verifySuccess
   }
 
@@ -30,4 +31,11 @@ class FindDSLWithManySpec extends AkuruSpecSupport {
       +> (find * Blog where titleField === (".*"/) withResults { b => Failure("Expected 0 but received: " + b.size) } withoutResults Success({}))
     }).execute verifySuccess
   }
+
+  it should "handle exceptions thrown on finder execution" in {
+    (drop collection Blog withResults {
+      +> (find * Person where Person.nameField === ("*"/) withResults (p => Success(p)) withoutResults Failure("Could not any Person"))
+    }).execute verifyFailure (Person.expectedError)
+  }
+
 }

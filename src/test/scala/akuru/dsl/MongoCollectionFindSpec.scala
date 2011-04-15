@@ -27,12 +27,12 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTool
 //    ) ~~>() verifySuccess
 //  }
 
-  it should "return zero results if there are no matches" in {
-    (onTestDB ~~>
-              drop[Blog] ~~>
-              ( find * Blog where titleField === ("*"/) withResults { b => error("Expected 0 but received: " + b.size) } withoutResults success)
-    ) ~~>() verifySuccess
-  }
+//  it should "return zero results if there are no matches" in {
+//    (onTestDB ~~>
+//              drop[Blog] ~~>
+//              ( find * Blog where titleField === ("*"/) withResults { b => error("Expected 0 but received: " + b.size) } withoutResults success)
+//    ) ~~>() verifySuccess
+//  }
 
   it should "handle exceptions thrown on finder execution" in {
     (
