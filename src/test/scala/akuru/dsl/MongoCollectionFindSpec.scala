@@ -34,46 +34,46 @@ final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTool
 //    ) ~~>() verifySuccess
 //  }
 
-  it should "handle exceptions thrown on finder execution" in {
-    (
-      onTestDB ~~>
-              drop[Blog] ~~>
-              (find * Person where Person.nameField === ("*"/) withResults (_ => error("Should not have return results"))
-              withoutResults error("should not have been called when an Exception is thrown!")) ~~>()
-    ) verifyError has (Person.expectedError)
-  }
+//  it should "handle exceptions thrown on finder execution" in {
+//    (
+//      onTestDB ~~>
+//              drop[Blog] ~~>
+//              (find * Person where Person.nameField === ("*"/) withResults (_ => error("Should not have return results"))
+//              withoutResults error("should not have been called when an Exception is thrown!")) ~~>()
+//    ) verifyError has (Person.expectedError)
+//  }
 
-  it should "handle exceptions throw on creating a query" in {
-    (
-      onTestDB ~~>
-              drop[Blog] ~~>
-              ( find * Blog where (exceptionalFieldValueJoiner) withResults (_ => error("Should not have return results"))
-              withoutResults error("should not have been called when an Exception is thrown!") ) ~~>()
-    ) verifyError has (mongoCreationException)
-  }
+//  it should "handle exceptions throw on creating a query" in {
+//    (
+//      onTestDB ~~>
+//              drop[Blog] ~~>
+//              ( find * Blog where (exceptionalFieldValueJoiner) withResults (_ => error("Should not have return results"))
+//              withoutResults error("should not have been called when an Exception is thrown!") ) ~~>()
+//    ) verifyError has (mongoCreationException)
+//  }
 
-  it should "handle exception thrown by match handler function" in {
-    (
-      onTestDB ~~>
-              drop[Blog] ~~>
-              save(Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) ~~>
-              ( find * Blog where titleField === (".*"/) withResults (_ => ex("Handler threw an Exception"))
-              withoutResults error("should not have been called when an Exception is thrown!") ) ~~>()
-    ) verifyError has ("Handler threw an Exception")
-  }
+//  it should "handle exception thrown by match handler function" in {
+//    (
+//      onTestDB ~~>
+//              drop[Blog] ~~>
+//              save(Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) ~~>
+//              ( find * Blog where titleField === (".*"/) withResults (_ => ex("Handler threw an Exception"))
+//              withoutResults error("should not have been called when an Exception is thrown!") ) ~~>()
+//    ) verifyError has ("Handler threw an Exception")
+//  }
 
-  it should "find regex" in {
-    (
-      onTestDB ~~>
-              drop[Blog] ~~>
-              save(Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) ~~>
-              ( find * Blog where titleField === ("querying with RegEx"/) withResults { b => error("Expected 0 but received: " + b.size) }
-                      withoutResults success ) ~~>
-              ( find * Blog where titleField === ("Querying with RegEx"/i) withResults { expectOne } withoutResults error("Expected 1") ) ~~>
-              ( find * Blog where titleField === (".* with RegEx"/) withResults { expectOne } withoutResults error("Expected 1") ) ~~>
-              ( find * Blog where titleField === (".*query.*"/i) withResults { expectOne } withoutResults error("Expected 1"))
-      ~~>()) verifySuccess
-  }
+//  it should "find regex" in {
+//    (
+//      onTestDB ~~>
+//              drop[Blog] ~~>
+//              save(Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) ~~>
+//              ( find * Blog where titleField === ("querying with RegEx"/) withResults { b => error("Expected 0 but received: " + b.size) }
+//                      withoutResults success ) ~~>
+//              ( find * Blog where titleField === ("Querying with RegEx"/i) withResults { expectOne } withoutResults error("Expected 1") ) ~~>
+//              ( find * Blog where titleField === (".* with RegEx"/) withResults { expectOne } withoutResults error("Expected 1") ) ~~>
+//              ( find * Blog where titleField === (".*query.*"/i) withResults { expectOne } withoutResults error("Expected 1"))
+//      ~~>()) verifySuccess
+//  }
 
   private def expectOne(blogs:Seq[Blog]): Option[String] = { blogs.size should equal (1); success }
 

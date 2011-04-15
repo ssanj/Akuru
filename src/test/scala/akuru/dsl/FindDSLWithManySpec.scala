@@ -38,4 +38,43 @@ class FindDSLWithManySpec extends AkuruSpecSupport {
     }).execute verifyFailure (Person.expectedError)
   }
 
+  it should "handle exceptions throw on creating a query" in {
+    (drop collection Blog withResults {
+      +> (find * Blog where (exceptionalFieldValueJoiner) withResults (b => Success(b)) withoutResults Failure("Did not find Blogs"))
+    }).execute verifyFailure (mongoCreationException)
+  }
+
+  it should "handle exception thrown by the withResults function" in {
+    (drop collection Blog withResults {
+      +> (save a Blog withValues (Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) withResults {
+        +> (find * Blog where titleField === (".*"/) withResults (_ => ex("withResults threw an Exception"))
+                withoutResults Failure("Could not find Blog"))
+      } withoutResults (wr => Failure("Could not save Blog")))
+    }).execute verifyFailure ("withResults threw an Exception")
+  }
+
+  it should "handle exception thrown by the withoutResults function" in {
+    (drop collection Blog withResults {
+      +> (save a Blog withValues (Blog(titleField === "SkidRow", labelsField === Seq("80s", "Rock"))) withResults {
+        +> (find * Blog where titleField === ("Blah*"/) withResults (_ => Success({})) withoutResults ex("withoutResults threw an Exception"))
+      } withoutResults (wr => Failure("Could not save Blog")))
+    }).execute verifyFailure ("withoutResults threw an Exception")
+  }
+
+  it should "find regex" in {
+    (drop collection Blog withResults {
+      +> (save a Blog withValues (Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) withResults {
+        +> (find * Blog where titleField === ("querying with RegEx"/) withResults (b => Failure("Expected 0 but received: " + b.size))
+                withoutResults {
+                  +> (find * Blog where titleField === ("querying with regEx"/i) withResults {b1 =>
+                    +> (find * Blog where titleField === (".* with RegEx"/) withResults {b2 =>
+                     +> (find * Blog where titleField === (".*query.*"/i) withResults {b3 => Success(b3(0).title.value) }
+                             withoutResults Failure("Didn't match wilcard with case-insensitive match"))
+                    } withoutResults Failure("Didn't match wildcard with case-sensitive match") )
+                  } withoutResults Failure("Didn't match case-insensitive match"))
+        } )
+      } withoutResults(wr => Failure("Could not save Blog")))
+    }).execute verifySuccess("Querying with RegEx")
+  }
+
 }

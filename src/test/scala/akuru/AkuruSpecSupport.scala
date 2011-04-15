@@ -38,9 +38,11 @@ trait AkuruSpecSupport extends FlatSpec
 
     def verifyFailure(error:String) {
       r match {
-        case Left(e) => e should equal (e)
+        case Left(e) => e should equal (error)
         case Right(s) => fail("Expected Failure bot got Success(" + s + ")")
       }
     }
   }
+
+  def ex(error:String): WorkResult[Nothing] = throw new RuntimeException(error)
 }
