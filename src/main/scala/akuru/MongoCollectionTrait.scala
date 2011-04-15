@@ -9,7 +9,7 @@ import MongoTypes.MongoCursor
 import scala.Either
 import Tools._
 
-trait MongoCollectionTrait { this:MongoFunctions =>
+trait MongoCollectionTrait {
 
   //TODO:Once all methods ar tested remove dbc and replace with newdbc.
   case class MongoCollection(dbc:DBCollection) {
