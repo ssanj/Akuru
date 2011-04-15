@@ -77,4 +77,20 @@ class FindDSLWithManySpec extends AkuruSpecSupport {
     }).execute verifySuccess("Querying with RegEx")
   }
 
+  it should "sort results" in {
+    val blogs = Seq(Blog(titleField === "Pears", labelsField === Seq("fruit", "pears")),
+                    Blog(titleField === "Orange", labelsField === Seq("citrus", "fruit", "navel", "jaffa")),
+                    Blog(titleField === "Apple", labelsField === Seq("apples", "fruit", "green", "red")),
+                    Blog(titleField === "WaterMellon", labelsField === Seq("mellon", "fruit", "striped")))
+    (drop collection Blog withResults {
+      +> (save * Blog withValues (blogs) withResults {
+        +> (find * Blog where labelsField === ("fruit"/) constrainedBy (Limit(2) and Order(titleField -> ASC)) withResults {blogs =>
+          blogs.size should equal (2)
+          blogs(0).title.value should equal ("Apple")
+          blogs(1).title.value should equal ("Orange")
+          Success({})
+        } withoutResults Failure("Expected 2 but received 0."))
+      } withoutResults((blog, wr) => Failure("Could not save Blog: " + blog)))
+    }).execute verifySuccess
+  }
 }
