@@ -61,7 +61,7 @@ class FindDSLWithManySpec extends AkuruSpecSupport {
     }).execute verifyFailure ("withoutResults threw an Exception")
   }
 
-  it should "find regex" in {
+  it should "find by regex" in {
     (drop collection Blog withResults {
       +> (save a Blog withValues (Blog(titleField === "Querying with RegEx", labelsField === Seq("query", "regex"))) withResults {
         +> (find * Blog where titleField === ("querying with RegEx"/) withResults (b => Failure("Expected 0 but received: " + b.size))
