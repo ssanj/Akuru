@@ -7,6 +7,7 @@ package akuru
 import org.scalatest.Assertions
 import org.scalatest.matchers.ShouldMatchers
 
+//TODO: "Use AkuruSpecSupport instead" once upgrade is complete.
 trait MongoSpecSupport { this:Assertions with ShouldMatchers with MongoFunctions =>
 
   case class VerifyResult(op:Option[String]) {

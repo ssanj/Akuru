@@ -6,25 +6,26 @@
 package akuru
 package dsl
 
+//TODO: remove once FindDSLWithManySpec is complete
 final class MongoCollectionFindSpec extends CommonSpec with FindDSL with DSLTools {
 
   import Blog._
 
-  "A MongoCollection with find" should "find all saved objects matching a query" in {
-    (onTestDB ~~>
-              drop[Blog] ~~>
-              save(Blog(titleField === "sample1", labelsField === Seq("sample"))) ~~>
-              save(Blog(titleField === "sample2", labelsField === Seq("sample"))) ~~>
-              save(Blog(titleField === "sample3", labelsField === Seq("sample"))) ~~>
-              ( find * Blog where titleField === ("sample*"/) withResults { blogs =>
-                blogs.size should equal (3)
-                blogs.exists(_.title.value == "sample1") should be (true)
-                blogs.exists(_.title.value == "sample2") should be (true)
-                blogs.exists(_.title.value == "sample3") should be (true)
-                success
-              } withoutResults error("Expected 3 but got 0"))
-    ) ~~>() verifySuccess
-  }
+//  "A MongoCollection with find" should "find all saved objects matching a query" in {
+//    (onTestDB ~~>
+//              drop[Blog] ~~>
+//              save(Blog(titleField === "sample1", labelsField === Seq("sample"))) ~~>
+//              save(Blog(titleField === "sample2", labelsField === Seq("sample"))) ~~>
+//              save(Blog(titleField === "sample3", labelsField === Seq("sample"))) ~~>
+//              ( find * Blog where titleField === ("sample*"/) withResults { blogs =>
+//                blogs.size should equal (3)
+//                blogs.exists(_.title.value == "sample1") should be (true)
+//                blogs.exists(_.title.value == "sample2") should be (true)
+//                blogs.exists(_.title.value == "sample3") should be (true)
+//                success
+//              } withoutResults error("Expected 3 but got 0"))
+//    ) ~~>() verifySuccess
+//  }
 
   it should "return zero results if there are no matches" in {
     (onTestDB ~~>
