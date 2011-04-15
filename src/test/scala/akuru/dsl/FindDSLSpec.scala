@@ -5,7 +5,7 @@
 package akuru
 package dsl
 
-class FindDSLWithManySpec extends AkuruSpecSupport {
+class FindDSLSpec extends AkuruSpecSupport {
   import Config._
   import Blog._
 
