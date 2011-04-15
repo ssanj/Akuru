@@ -18,7 +18,7 @@ final class SaveDSLSpec extends AkuruSpecSupport {
             blogs.size should equal (1)
             blogs(0).title.value should equal ("blah")
             blogs(0).labels.value should equal (Seq("test", "random"))
-            Success({})
+            Empty
           } withoutResults Failure("Did not find Blog"))
         } withoutResults(_ => Failure("Could not save Blog")))
       })
@@ -26,13 +26,13 @@ final class SaveDSLSpec extends AkuruSpecSupport {
   }
 
   it should ("handle Exceptions on object creation") in {
-    (save a Blog withValues (exceptionBlog) withResults (Success({})) withoutResults (_ => Failure("Could not save Blog"))).
+    (save a Blog withValues (exceptionBlog) withResults (Empty) withoutResults (_ => Failure("Could not save Blog"))).
             execute verifyFailure (expectedError)
   }
 
   it should ("handle Exceptions that occur during save execution") in {
     import Person._
-    (save a Person withValues Person(nameField === "sanj") withResults(Success({})) withoutResults (_ => Failure("Could not save Person"))).
+    (save a Person withValues Person(nameField === "sanj") withResults(Empty) withoutResults (_ => Failure("Could not save Person"))).
             execute verifyFailure (Person.expectedError)
   }
 

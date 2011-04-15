@@ -14,6 +14,8 @@ trait AkuruGlobalFunctions {
 
   def Success[R](value:R): WorkResult[R] = Right(value)
 
+  def Empty: WorkResult[Unit] = Right()
+
   def Failure[R](error:String): WorkResult[R] = Left(error)
 
 }

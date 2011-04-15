@@ -21,14 +21,14 @@ class FindDSLSpec extends AkuruSpecSupport {
               blogs(0).title.value should equal ("sample1")
               blogs(1).title.value should equal ("sample2")
               blogs(2).title.value should equal ("sample3")
-              Success({})
+              Empty
             } withoutResults Failure("Expected 3 got 0"))} withoutResults ((blog, wr) => Failure("Could not save Blog: " + blog.title.value)))}).
     execute verifySuccess
   }
 
   it should "return zero results if there are no matches" in {
     (drop collection Blog withResults {
-      +> (find * Blog where titleField === (".*"/) withResults { b => Failure("Expected 0 but received: " + b.size) } withoutResults Success({}))
+      +> (find * Blog where titleField === (".*"/) withResults { b => Failure("Expected 0 but received: " + b.size) } withoutResults Empty)
     }).execute verifySuccess
   }
 
@@ -56,7 +56,7 @@ class FindDSLSpec extends AkuruSpecSupport {
   it should "handle exception thrown by the withoutResults function" in {
     (drop collection Blog withResults {
       +> (save a Blog withValues (Blog(titleField === "SkidRow", labelsField === Seq("80s", "Rock"))) withResults {
-        +> (find * Blog where titleField === ("Blah*"/) withResults (_ => Success({})) withoutResults ex("withoutResults threw an Exception"))
+        +> (find * Blog where titleField === ("Blah*"/) withResults (_ => Empty) withoutResults ex("withoutResults threw an Exception"))
       } withoutResults (wr => Failure("Could not save Blog")))
     }).execute verifyFailure ("withoutResults threw an Exception")
   }
@@ -88,7 +88,7 @@ class FindDSLSpec extends AkuruSpecSupport {
           blogs.size should equal (2)
           blogs(0).title.value should equal ("Apple")
           blogs(1).title.value should equal ("Orange")
-          Success({})
+          Empty
         } withoutResults Failure("Expected 2 but received 0."))
       } withoutResults((blog, wr) => Failure("Could not save Blog: " + blog)))
     }).execute verifySuccess

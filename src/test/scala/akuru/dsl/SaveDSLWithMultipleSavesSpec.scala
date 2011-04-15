@@ -23,7 +23,7 @@ final class SaveDSLWithMultipleSavesSpec extends AkuruSpecSupport {
                   blogs(0).title.value should equal ("sample1")
                   blogs(1).title.value should equal ("sample2")
                   blogs(2).title.value should equal ("sample3")
-                  Success({})
+                  Empty
             } withoutResults Failure("Expected 3 got 0"))} withoutResults ((blog, wr) => Failure("Could not save Blog: " + blog.title.value)))})
       }).execute verifySuccess
   }
@@ -32,13 +32,13 @@ final class SaveDSLWithMultipleSavesSpec extends AkuruSpecSupport {
     (save * Blog withValues (Seq(Blog(titleField === "Monads", labelsField === Seq("FP")),
                               exceptionBlog,
                               Blog(titleField === "Monoids", labelsField === Seq("FP"))))
-            withResults (Success({})) withoutResults ((blog, _) => Failure("Could not save Blog: " + blog))).
+            withResults (Empty) withoutResults ((blog, _) => Failure("Could not save Blog: " + blog))).
     execute verifyFailure (expectedError)
   }
 
   it should ("handle Exceptions that occur during save execution") in {
     import Person._
-    (save * Person withValues Seq(Person(nameField === "sanj")) withResults(Success({})) withoutResults ((_,_) => Failure("Could not save Person"))).
+    (save * Person withValues Seq(Person(nameField === "sanj")) withResults(Empty) withoutResults ((_,_) => Failure("Could not save Person"))).
             execute verifyFailure (Person.expectedError)
   }
 
