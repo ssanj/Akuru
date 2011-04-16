@@ -6,30 +6,29 @@ package akuru
 
 import MongoTypes.MongoCollection
 
-final class AkuruMongoWrapperSaveManySpec extends AkuruSpecSupport with AkuruMongoWrapper {
-
-  import Blog._
-  val singleBlog:Seq[Blog] = Seq(Blog(titleField === "blah"))
-  val multipleBlogs:Seq[Blog] = Seq(singleBlog(0), Blog(titleField === "misc"), Blog(titleField === "meh"))
-  implicit val dbName:DBName[Blog] = new DBName[Blog] { val name = "" }
-
-  def colProvider(f: => MongoCollection)(dbName:String, colName:String): MongoCollection = f
+//TODO: Add more scenarios for failure/success/exception combinations
+final class AkuruMongoWrapperSaveManySpec extends AkuruSpecSupport with AkuruMongoWrapper with AkuruMongoWrapperSaveCommon {
 
   "An AkuruMongoWrapper calling SaveMany" should "call the Failure function when a save fails" in {
     def onSuccess: WorkResult[Unit] = fail("Success should not be called on a Failure")
-    def onFailure(blog:Blog, wr:MongoWriteResult): WorkResult[Unit] = { blog.title.value should equal ("blah"); Empty }
+
+    def onFailure(blog:Blog, wr:MongoWriteResult): WorkResult[Unit] = {
+      blog.title.value should equal ("blah")
+      wr should be theSameInstanceAs (InvalidMongoWriteResult)
+      Empty
+    }
+
     val wu = aSaveMany[Blog, Unit](singleBlog)(onSuccess)(onFailure(_, _))
     wu(colProvider(InvalidMongoCollection)) verifySuccess
   }
 
   it should "call the success function when a save succeeds" in {
-    def onSuccess: WorkResult[Unit] = Empty
     def onFailure(blog:Blog, wr:MongoWriteResult): WorkResult[Unit] = fail("Expected success, but failed on Blog: " + blog)
-    val wu = aSaveMany[Blog, Unit](singleBlog)(onSuccess)(onFailure(_, _))
+    val wu = aSaveMany[Blog, Unit](singleBlog)(Empty)(onFailure(_, _))
     wu(colProvider(ValidMongoCollection)) verifySuccess
   }
 
-  it should "return handle Exceptions thrown when saving" in {
+  it should "not call the success or failure functions when an Exception is thrown" in {
     def onSuccess: WorkResult[Unit] = fail("Success should not be called on an Exception")
     def onFailure(blog:Blog, wr:MongoWriteResult): WorkResult[Unit] = fail("Failure should not be called on an Exception")
 
@@ -45,31 +44,13 @@ final class AkuruMongoWrapperSaveManySpec extends AkuruSpecSupport with AkuruMon
   }
 
   it should "call the success function if all saves pass" in {
-    def onSuccess: WorkResult[Unit] = Empty
     def onFailure(blog:Blog, wr:MongoWriteResult): WorkResult[Unit] = fail("Expected success but failed on Blog: " + blog)
-    val wu = aSaveMany[Blog, Unit](multipleBlogs)(onSuccess)(onFailure(_, _))
+    val wu = aSaveMany[Blog, Unit](multipleBlogs)(Empty)(onFailure(_, _))
     wu(colProvider(ValidMongoCollection)) verifySuccess
-  }
-
-  class ValidMongoWriteResult extends MongoWriteResult(null) { override def ok: Boolean = true }
-
-  class InvalidMongoWriteResult extends MongoWriteResult(null) { override def ok: Boolean = false }
-
-  object InvalidMongoCollection extends MongoCollection(null) {
-      override def aSave[T <: DomainObject : DomainToMongo](value: => T): Either[String, MongoWriteResult] = Right(new InvalidMongoWriteResult)
-  }
-
-  object ValidMongoCollection extends MongoCollection(null) {
-      override def aSave[T <: DomainObject : DomainToMongo](value: => T): Either[String, MongoWriteResult] = Right(new ValidMongoWriteResult)
-  }
-
-  object ExceptionalMongoCollection extends MongoCollection(null) {
-     val errorMessage = "Could not save object due to Exception."
-      override def aSave[T <: DomainObject : DomainToMongo](value: => T): Either[String, MongoWriteResult] = Left(errorMessage)
   }
 
   class FailOnMongoCollection(blog:Blog) extends MongoCollection(null) {
       override def aSave[T <: DomainObject : DomainToMongo](value: => T): Either[String, MongoWriteResult] =
-        Right(if (!(blog eq value)) new ValidMongoWriteResult else new InvalidMongoWriteResult)
+        Right(if (!(blog eq value)) ValidMongoWriteResult else InvalidMongoWriteResult)
   }
 }

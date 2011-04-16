@@ -8,6 +8,7 @@ import org.scalatest.{FlatSpec, Assertions}
 import org.scalatest.matchers.ShouldMatchers
 import akuru.dsl.{AkuruDSL2, DSLTools}
 import akuru.domain.TestDomainObjects
+import MongoTypes.MongoCollection
 
 trait AkuruSpecSupport extends FlatSpec
                             with ShouldMatchers
@@ -49,4 +50,6 @@ trait AkuruSpecSupport extends FlatSpec
   val expectedError = "ExceptionalBlog threw an Exception on Blog creation!Whoops"
 
   def exceptionBlog():Blog = throw new RuntimeException(expectedError)
+
+  def colProvider(f: => MongoCollection)(dbName:String, colName:String): MongoCollection = f
 }

@@ -10,11 +10,8 @@ final class AkuruMongoWrapperDropSpec extends AkuruSpecSupport with AkuruMongoWr
 
   implicit val dbName:DBName[Blog] = new DBName[Blog] { val name = "" }
 
-  def colProvider(f: => MongoCollection)(dbName:String, colName:String): MongoCollection = f
-
   "An AkuruMongoWrapper calling drop" should "call success if the drop was successful" in {
-    def onSuccess: WorkResult[Unit] = Empty
-    val wu = aDrop[Blog, Unit](onSuccess)
+    val wu = aDrop[Blog, Unit](Empty)
     wu(colProvider(ValidMongoCollection)) verifySuccess
   }
 
