@@ -5,9 +5,8 @@
 package akuru
 
 import MongoTypes.MongoCollection
-import org.scalatest.mock.MockitoSugar
 
-final class AkuruMongoWrapperSaveManySpec extends AkuruSpecSupport with AkuruMongoWrapper with MockitoSugar {
+final class AkuruMongoWrapperSaveManySpec extends AkuruSpecSupport with AkuruMongoWrapper {
 
   import Blog._
   val singleBlog:Seq[Blog] = Seq(Blog(titleField === "blah"))
@@ -16,7 +15,7 @@ final class AkuruMongoWrapperSaveManySpec extends AkuruSpecSupport with AkuruMon
 
   def colProvider(f: => MongoCollection)(dbName:String, colName:String): MongoCollection = f
 
-  "An AkuruMongoWrapper" should "call the Failure function when a save fails" in {
+  "An AkuruMongoWrapper calling SaveMany" should "call the Failure function when a save fails" in {
     def onSuccess: WorkResult[Unit] = fail("Success should not be called on a Failure")
     def onFailure(blog:Blog, wr:MongoWriteResult): WorkResult[Unit] = { blog.title.value should equal ("blah"); Empty }
     val wu = aSaveMany[Blog, Unit](singleBlog)(onSuccess)(onFailure(_, _))

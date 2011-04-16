@@ -7,7 +7,6 @@ package akuru
 import MongoTypes.MongoCursor
 import Tools._
 
-//TODO: Test
 trait AkuruMongoWrapper {
 
   def afind[T <: DomainObject : CollectionName : DBName : MongoToDomain, R](f: => MongoObject)(c: MongoCursor => MongoCursor)
