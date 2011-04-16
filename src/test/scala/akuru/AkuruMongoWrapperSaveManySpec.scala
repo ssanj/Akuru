@@ -7,7 +7,7 @@ package akuru
 import MongoTypes.MongoCollection
 import org.scalatest.mock.MockitoSugar
 
-final class AkuruMongoWrapperSpec extends AkuruSpecSupport with AkuruMongoWrapper with MockitoSugar {
+final class AkuruMongoWrapperSaveManySpec extends AkuruSpecSupport with AkuruMongoWrapper with MockitoSugar {
 
   import Blog._
   val singleBlog:Seq[Blog] = Seq(Blog(titleField === "blah"))
